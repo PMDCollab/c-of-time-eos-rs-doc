@@ -44,6 +44,10 @@ jobs:
             --no-deps
             --target-dir .
 
+      - name: Remove built objects
+        run:
+          rm debug armv5te-none-ndseoseabi-na/debug -rf
+
       - name: Commit and Push
         uses: EndBug/add-and-commit@v7
         with:
