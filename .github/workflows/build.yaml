@@ -8,7 +8,6 @@ name: eos-rs docs
 
 jobs:
   build-docs:
-    name: Test Suite
     runs-on: ubuntu-latest
     steps:
       - name: Checkout c-of-time-eos-rs-doc
