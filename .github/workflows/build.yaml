@@ -30,7 +30,7 @@ jobs:
 
       - name: Remove old docs
         run:
-          rm armv5te-none-ndseoseabi-na debug -rf
+          rm armv5te-none-ndseoseabi-na -rf
 
       - name: Run cargo doc
         uses: actions-rs/cargo@v1
@@ -43,10 +43,6 @@ jobs:
             --target _build/rust/armv5te-none-ndseoseabi-na.json
             --no-deps
             --target-dir .
-
-      - name: Remove built objects
-        run:
-          rm debug armv5te-none-ndseoseabi-na/debug -rf
 
       - name: Commit and Push
         uses: EndBug/add-and-commit@v7

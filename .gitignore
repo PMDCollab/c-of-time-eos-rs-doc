@@ -1,1 +1,3 @@
 _build/
+debug/
+armv5te-none-ndseoseabi-na/debug/
