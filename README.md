@@ -1,5 +1,5 @@
 # eos-rs Documentation
-This is the documentation for the `eos-rs` crate found at <https://github.com/tech-ticks/c-of-time/tree/rust-runtime/rust/eos-rs>.
+This is the documentation for the `eos-rs` crate found at <https://github.com/tech-ticks/c-of-time/tree/main/rust/eos-rs>.
 
 You can access the documentation at <https://eosrs.pmdcollab.org>.
 
