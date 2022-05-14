@@ -1,0 +1,49 @@
+on: 
+  workflow_dispatch: {}
+  repository_dispatch: {}
+  schedule:
+    - cron: "5 4 * * *"
+
+name: eos-rs docs
+
+jobs:
+  build-docs:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout c-of-time-eos-rs-doc
+        uses: actions/checkout@v3
+
+      - name: Checkout c-of-time
+        uses: actions/checkout@v3
+        with:
+          # TODO: this will be updated when merged.
+          repository: SkyTemple/c-of-time
+          ref: rust-runtime
+          path: _build
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          profile: minimal
+          components: rust-src, rust-docs
+          override: true
+
+      - name: Run cargo doc
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: >-
+            --package eos-rs
+            -Zbuild-std=core,alloc
+            --manifest-path _build/rust/eos-rs/Cargo.toml
+            --target _build/rust/armv5te-none-ndseoseabi-na.json
+            --no-deps
+            --target-dir .
+
+      - name: Commit and Push
+        uses: EndBug/add-and-commit@v7
+        with:
+          add: .
+          message: 'Documentation update'
+          push: false
