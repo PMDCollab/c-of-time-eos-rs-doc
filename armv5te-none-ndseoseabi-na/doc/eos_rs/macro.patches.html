@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This generates the entrypoints for item &amp; move effects and special processes. This macro needs to be called exactly once and only in the `main` module."><meta name="keywords" content="rust, rustlang, rust-lang, patches"><title>patches in eos_rs - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../eos_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../eos_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In eos_rs</a></h2><div id="sidebar-vars" data-name="patches" data-ty="macro" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../eos_rs/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Macro <a href="index.html">eos_rs</a>::<wbr><a class="macro" href="#">patches</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust macro"><code>patches!() { /* proc-macro */ }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This generates the entrypoints for item &amp; move effects and special processes.
+This macro needs to be called exactly once and only in the <code>main</code> module.</p>
+<h2 id="arguments"><a href="#arguments">Arguments</a></h2>
+<ul>
+<li>All but the last argument can be one of these:
+<ul>
+<li><code>Raw Patch</code></li>
+<li><code>Item Effect</code></li>
+<li><code>Move Effect</code></li>
+<li><code>Special Process</code></li>
+</ul>
+</li>
+<li>The last argument is optional and can be <code>ASM glue code</code>.</li>
+</ul>
+<h3 id="raw-patch"><a href="#raw-patch">Raw Patch</a></h3>
+<p>A raw patch that can be used any way you want. You will need to add <code>ASM glue code</code>
+that will actually branch to this patch for it to actually do anything.</p>
+<p>The patch function MUST be <code>extern &quot;C&quot;</code>, <code>pub</code> and be annotated with <code>#[no_mangle]</code>.
+The arguments it receives depend on the glue code / where it is inserted in the machine code
+of the ROM.</p>
+<p>Raw patches must call [<code>eos_rs::log_impl::register_logger</code>] for log macros to work.</p>
+<h4 id="syntax-of-argument"><a href="#syntax-of-argument">Syntax of argument</a></h4>
+<p><code>&lt;Function Name; Rust Identifier&gt;</code></p>
+<h4 id="signature-of-raw-patch-functions-registered-this-way"><a href="#signature-of-raw-patch-functions-registered-this-way">Signature of raw patch functions registered this way:</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">no_mangle</span>]</span> <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="comment">/* ? */</span>) <span class="comment">/* -&gt; ? */</span> { <span class="comment">/* ... */</span> }</code></pre></div>
+<p>Can be optionally marked unsafe.</p>
+<h4 id="note"><a href="#note">Note</a></h4>
+<p>At the present time, defining raw patches in this macro doesn’t actually do anything.
+Your patch will work just fine without it, however this could change in the future,
+so please add your patches.</p>
+<h3 id="item-effect"><a href="#item-effect">Item Effect</a></h3>
+<p>Registers a function that will be called for the defined item when it is used in a dungeon.</p>
+<h4 id="syntax-of-argument-1"><a href="#syntax-of-argument-1">Syntax of argument</a></h4>
+<p><code>&lt;Function Name; Rust Identifier&gt;: item_effect &lt;Item ID; Literal number or Path&gt;</code></p>
+<h4 id="signature-of-raw-patch-functions-registered-this-way-1"><a href="#signature-of-raw-patch-functions-registered-this-way-1">Signature of raw patch functions registered this way:</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(
+    <span class="ident">effects</span>: <span class="kw-2">&amp;</span><span class="ident">eos_rs::api::dungeon_mode::DungeonEffectsEmitter</span>,
+    <span class="ident">user</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
+    <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
+    <span class="ident">used_item</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonItem</span>,
+    <span class="ident">_is_thrown</span>: <span class="ident">bool</span>
+) { <span class="comment">/* ... */</span> }</code></pre></div>
+<h3 id="move-effect"><a href="#move-effect">Move Effect</a></h3>
+<p>Registers a function that will be called for the defined moved when it is used in a dungeon.</p>
+<h4 id="syntax-of-argument-2"><a href="#syntax-of-argument-2">Syntax of argument</a></h4>
+<p><code>&lt;Function Name; Rust Identifier&gt;: move_effect &lt;Move ID; Literal number or Path&gt;</code></p>
+<h4 id="signature-of-raw-patch-functions-registered-this-way-2"><a href="#signature-of-raw-patch-functions-registered-this-way-2">Signature of raw patch functions registered this way:</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(
+    <span class="ident">effects</span>: <span class="kw-2">&amp;</span><span class="ident">eos_rs::api::dungeon_mode::DungeonEffectsEmitter</span>,
+    <span class="ident">user</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
+    <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
+    <span class="ident">used_move</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::Move</span>
+) { <span class="comment">/* ... */</span> }</code></pre></div>
+<h3 id="special-process"><a href="#special-process">Special Process</a></h3>
+<p>Registers a function that can be called from the script engine using the “special process”
+mechanism.</p>
+<h4 id="syntax-of-argument-3"><a href="#syntax-of-argument-3">Syntax of argument</a></h4>
+<p><code>&lt;Function Name; Rust Identifier&gt;: special_process &lt;Process ID; Literal number&gt;</code></p>
+<h4 id="signature-of-raw-patch-functions-registered-this-way-3"><a href="#signature-of-raw-patch-functions-registered-this-way-3">Signature of raw patch functions registered this way:</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="ident">arg1</span>: <span class="ident">i16</span>, <span class="ident">arg2</span>: <span class="ident">i16</span>, <span class="ident">ov11</span>: <span class="kw-2">&amp;</span><span class="ident">eos_rs::api::overlay::OverlayLoadLease</span><span class="op">&lt;</span><span class="number">11</span><span class="op">&gt;</span>) { <span class="comment">/* ... */</span> }</code></pre></div>
+<h3 id="asm-glue-code"><a href="#asm-glue-code">ASM glue code</a></h3>
+<p>This is a literal string. It will later during the build process be converted into a <code>cotpatch</code>
+file that is placed in the <code>patches/</code> directory of <code>c-of-time</code>.</p>
+<p>See the documentation in the <code>README.md</code> of the <code>c-of-time</code> repository for more information
+(section <code>Usage</code>; <a href="https://github.com/tech-ticks/c-of-time#usage">on Github</a>).</p>
+<h2 id="what-this-will-generate"><a href="#what-this-will-generate">What this will generate</a></h2>
+<p>This will generate three functions at the place it’s called:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="doccomment">/// This function is called from C code of `c-of-time` (see `src/item_effects.c` in the</span>
+<span class="doccomment">/// `c-of-time` repository).</span>
+<span class="doccomment">/// It will select all item effects defined in this macro for the related item and call it.</span>
+<span class="doccomment">/// This function will also setup the logger.</span>
+<span class="doccomment">/// It will log a warning if it can&#39;t find any item effects.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// NOTE: By default `src/item_effects.c` is written in a way that will only call</span>
+<span class="doccomment">/// the Rust codebase, if there is no item effect already defined in C code.</span>
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">eos_rs_apply_item_effect</span>(
+    <span class="ident">user</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
+    <span class="ident">target</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
+    <span class="ident">used_item</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::item</span>,
+    <span class="ident">is_thrown</span>: <span class="ident">eos_rs::ffi::bool_</span>
+) -&gt; <span class="ident">eos_rs::ffi::bool_</span> { <span class="comment">/* ... */</span> }
+
+<span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for move effects.</span>
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">eos_rs_apply_move_effect</span>(
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::move_effect_input</span>,
+    <span class="ident">user</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
+    <span class="ident">target</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
+    <span class="ident">used_move</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::move_</span>
+) -&gt; <span class="ident">eos_rs::ffi::bool_</span> { <span class="comment">/* ... */</span> }
+
+<span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for special processes.</span>
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">eos_rs_call_special_process</span>(
+    <span class="ident">unknown</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::undefined4</span>,
+    <span class="ident">special_process_id</span>: <span class="ident">eos_rs::ctypes::c_uint</span>,
+    <span class="ident">arg1</span>: <span class="ident">eos_rs::ctypes::c_short</span>,
+    <span class="ident">arg2</span>: <span class="ident">eos_rs::ctypes::c_short</span>,
+) { <span class="comment">/* ... */</span> }</code></pre></div>
+<h2 id="example"><a href="#example">Example</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">eos_rs_proc::patches</span>;  <span class="comment">// use `eos_rs::patches` from public code. The proc crate is private.</span>
+
+<span class="comment">// `has_high_health`, `print_args` etc. are functions.</span>
+<span class="comment">// See `rust/src/main.rs` in the default `c-of-time` repository for more details.</span>
+<span class="macro">patches!</span> {
+    <span class="ident">has_high_health</span>,
+    <span class="ident">print_args</span>: <span class="ident">special_process</span> <span class="number">101</span>,
+    <span class="ident">just_panic</span>: <span class="ident">special_process</span> <span class="number">102</span>,
+    <span class="ident">oran_berry_burn</span>: <span class="ident">item_effect</span> <span class="ident">eos_rs::item_catalog::ITEM_ORAN_BERRY</span>,
+    <span class="ident">cut_badly_poisoned</span>: <span class="ident">eos_rs::move_effect</span> <span class="ident">move_catalog::MOVE_CUT</span>,
+    <span class="string">&quot;
+HasLowHealth+0:
+  B has_high_health
+    &quot;</span>
+}</code></pre></div>
+<h2 id="notes"><a href="#notes">Notes</a></h2>
+<p>The ASM glue code is not processed at runtime, this is done by the <code>eos-rs-build</code> crate
+during build.
+It will extract the ASM glue code to the <code>patches/</code> directory in the <code>c-of-time</code>
+base directory (in the default configuration of the <code>c-of-time</code> repository.</p>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (f1f721e64 2022-05-13)" ></div>
+</body></html>

@@ -1,0 +1,6 @@
+$ mkdir -p "/home/runner/work/c-of-time-eos-rs-doc/c-of-time-eos-rs-doc/./armv5te-none-ndseoseabi-na/debug/build/az-4fb01bc534c6f900/out/try_track_caller"
+$ cd "/home/runner/work/c-of-time-eos-rs-doc/c-of-time-eos-rs-doc/./armv5te-none-ndseoseabi-na/debug/build/az-4fb01bc534c6f900/out/try_track_caller"
+$ printf '%s' "// try_tra"... > "/home/runner/work/c-of-time-eos-rs-doc/c-of-time-eos-rs-doc/./armv5te-none-ndseoseabi-na/debug/build/az-4fb01bc534c6f900/out/try_track_caller/try_track_caller.rs"
+$ "rustc" "try_track_caller.rs" "--emit=dep-info,metadata" >& /dev/null
+cargo:rustc-cfg=track_caller
+$ rm -r "/home/runner/work/c-of-time-eos-rs-doc/c-of-time-eos-rs-doc/./armv5te-none-ndseoseabi-na/debug/build/az-4fb01bc534c6f900/out/try_track_caller"

@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["VARTYPE_BIT",""],["VARTYPE_INT16",""],["VARTYPE_INT32",""],["VARTYPE_INT8",""],["VARTYPE_NONE",""],["VARTYPE_SPECIAL",""],["VARTYPE_STRING",""],["VARTYPE_UINT16",""],["VARTYPE_UINT32",""],["VARTYPE_UINT8",""]],"type":[["Type",""]]});

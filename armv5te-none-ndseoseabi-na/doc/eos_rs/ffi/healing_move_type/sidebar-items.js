@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["HEALING_MOVE_FAINT",""],["HEALING_MOVE_NORMAL",""],["HEALING_MOVE_SPECIAL",""]],"type":[["Type",""]]});

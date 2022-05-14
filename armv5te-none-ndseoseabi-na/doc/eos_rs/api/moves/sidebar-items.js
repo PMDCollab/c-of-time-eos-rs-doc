@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["HealingMoveType","Seems to be used to differentiate certain healing moves. This might also be a bitfield rather than an enum?"],["MoveRange","Move range."],["MoveTarget","Move target (i.e., who does a move affect when used?)."]],"trait":[["MoveExt","Game functions related to [`Move`]s."]]});

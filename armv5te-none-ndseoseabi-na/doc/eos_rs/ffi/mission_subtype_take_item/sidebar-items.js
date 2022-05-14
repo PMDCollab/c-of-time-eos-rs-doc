@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MISSION_TAKE_ITEM_FLEEING_OUTLAW",""],["MISSION_TAKE_ITEM_HIDDEN_OUTLAW",""],["MISSION_TAKE_ITEM_NORMAL_OUTLAW",""]],"type":[["Type",""]]});

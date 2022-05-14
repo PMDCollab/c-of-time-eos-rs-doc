@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["eos_rs"] = [{"text":"impl Drop for <a class=\"struct\" href=\"eos_rs/api/io/file/struct.File.html\" title=\"struct eos_rs::api::io::file::File\">File</a>","synthetic":false,"types":["eos_rs::api::io::file::File"]},{"text":"impl Drop for <a class=\"struct\" href=\"eos_rs/api/wte/struct.OwnedWte.html\" title=\"struct eos_rs::api::wte::OwnedWte\">OwnedWte</a>","synthetic":false,"types":["eos_rs::api::wte::OwnedWte"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["TEXFORMAT_16COLOR",""],["TEXFORMAT_256COLOR",""],["TEXFORMAT_4COLOR",""],["TEXFORMAT_A3I5",""],["TEXFORMAT_A5I3",""],["TEXFORMAT_COMPRESSED",""],["TEXFORMAT_DIRECT",""],["TEXFORMAT_NONE",""]],"type":[["Type",""]]});

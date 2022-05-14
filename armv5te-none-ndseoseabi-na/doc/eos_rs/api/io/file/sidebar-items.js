@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["read","Loads a file from ROM by filepath into a heap-allocated buffer."]],"struct":[["File",""]]});

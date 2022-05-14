@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["register_logger","Registers the logger at the [`log`] crate. This is safe to be called multiple times."]]});

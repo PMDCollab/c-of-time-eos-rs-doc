@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MOBILITY_HOVERING",""],["MOBILITY_INTANGIBLE",""],["MOBILITY_LAVA",""],["MOBILITY_NORMAL",""],["MOBILITY_SECONDARY",""],["MOBILITY_WATER",""]],"type":[["Type",""]]});

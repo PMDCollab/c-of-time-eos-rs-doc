@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["RANGE_FLOOR",""],["RANGE_FRONT",""],["RANGE_FRONT_10",""],["RANGE_FRONT_2",""],["RANGE_FRONT_AND_SIDES",""],["RANGE_FRONT_WITH_CORNER_CUTTING",""],["RANGE_ICE_SHARD",""],["RANGE_NEARBY",""],["RANGE_ROOM",""],["RANGE_SPECIAL",""],["RANGE_USER",""]],"type":[["Type",""]]});

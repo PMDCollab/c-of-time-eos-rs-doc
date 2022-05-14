@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["CATEGORY_NONE",""],["CATEGORY_PHYSICAL",""],["CATEGORY_SPECIAL",""],["CATEGORY_STATUS",""]],"type":[["Type",""]]});

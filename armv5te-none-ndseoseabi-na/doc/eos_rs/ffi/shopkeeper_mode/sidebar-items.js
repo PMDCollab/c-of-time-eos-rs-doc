@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["SHOPKEEPER_MODE_ATTACK_ENEMIES",""],["SHOPKEEPER_MODE_ATTACK_TEAM",""],["SHOPKEEPER_MODE_NORMAL",""],["SHOPKEEPER_MODE_SHOPKEEPER",""]],"type":[["Type",""]]});

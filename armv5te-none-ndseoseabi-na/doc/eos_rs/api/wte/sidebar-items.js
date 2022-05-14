@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["OwnedWte","A Rust-owned WTE file."]]});
