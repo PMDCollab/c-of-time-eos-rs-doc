@@ -1,5 +1,0 @@
-cargo:rerun-if-changed=build.rs
-cargo:compiler-rt=/home/runner/.cargo/git/checkouts/compiler-builtins-f829ada454dc946b/d728c5e/compiler-rt
-cargo:rustc-cfg=feature="unstable"
-cargo:rustc-cfg=feature="mem"
-cargo:rustc-cfg=kernel_user_helpers
