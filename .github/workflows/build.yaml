@@ -28,6 +28,10 @@ jobs:
           components: rust-src, rust-docs
           override: true
 
+      - name: Remove old docs
+        run:
+          rm armv5te-none-ndseoseabi-na debug -rf
+
       - name: Run cargo doc
         uses: actions-rs/cargo@v1
         with:
