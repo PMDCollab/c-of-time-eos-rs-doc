@@ -3,7 +3,9 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../eos_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../eos_rs/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../eos_rs/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -183,20 +185,12 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::DungeonEntity</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay</span>::{<span class="ident">CreatableWithLease</span>, <span class="ident">OverlayLoadLease</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::random</span>::{<span class="ident">rand_i32_internal</span>, <span class="ident">rand_u16_internal</span>, <span class="ident">Rng</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::random</span>::{<span class="ident">rand_u16_internal</span>, <span class="ident">Rng</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes::c_int</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+<span class="kw">use</span> <span class="ident">core::hint::unreachable_unchecked</span>;
 <span class="kw">use</span> <span class="ident">core::ops::RangeBounds</span>;
 
 <span class="doccomment">/// Helper struct for dungeon RNG.</span>
@@ -219,12 +213,16 @@
         <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonRand16Bit</span>() <span class="kw">as</span> <span class="ident">u16</span> }
     }
 
+    <span class="doccomment">/// NOT SUPPORTED BY THIS.</span>
     <span class="kw">fn</span> <span class="ident">rand32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonRandInt</span>(<span class="ident">u32::MAX</span>) }
+        <span class="comment">// SAFETY: This will never be called. It is not used in this module and it is not exposed.</span>
+        <span class="kw">unsafe</span> { <span class="ident">unreachable_unchecked</span>() }
     }
 
-    <span class="kw">fn</span> <span class="ident">rand_range32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">c_int</span>, <span class="ident">y</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonRandRange</span>(<span class="ident">x</span>, <span class="ident">y</span>) }
+    <span class="doccomment">/// NOT SUPPORTED BY THIS.</span>
+    <span class="kw">fn</span> <span class="ident">rand_range32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_x</span>: <span class="ident">c_int</span>, <span class="ident">_y</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
+        <span class="comment">// SAFETY: This will never be called. It is not used in this module and it is not exposed.</span>
+        <span class="kw">unsafe</span> { <span class="ident">unreachable_unchecked</span>() }
     }
 }
 
@@ -302,20 +300,6 @@
         <span class="ident">rand_u16_internal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">DungeonRngImpl</span>, <span class="ident">range</span>)
     }
 
-    <span class="doccomment">/// Generates a random number between the beginning and end of the range.</span>
-    <span class="doccomment">/// If the range is unbounded, min and/or max values are bound to</span>
-    <span class="doccomment">/// [`i32::MIN`] and [`i32::MAX`] respectively.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this uses the dungeon PRNG as opposed to the functions in [`crate::api::random`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For details see [`Self::rand_u16`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The range must contain at least one element, or this will panic.</span>
-    <span class="doccomment">/// Same if the start bound is excluded.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rand_i32</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="ident">i32</span> {
-        <span class="ident">rand_i32_internal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">DungeonRngImpl</span>, <span class="ident">range</span>)
-    }
-
     <span class="doccomment">/// Compute a pseudorandom integer on the interval [0, 100) using the dungeon PRNG.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rand100</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonRand100</span>() }
@@ -382,5 +366,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (70b3681bf 2022-05-14)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (42e1761c7 2022-05-15)" ></div>
 </body></html>
