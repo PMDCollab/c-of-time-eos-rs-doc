@@ -86,33 +86,6 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The dungeon generation as a collection of traits with two implementations.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - The game&#39;s implementation ([`game_builtin`]). Limited in flexibility. Works on the current</span>
@@ -181,29 +154,6 @@
 <span class="doccomment">/// Generator for entities on a dungeon floor.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonEntityGeneration</span> {
     <span class="doccomment">/// Spawn all non-enemy entities, which includes stairs, items, traps, and the player.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Most entities are spawned randomly on a subset of permissible tiles.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Stairs are spawned if they don&#39;t already exist on the floor, and hidden stairs of the</span>
-    <span class="doccomment">/// specified type are also spawned if configured as long as there are at least 2 floors left</span>
-    <span class="doccomment">/// in the dungeon. Stairs can spawn on any tile that has open terrain, is in a room, isn&#39;t in</span>
-    <span class="doccomment">/// a Kecleon shop, doesn&#39;t already have an enemy spawn, isn&#39;t a hallway junction, and isn&#39;t a</span>
-    <span class="doccomment">/// special tile like a Key door.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Items are spawned both normally in rooms, as well as in walls and Monster Houses. Normal</span>
-    <span class="doccomment">/// items can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon shop</span>
-    <span class="doccomment">/// or Monster House, isn&#39;t a hallway junction, and isn&#39;t a special tile like a Key door.</span>
-    <span class="doccomment">/// Buried items can spawn on any wall tile. Monster House items can spawn on any Monster House</span>
-    <span class="doccomment">/// tile that isn&#39;t in a Kecleon shop and isn&#39;t a hallway junction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Traps are similarly spawned both normally in rooms, as well as in Monster Houses. Normal</span>
-    <span class="doccomment">/// traps can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon shop,</span>
-    <span class="doccomment">/// doesn&#39;t already have an item or enemy spawn, and isn&#39;t a special tile like a Key door.</span>
-    <span class="doccomment">/// Monster House traps follow the same conditions as Monster House items.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The player can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon</span>
-    <span class="doccomment">/// shop, isn&#39;t a hallway junction, doesn&#39;t already have an item, enemy, or trap spawn, and</span>
-    <span class="doccomment">/// isn&#39;t a special tile like a Key door.</span>
     <span class="kw">fn</span> <span class="ident">spawn_non_enemies</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
@@ -211,10 +161,6 @@
     );
 
     <span class="doccomment">/// Spawn all enemies, which includes normal enemies and those in Monster Houses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Normal enemies can spawn on any tile that has open terrain, isn&#39;t in a Kecleon shop, doesn&#39;t already have another entity spawn, and isn&#39;t a special tile like a Key door.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Monster House enemies can spawn on any Monster House tile that isn&#39;t in a Kecleon shop, isn&#39;t where the player spawns, and isn&#39;t a special tile like a Key door.</span>
     <span class="kw">fn</span> <span class="ident">spawn_enemies</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
@@ -222,5 +168,5 @@
     );
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (cd282d7f7 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c06728704 2022-05-19)" ></div>
 </body></html>
