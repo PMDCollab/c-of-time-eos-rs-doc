@@ -29,7 +29,7 @@ however <a href="struct.DungeonGridMutator.html#method.into_inner" title="Self::
 missing values initialized with defaults.</p>
 <p>Note that the game usually works with the assumption that there are exactly 15 rows.
 Using other row sizes may or may not lead to UB with some methods.</p>
-<p>The maximum values for <code>width</code> and <code>height</code> are [<code>GRID_CAPACITY_DIM</code>],
+<p>The maximum values for <code>width</code> and <code>height</code> are <a href="constant.GRID_CAPACITY_DIM.html" title="GRID_CAPACITY_DIM"><code>GRID_CAPACITY_DIM</code></a>,
 otherwise this function will panic.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../../../src/eos_rs/api/dungeon_mode/dungeon_generator/game_builtin/grid.rs.html#150-170">source</a></span><a href="#method.new" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new" class="fnname">new</a>(&amp;self, width: usize, ov29: <a class="struct" href="../../../overlay/struct.OverlayLoadLease.html" title="struct eos_rs::api::overlay::OverlayLoadLease">OverlayLoadLease</a>&lt;29&gt;) -&gt; Self</h4></section></summary><div class="docblock"><p>Initialize a dungeon grid with defaults.</p>
 <p>The grid is an array of grid cells stored in column-major order (!) (such that grid cells
