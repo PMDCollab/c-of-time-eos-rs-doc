@@ -99,7 +99,6 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
-<span id="95">95</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Dealing with [fixed-point numbers](https://en.wikipedia.org/wiki/Fixed-point_arithmetic)</span>
 <span class="doccomment">//! used in the game.</span>
 <span class="doccomment">//!</span>
@@ -167,15 +166,14 @@
 <span class="doccomment">//! [U0]: fixed::types::extra::U0</span>
 <span class="doccomment">//! [U24]: fixed::types::extra::U24</span>
 <span class="doccomment">//! [U32]: fixed::types::extra::U32</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fixed</span>::{<span class="ident">FixedU8</span>, <span class="ident">FixedI8</span>, <span class="ident">FixedU16</span>, <span class="ident">FixedI16</span>, <span class="ident">FixedU32</span>, <span class="ident">FixedI32</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fixed::types</span>::<span class="kw-2">*</span>;
-
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fixed</span>::{<span class="ident">FixedI16</span>, <span class="ident">FixedI32</span>, <span class="ident">FixedI8</span>, <span class="ident">FixedU16</span>, <span class="ident">FixedU32</span>, <span class="ident">FixedU8</span>};
 
 <span class="comment">// Since doctests don&#39;t work, we turn the doctest into a normal unit test here.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">alloc::format</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::I24F8</span>;
+    <span class="kw">use</span> <span class="ident">alloc::format</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_documentation</span>() {
@@ -196,5 +194,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (e6a4afc3a 2022-05-20)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (9257f5aad 2022-05-21)" ></div>
 </body></html>
