@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["AI_CONDITION_ASLEEP",""],["AI_CONDITION_GHOST",""],["AI_CONDITION_HP_25",""],["AI_CONDITION_HP_25_OR_STATUS",""],["AI_CONDITION_NONE",""],["AI_CONDITION_RANDOM",""],["AI_CONDITION_STATUS",""]],"type":[["Type",""]]});

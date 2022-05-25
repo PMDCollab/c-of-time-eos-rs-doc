@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["OBJECTIVE_NORMAL",""],["OBJECTIVE_RESCUE",""],["OBJECTIVE_STORY",""]],"type":[["Type",""]]});
+initSidebarItems({"constant":[["OBJECTIVE_NORMAL",""],["OBJECTIVE_RESCUE",""],["OBJECTIVE_STORY",""],["OBJECTIVE_UNK_GAME_MODE_5",""]],"type":[["Type",""]]});

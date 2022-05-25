@@ -604,11 +604,37 @@
 <span id="597">597</span>
 <span id="598">598</span>
 <span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::type_matchup::Type</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Move index of a monster, used by some functions.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TargetTypeIndex</span> {
     <span class="ident">FirstType</span> <span class="op">=</span> <span class="number">0</span>,
@@ -616,7 +642,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Describes the effectiveness of a move&#39;s type against type(s).</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DungeonTypeMatchup</span> {
     <span class="ident">Immune</span> <span class="op">=</span> <span class="ident">ffi::type_matchup::MATCHUP_IMMUNE</span>,
@@ -642,7 +668,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// The type of an entity in a dungeon.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DungeonEntityType</span> {
     <span class="ident">Nothing</span> <span class="op">=</span> <span class="ident">ffi::entity_type::ENTITY_NOTHING</span>,
@@ -668,7 +694,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// The category of a move.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveCategory</span> {
     <span class="prelude-val">None</span> <span class="op">=</span> <span class="ident">ffi::move_category::CATEGORY_NONE</span>,
@@ -692,7 +718,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// The type of a floor.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FloorType</span> {
     <span class="doccomment">/// The floor is neither a fixed floor nor does it contain a rescue point.</span>
@@ -717,7 +743,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// The type of terrain of a tile.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TerrainType</span> {
     <span class="ident">Wall</span> <span class="op">=</span> <span class="ident">ffi::terrain_type::TERRAIN_WALL</span>,
@@ -741,7 +767,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// The type of secondary terrain of a tile.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SecondaryTerrainType</span> {
     <span class="ident">Water</span> <span class="op">=</span> <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_WATER</span>,
@@ -763,7 +789,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Types of weather.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Weather</span> {
     <span class="ident">Clear</span> <span class="op">=</span> <span class="ident">ffi::weather_id::WEATHER_CLEAR</span>,
@@ -797,7 +823,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Types of weather.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DungeonObjective</span> {
     <span class="ident">Story</span> <span class="op">=</span> <span class="ident">ffi::dungeon_objective::OBJECTIVE_STORY</span>,
@@ -819,7 +845,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Direction on the dungeon grid</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Direction</span> {
     <span class="ident">Down</span> <span class="op">=</span> <span class="ident">ffi::direction_id::DIR_DOWN</span>,
@@ -853,7 +879,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Different types of warp effects</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WarpType</span> {
     <span class="doccomment">/// Warp to a random position</span>
@@ -887,7 +913,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// The status of a monster&#39;s Conversion 2 state.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Conversion2Status</span> {
     <span class="doccomment">/// The monster is not under the effect of Conversion 2.</span>
@@ -911,8 +937,34 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="doccomment">/// Controls whether the loop that runs until the current floor ends should continue</span>
+<span class="doccomment">/// iterating or not and why</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FloorLoopStatus</span> {
+    <span class="doccomment">/// The floor loop keeps executing as normal</span>
+    <span class="ident">Continue</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// The floor loop exits because the leader fainted</span>
+    <span class="ident">LeaderFainted</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// The floor loop exits because the floor is over</span>
+    <span class="ident">NextFloor</span> <span class="op">=</span> <span class="number">2</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ffi::floor_loop_status::Type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FloorLoopStatus</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::floor_loop_status::Type</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
+            <span class="ident">ffi::floor_loop_status::FLOOR_LOOP_CONTINUE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorLoopStatus::Continue</span>),
+            <span class="ident">ffi::floor_loop_status::FLOOR_LOOP_LEADER_FAINTED</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorLoopStatus::LeaderFainted</span>),
+            <span class="ident">ffi::floor_loop_status::FLOOR_LOOP_NEXT_FLOOR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorLoopStatus::NextFloor</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+        }
+    }
+}
+
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Group of mission type on a dungeon floor.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionTypeGroup</span> {
     <span class="ident">RescueClient</span> <span class="op">=</span> <span class="ident">ffi::mission_type::MISSION_RESCUE_CLIENT</span>,
@@ -959,7 +1011,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Specific mission type on a dungeon floor.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionType</span> {
     <span class="ident">RescueClient</span>,
@@ -1027,7 +1079,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Mission subtype for [`MissionType::ExploreWithClient`].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeExplore</span> {
     <span class="ident">Normal</span> <span class="op">=</span> <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_NORMAL</span>,
@@ -1064,7 +1116,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Mission subtype for [`MissionType::TakeItemFromOutlaw`].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeTakeItem</span> {
     <span class="ident">NormalOutlaw</span> <span class="op">=</span> <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_NORMAL_OUTLAW</span>,
@@ -1101,7 +1153,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Mission subtype for [`MissionType::ArrestOutlaw`].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeOutlaw</span> {
     <span class="ident">Normal0</span> <span class="op">=</span> <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_0</span>,
@@ -1156,7 +1208,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Mission subtype for [`MissionType::ChallengeRequest`].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeChallenge</span> {
     <span class="ident">Normal</span> <span class="op">=</span> <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_NORMAL</span>,
@@ -1204,5 +1256,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (ee160f2f5 2022-05-23)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (76761db59 2022-05-24)" ></div>
 </body></html>

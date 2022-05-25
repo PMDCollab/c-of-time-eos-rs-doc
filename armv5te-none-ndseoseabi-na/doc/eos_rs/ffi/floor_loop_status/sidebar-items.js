@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["FLOOR_LOOP_CONTINUE",""],["FLOOR_LOOP_LEADER_FAINTED",""],["FLOOR_LOOP_NEXT_FLOOR",""]],"type":[["Type",""]]});

@@ -200,15 +200,36 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions related to getting information about monster moves.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode::MoveCategory</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::Move</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::move_target_and_range</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Move target (i.e., who does a move affect when used?).</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveTarget</span> {
     <span class="ident">Enemies</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_ENEMIES</span>,
@@ -240,7 +261,7 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Move range.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveRange</span> {
     <span class="ident">Front</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT</span>,
@@ -252,7 +273,7 @@
     <span class="ident">Floor</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FLOOR</span>,
     <span class="ident">User</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_USER</span>,
     <span class="ident">FrontWithCornerCutting</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_WITH_CORNER_CUTTING</span>,
-    <span class="ident">IceShard</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_ICE_SHARD</span>,
+    <span class="ident">Front2WithCornerCutting</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_2_WITH_CORNER_CUTTING</span>,
     <span class="ident">Special</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_SPECIAL</span>,
 }
 
@@ -272,7 +293,9 @@
             <span class="ident">ffi::move_range::RANGE_FRONT_WITH_CORNER_CUTTING</span> =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">MoveRange::FrontWithCornerCutting</span>)
             }
-            <span class="ident">ffi::move_range::RANGE_ICE_SHARD</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveRange::IceShard</span>),
+            <span class="ident">ffi::move_range::RANGE_FRONT_2_WITH_CORNER_CUTTING</span> =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="ident">MoveRange::Front2WithCornerCutting</span>)
+            }
             <span class="ident">ffi::move_range::RANGE_SPECIAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveRange::Special</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
         }
@@ -280,42 +303,89 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Seems to be used to differentiate certain healing moves.</span>
-<span class="doccomment">/// This might also be a bitfield rather than an enum?</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HealingMoveType</span> {
-    <span class="ident">Normal</span> <span class="op">=</span> <span class="ident">ffi::healing_move_type::HEALING_MOVE_NORMAL</span>,
-    <span class="doccomment">/// For Softboiled, Moonlight, Milk Drink, Synthesis, Swallow, Heal Order, and Roost</span>
-    <span class="ident">Special</span> <span class="op">=</span> <span class="ident">ffi::healing_move_type::HEALING_MOVE_SPECIAL</span>,
-    <span class="doccomment">/// For Healing Wish and Lunar Dance</span>
-    <span class="ident">Faint</span> <span class="op">=</span> <span class="ident">ffi::healing_move_type::HEALING_MOVE_FAINT</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="doccomment">/// Conditions checked by the AI to determine when a move should be used.</span>
+<span class="doccomment">/// It does not affect how the move works.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveAiCondition</span> {
+    <span class="prelude-val">None</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_NONE</span>,
+    <span class="doccomment">/// The AI will consider a target elegible wirh a chance equal to the</span>
+    <span class="doccomment">/// move&#39;s &quot;ai_condition_random_chance&quot; value.</span>
+    <span class="ident">Random</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_RANDOM</span>,
+    <span class="doccomment">/// Target has HP &lt;= 25%</span>
+    <span class="ident">Hp25</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25</span>,
+    <span class="doccomment">/// Target has a negative status condition</span>
+    <span class="ident">Status</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_STATUS</span>,
+    <span class="doccomment">/// Target is asleep, napping or in a nightmare</span>
+    <span class="ident">Asleep</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_ASLEEP</span>,
+    <span class="doccomment">/// Target is ghost-type and not exposed</span>
+    <span class="ident">Ghost</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_GHOST</span>,
+    <span class="doccomment">/// Target has HP &lt;= 25% or a negative status condition</span>
+    <span class="ident">Hp25OrStatus</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25_OR_STATUS</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">HealingMoveType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::healing_move_type::Type</span> {
+<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">MoveAiCondition</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::move_ai_condition::Type</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HealingMoveType</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MoveAiCondition</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ffi::healing_move_type::HEALING_MOVE_NORMAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">HealingMoveType::Normal</span>),
-            <span class="ident">ffi::healing_move_type::HEALING_MOVE_SPECIAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">HealingMoveType::Special</span>),
-            <span class="ident">ffi::healing_move_type::HEALING_MOVE_FAINT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">HealingMoveType::Faint</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_NONE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::None</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_RANDOM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Random</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Hp25</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_STATUS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Status</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_ASLEEP</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Asleep</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_GHOST</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Ghost</span>),
+            <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25_OR_STATUS</span> =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Hp25OrStatus</span>)
+            }
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
         }
+    }
+}
+
+<span class="doccomment">/// Range, target and AI data for a move.</span>
+<span class="doccomment">/// Values are None, if they are invalid / non-standard.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoveTargetAndRange</span> {
+    <span class="kw">pub</span> <span class="ident">target</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveTarget</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">range</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveRange</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">ai_condition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveAiCondition</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">unused</span>: <span class="ident">u16</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ffi::move_target_and_range</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MoveTargetAndRange</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tr</span>: <span class="ident">ffi::move_target_and_range</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">MoveTargetAndRange</span> {
+            <span class="ident">target</span>: <span class="ident">tr</span>.<span class="ident">target</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
+            <span class="ident">range</span>: <span class="ident">tr</span>.<span class="ident">range</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
+            <span class="ident">ai_condition</span>: <span class="ident">tr</span>.<span class="ident">ai_condition</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
+            <span class="ident">unused</span>: <span class="ident">tr</span>.<span class="ident">unused</span>(),
+        }
+    }
+}
+
+<span class="doccomment">/// Will fail, if any values are None in MoveTargetAndRange.</span>
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">MoveTargetAndRange</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::move_target_and_range</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">MoveTargetAndRange</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">target</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">range</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">ai_condition</span>.<span class="ident">is_none</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        }
+        <span class="prelude-val">Ok</span>(<span class="ident">ffi::move_target_and_range</span> {
+            <span class="ident">_bitfield_align_1</span>: [],
+            <span class="ident">_bitfield_1</span>: <span class="ident">ffi::move_target_and_range::new_bitfield_1</span>(
+                <span class="ident">value</span>.<span class="ident">target</span>.<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">ffi::move_target::Type</span>,
+                <span class="ident">value</span>.<span class="ident">range</span>.<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">ffi::move_range::Type</span>,
+                <span class="ident">value</span>.<span class="ident">ai_condition</span>.<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">ffi::move_ai_condition::Type</span>,
+                <span class="ident">value</span>.<span class="ident">unused</span>,
+            ),
+        })
     }
 }
 
 <span class="doccomment">/// Game functions related to [`Move`]s.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MoveExt</span> {
     <span class="doccomment">/// Gets the move target-and-range field. See struct move_target_and_range in the C headers.</span>
-    <span class="kw">fn</span> <span class="ident">get_target_and_range</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">is_ai</span>: <span class="ident">bool</span>,
-    ) -&gt; (
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveTarget</span><span class="op">&gt;</span>,
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveRange</span><span class="op">&gt;</span>,
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HealingMoveType</span><span class="op">&gt;</span>,
-        <span class="ident">u16</span>,
-    );
+    <span class="kw">fn</span> <span class="ident">get_target_and_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">is_ai</span>: <span class="ident">bool</span>) -&gt; <span class="ident">MoveTargetAndRange</span>;
 
     <span class="doccomment">/// Gets the base power of the move.</span>
     <span class="kw">fn</span> <span class="ident">get_base_power</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span>;
@@ -339,15 +409,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MoveExt</span> <span class="kw">for</span> <span class="ident">Move</span> {
-    <span class="kw">fn</span> <span class="ident">get_target_and_range</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">is_ai</span>: <span class="ident">bool</span>,
-    ) -&gt; (
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveTarget</span><span class="op">&gt;</span>,
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveRange</span><span class="op">&gt;</span>,
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HealingMoveType</span><span class="op">&gt;</span>,
-        <span class="ident">u16</span>,
-    ) {
+    <span class="kw">fn</span> <span class="ident">get_target_and_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">is_ai</span>: <span class="ident">bool</span>) -&gt; <span class="ident">MoveTargetAndRange</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::GetMoveTargetAndRange</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), <span class="ident">is_ai</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }.<span class="ident">into</span>()
     }
 
@@ -377,24 +439,6 @@
             .<span class="ident">ok</span>()
     }
 }
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">move_target_and_range</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveTarget</span><span class="op">&gt;</span>,
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveRange</span><span class="op">&gt;</span>,
-        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HealingMoveType</span><span class="op">&gt;</span>,
-        <span class="ident">u16</span>,
-    )
-{
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tr</span>: <span class="ident">move_target_and_range</span>) -&gt; <span class="self">Self</span> {
-        (
-            <span class="ident">tr</span>.<span class="ident">target</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
-            <span class="ident">tr</span>.<span class="ident">range</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
-            <span class="ident">tr</span>.<span class="ident">type_</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
-            <span class="ident">tr</span>.<span class="ident">unused</span>(),
-        )
-    }
-}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (ee160f2f5 2022-05-23)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (76761db59 2022-05-24)" ></div>
 </body></html>

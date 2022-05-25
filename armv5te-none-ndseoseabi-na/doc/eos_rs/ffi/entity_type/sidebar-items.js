@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["ENTITY_HIDDEN_STAIRS",""],["ENTITY_ITEM",""],["ENTITY_MONSTER",""],["ENTITY_NOTHING",""],["ENTITY_TRAP",""]],"type":[["Type",""]]});
+initSidebarItems({"constant":[["ENTITY_HIDDEN_STAIRS",""],["ENTITY_ITEM",""],["ENTITY_MONSTER",""],["ENTITY_NOTHING",""],["ENTITY_TEMPORARY",""],["ENTITY_TRAP",""]],"type":[["Type",""]]});
