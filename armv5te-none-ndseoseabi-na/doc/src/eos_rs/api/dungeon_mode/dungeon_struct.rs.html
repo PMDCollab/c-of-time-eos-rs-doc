@@ -1534,7 +1534,7 @@
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">gravity</span> <span class="op">=</span> <span class="ident">gravity</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>
     }
 
-    <span class="doccomment">/// Entity that is taking it&#39;s turn at this moment.</span>
+    <span class="doccomment">/// Entity that is taking its turn at this moment.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_active_entity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">current_active_entity</span>;
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
@@ -1544,7 +1544,7 @@
         }
     }
 
-    <span class="doccomment">/// Entity that is taking it&#39;s turn at this moment.</span>
+    <span class="doccomment">/// Entity that is taking its turn at this moment.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_active_entity_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">current_active_entity</span>;
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
@@ -1667,13 +1667,13 @@
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">skip_faint_animation_flag</span> <span class="op">=</span> <span class="ident">flag</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>
     }
 
-    <span class="doccomment">/// True if the leader is running. Causes the leader&#39;s action for the next tur</span>
+    <span class="doccomment">/// True if the leader is running. Causes the leader&#39;s action for the next turn</span>
     <span class="doccomment">/// to be set to [`ffi::action::ACTION_WALK`] until it hits an obstacle.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_leader_running</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">leader_running</span> <span class="op">&gt;</span> <span class="number">0</span>
     }
 
-    <span class="doccomment">/// True if the leader is running. Causes the leader&#39;s action for the next tur</span>
+    <span class="doccomment">/// True if the leader is running. Causes the leader&#39;s action for the next turn</span>
     <span class="doccomment">/// to be set to [`ffi::action::ACTION_WALK`] until it hits an obstacle.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_leader_running</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">running</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">leader_running</span> <span class="op">=</span> <span class="ident">running</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>
@@ -2292,5 +2292,5 @@
     <span class="ident">res</span>
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (76761db59 2022-05-24)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (4cbaac699 2022-05-25)" ></div>
 </body></html>
