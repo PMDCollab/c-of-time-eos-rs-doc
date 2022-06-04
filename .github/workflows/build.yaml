@@ -16,9 +16,8 @@ jobs:
       - name: Checkout c-of-time
         uses: actions/checkout@v3
         with:
-          # TODO: this will be updated when merged.
           repository: SkyTemple/c-of-time
-          ref: rust-runtime
+          ref: main
           path: _build
 
       - uses: actions-rs/toolchain@v1
