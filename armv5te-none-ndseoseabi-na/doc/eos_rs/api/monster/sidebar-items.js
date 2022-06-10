@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MonsterSpeciesInfo","Metadata of a monster species."]]});
