@@ -64,6 +64,30 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits, enums, structs and functions related to dungeon mode.</span>
 
 <span class="kw">mod</span> <span class="ident">dungeon_struct</span>;
@@ -78,6 +102,8 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dungeon_generator</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::DungeonEntity</span>;
+<span class="kw">use</span> <span class="ident">core::ptr</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dungeon_struct</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">effects</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">entity</span>::<span class="kw-2">*</span>;
@@ -123,6 +149,28 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_both_screens_window_color_to_default</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
     <span class="kw">unsafe</span> { <span class="ident">ffi::SetBothScreensWindowColorToDefault</span>() }
 }
+
+<span class="doccomment">/// Fades the screen to black across several frames.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fade_to_black</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+    <span class="kw">unsafe</span> { <span class="ident">ffi::FadeToBlack</span>() }
+}
+
+<span class="doccomment">/// Advances one frame. Does not return until the next frame starts.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_frame</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+    <span class="kw">unsafe</span> { <span class="ident">ffi::AdvanceFrame</span>(<span class="number">0</span> <span class="kw">as</span> <span class="ident">ffi::undefined</span>) }
+}
+
+<span class="doccomment">/// Graphically displays any pending actions that have happened but haven&#39;t been shown on screen</span>
+<span class="doccomment">/// yet.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// All actions are displayed at the same time. For example, this delayed display system is used</span>
+<span class="doccomment">/// to display multiple monsters moving at once even though they take turns sequentially.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Seems to return true if there were any pending actions to display.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_actions</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>, <span class="ident">entity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">entity</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">force_mut_ptr!</span>(<span class="ident">e</span>)).<span class="ident">unwrap_or</span>(<span class="ident">ptr::null_mut</span>());
+    <span class="kw">unsafe</span> { <span class="ident">ffi::DisplayActions</span>(<span class="ident">ptr</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (cacc75c82 2022-06-16)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c3b7d7b49 2022-06-17)" ></div>
 </body></html>

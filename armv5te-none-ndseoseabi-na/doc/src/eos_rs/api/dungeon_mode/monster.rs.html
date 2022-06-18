@@ -874,11 +874,65 @@
 <span id="867">867</span>
 <span id="868">868</span>
 <span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::moves</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::type_id::Type</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::undefined4</span>;
 <span class="kw">use</span> <span class="ident">fixed::types::I24F8</span>;
 
 <span class="doccomment">/// Extension trait for [`DungeonMonsterRef`] (read operations).</span>
@@ -1106,12 +1160,13 @@
     <span class="doccomment">/// such as Hidden Power, Weather Ball, the regular attack...</span>
     <span class="kw">fn</span> <span class="ident">get_move_type_if_used_by_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">the_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>) -&gt; <span class="ident">type_catalog::Type</span>;
 
-    <span class="doccomment">/// Checks if the specified enemy should evolve because it just defeated an ally, and if so,</span>
-    <span class="doccomment">/// attempts to evolve it.</span>
-    <span class="kw">fn</span> <span class="ident">evolve_this_enemy_if_should</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+    <span class="doccomment">/// Returns the animation id to be applied to a monster that has the sleep, napping,</span>
+    <span class="doccomment">/// nightmare or bide status.</span>
+    <span class="kw">fn</span> <span class="ident">get_sleep_animation_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
 
-    <span class="doccomment">/// Makes the specified monster evolve into the specified species.</span>
-    <span class="kw">fn</span> <span class="ident">evolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">new_monster_idx</span>: <span class="ident">monster_catalog::Type</span>);
+    <span class="doccomment">/// Returns true if the monster has the blinded status, or if it is not the leader and is</span>
+    <span class="doccomment">/// holding Y-Ray Specs.</span>
+    <span class="kw">fn</span> <span class="ident">is_blinded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">check_held_item</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="doccomment">/// Extension trait for [`DungeonMonsterMut`] (write operations).</span>
@@ -1139,6 +1194,33 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Called when a monster is revived.</span>
     <span class="kw">fn</span> <span class="ident">restore_pp_for_all_moves_set_flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Checks if the specified enemy should evolve because it just defeated an ally, and if so,</span>
+    <span class="doccomment">/// attempts to evolve it.</span>
+    <span class="kw">fn</span> <span class="ident">evolve_this_enemy_if_should</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Makes the specified monster evolve into the specified species.</span>
+    <span class="kw">fn</span> <span class="ident">evolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">new_monster_idx</span>: <span class="ident">monster_catalog::Type</span>);
+
+    <span class="doccomment">/// Calculates the speed stage of a monster from its speed up/down counters. The second</span>
+    <span class="doccomment">/// parameter is the weight of each counter (how many stages it will add/remove), but appears</span>
+    <span class="doccomment">/// to be always 1.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Takes modifiers into account (paralysis, snowy weather, Time Tripper). Deoxys-speed,</span>
+    <span class="doccomment">/// Shaymin-sky and enemy Kecleon during a thief alert get a flat +1 always.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The calculated speed stage is both returned and saved in the monster&#39;s statuses struct.</span>
+    <span class="kw">fn</span> <span class="ident">calc_speed_stage</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">counter_weight</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span>;
+
+    <span class="doccomment">/// Sets the monster&#39;s reflect damage countdown to 4.</span>
+    <span class="kw">fn</span> <span class="ident">set_reflect_damage_countdown_to_four</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Executes the set action for the specified monster.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Used for both AI actions and player-inputted actions. If the action is not ACTION_NOTHING,</span>
+    <span class="doccomment">/// ACTION_PASS_TURN, ACTION_WALK or ACTION_UNK_4, the monster&#39;s already_acted field is set to</span>
+    <span class="doccomment">/// true.</span>
+    <span class="kw">fn</span> <span class="ident">execute_action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DungeonMonsterExtRead</span> <span class="kw">for</span> <span class="ident">DungeonMonsterRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -1233,7 +1315,7 @@
                 <span class="ident">attack_type</span>,
                 <span class="ident">attack_power</span>,
                 <span class="ident">crit_chance</span>,
-                <span class="ident">damage_out</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
+                <span class="ident">damage_out</span>,
                 <span class="ident">damage_multiplier</span>.<span class="ident">to_bits</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
                 <span class="ident">move_id</span>,
                 <span class="ident">param_9</span>,
@@ -1258,7 +1340,7 @@
                 <span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>),
                 <span class="ident">fixed_damage</span>,
                 <span class="ident">param_3</span>,
-                <span class="ident">damage_out</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
+                <span class="ident">damage_out</span>,
                 <span class="ident">move_id</span>,
                 <span class="ident">attack_type</span>,
                 <span class="ident">param_7</span>,
@@ -1288,7 +1370,7 @@
                 <span class="macro">force_mut_ptr!</span>(<span class="ident">defender</span>),
                 <span class="ident">fixed_damage</span>,
                 <span class="ident">param_4</span>,
-                <span class="ident">damage_out</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
+                <span class="ident">damage_out</span>,
                 <span class="ident">attack_type</span>,
                 <span class="ident">move_category</span> <span class="kw">as</span> <span class="ident">move_catalog::Type</span>,
                 <span class="ident">param_8</span>,
@@ -1317,7 +1399,7 @@
                 <span class="macro">force_mut_ptr!</span>(<span class="ident">defender</span>),
                 <span class="ident">fixed_damage</span>,
                 <span class="ident">param_4</span>,
-                <span class="ident">damage_out</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
+                <span class="ident">damage_out</span>,
                 <span class="ident">attack_type</span>,
                 <span class="ident">param_7</span>,
                 <span class="ident">message_type</span>,
@@ -1346,7 +1428,7 @@
                 <span class="macro">force_mut_ptr!</span>(<span class="ident">defender</span>),
                 <span class="ident">fixed_damage</span>,
                 <span class="ident">param_4</span>,
-                <span class="ident">damage_out</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
+                <span class="ident">damage_out</span>,
                 <span class="ident">attack_type</span>,
                 <span class="ident">move_category</span> <span class="kw">as</span> <span class="ident">move_catalog::Type</span>,
                 <span class="ident">param_8</span>,
@@ -1452,12 +1534,12 @@
         <span class="kw">unsafe</span> { <span class="ident">ffi::GetMoveTypeForMonster</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="macro">force_mut_ptr!</span>(<span class="ident">the_move</span>)) }
     }
 
-    <span class="kw">fn</span> <span class="ident">evolve_this_enemy_if_should</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EnemyEvolution</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) }
+    <span class="kw">fn</span> <span class="ident">get_sleep_animation_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::GetSleepAnimationId</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) }
     }
 
-    <span class="kw">fn</span> <span class="ident">evolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">new_monster_idx</span>: <span class="ident">monster_catalog::Type</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EvolveMonster</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">param_2</span>, <span class="ident">new_monster_idx</span>) }
+    <span class="kw">fn</span> <span class="ident">is_blinded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">check_held_item</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsBlinded</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">check_held_item</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) <span class="op">&gt;</span> <span class="number">0</span> }
     }
 }
 
@@ -1717,32 +1799,60 @@
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">get_move_type_if_used_by_self</span>(<span class="ident">the_move</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">evolve_this_enemy_if_should</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">evolve_this_enemy_if_should</span>()
+    <span class="kw">fn</span> <span class="ident">get_sleep_animation_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">get_sleep_animation_id</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">evolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">undefined4</span>, <span class="ident">new_monster_idx</span>: <span class="ident">monster_catalog::Type</span>) {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">evolve</span>(<span class="ident">param_2</span>, <span class="ident">new_monster_idx</span>)
+    <span class="kw">fn</span> <span class="ident">is_blinded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">check_held_item</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">is_blinded</span>(<span class="ident">check_held_item</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DungeonMonsterExtWrite</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">update_move_pp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">should_consume_pp</span>: <span class="ident">bool</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::UpdateMovePp</span>(<span class="self">self</span>.<span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">should_consume_pp</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::UpdateMovePp</span>(<span class="self">self</span>.<span class="number">1</span>, <span class="ident">should_consume_pp</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
     }
 
     <span class="kw">fn</span> <span class="ident">try_activate_truant</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryActivateTruant</span>(<span class="self">self</span>.<span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::TryActivateTruant</span>(<span class="self">self</span>.<span class="number">1</span>) }
     }
 
     <span class="kw">fn</span> <span class="ident">try_weather_form_change</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryWeatherFormChange</span>(<span class="self">self</span>.<span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::TryWeatherFormChange</span>(<span class="self">self</span>.<span class="number">1</span>) }
     }
 
     <span class="kw">fn</span> <span class="ident">restore_pp_for_all_moves_set_flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::RestorePpAllMovesSetFlags</span>(<span class="self">self</span>.<span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::RestorePpAllMovesSetFlags</span>(<span class="self">self</span>.<span class="number">1</span>) }
+    }
+
+    <span class="kw">fn</span> <span class="ident">evolve_this_enemy_if_should</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::EnemyEvolution</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) }
+    }
+
+    <span class="kw">fn</span> <span class="ident">evolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">new_monster_idx</span>: <span class="ident">monster_catalog::Type</span>) {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::EvolveMonster</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">param_2</span>, <span class="ident">new_monster_idx</span>) }
+    }
+
+    <span class="doccomment">/// Calculates the speed stage of a monster from its speed up/down counters. The second</span>
+    <span class="doccomment">/// parameter is the weight of each counter (how many stages it will add/remove), but appears</span>
+    <span class="doccomment">/// to be always 1.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Takes modifiers into account (paralysis, snowy weather, Time Tripper). Deoxys-speed,</span>
+    <span class="doccomment">/// Shaymin-sky and enemy Kecleon during a thief alert get a flat +1 always.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The calculated speed stage is both returned and saved in the monster&#39;s statuses struct.</span>
+    <span class="kw">fn</span> <span class="ident">calc_speed_stage</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">counter_weight</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::CalcSpeedStage</span>(<span class="self">self</span>.<span class="number">1</span>, <span class="ident">counter_weight</span>) }
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_reflect_damage_countdown_to_four</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::SetReflectDamageCountdownTo4</span>(<span class="self">self</span>.<span class="number">1</span>) }
+    }
+
+    <span class="kw">fn</span> <span class="ident">execute_action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> { <span class="ident">ffi::ExecuteMonsterAction</span>(<span class="self">self</span>.<span class="number">1</span>) }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (cacc75c82 2022-06-16)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c3b7d7b49 2022-06-17)" ></div>
 </body></html>

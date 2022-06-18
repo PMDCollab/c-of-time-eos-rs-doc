@@ -134,6 +134,21 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Nintendo DS system &amp; game bootstrapping related functions.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
@@ -263,6 +278,21 @@
     <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
     <span class="kw">unsafe</span> { <span class="ident">ffi::SetDebugFlag2</span>(<span class="ident">flag_id</span>, <span class="ident">value</span>) }
 }
+
+<span class="doccomment">/// Unpatched this function will always returns true.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Background information</span>
+<span class="doccomment">/// This function seems to be a debug switch that the developers may have used to disable the</span>
+<span class="doccomment">/// random enemy spawn.</span>
+<span class="doccomment">/// If it returned false, the call to `[GlobalDungeonData::spawn_monster]` inside</span>
+<span class="doccomment">/// `[GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]` would not be executed.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [GlobalDungeonData::spawn_monster]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::spawn_monster</span>
+<span class="doccomment">/// [GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_debug_flag_monster_spawns_enabled</span>() -&gt; <span class="ident">bool</span> {
+    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
+    <span class="kw">unsafe</span> { <span class="ident">ffi::MonsterSpawnsEnabled</span>() <span class="op">&gt;</span> <span class="number">0</span> }
+}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (cacc75c82 2022-06-16)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c3b7d7b49 2022-06-17)" ></div>
 </body></html>
