@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["GroundModeContext","Misc. and general ground mode functions, guarded by this struct."]]});
+window.SIDEBAR_ITEMS = {"struct":[["GroundModeContext","Misc. and general ground mode functions, guarded by this struct."]]};

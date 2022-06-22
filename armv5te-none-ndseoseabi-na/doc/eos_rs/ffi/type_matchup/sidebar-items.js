@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["MATCHUP_IMMUNE",""],["MATCHUP_NEUTRAL",""],["MATCHUP_NOT_VERY_EFFECTIVE",""],["MATCHUP_SUPER_EFFECTIVE",""]],"type":[["Type",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["MATCHUP_IMMUNE",""],["MATCHUP_NEUTRAL",""],["MATCHUP_NOT_VERY_EFFECTIVE",""],["MATCHUP_SUPER_EFFECTIVE",""]],"type":[["Type",""]]};

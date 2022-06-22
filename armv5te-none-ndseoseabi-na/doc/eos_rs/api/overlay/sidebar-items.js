@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["OverlayLoadLease","This represents a promise to the compiler that while a reference to this struct exists, the overlay N is loaded."]],"trait":[["CreatableWithLease","Trait for all structs that require a lease to be created (but nothing else)."]]});
+window.SIDEBAR_ITEMS = {"struct":[["OverlayLoadLease","This represents a promise to the compiler that while a reference to this struct exists, the overlay N is loaded."]],"trait":[["CreatableWithLease","Trait for all structs that require a lease to be created (but nothing else)."]]};

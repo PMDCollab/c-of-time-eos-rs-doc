@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["MonsterSpeciesInfo","Metadata of a monster species."]]});
+window.SIDEBAR_ITEMS = {"struct":[["MonsterSpeciesInfo","Metadata of a monster species."]]};

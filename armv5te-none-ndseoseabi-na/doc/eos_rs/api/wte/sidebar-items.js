@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["OwnedWte","A Rust-owned WTE file."]]});
+window.SIDEBAR_ITEMS = {"struct":[["OwnedWte","A Rust-owned WTE file."]]};

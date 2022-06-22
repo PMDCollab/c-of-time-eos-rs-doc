@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["TARGET_ALL",""],["TARGET_ALL_EXCEPT_USER",""],["TARGET_ENEMIES",""],["TARGET_ENEMIES_AFTER_CHARGING",""],["TARGET_PARTY",""],["TARGET_SPECIAL",""],["TARGET_TEAMMATES",""],["TARGET_USER",""]],"type":[["Type",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["TARGET_ALL",""],["TARGET_ALL_EXCEPT_USER",""],["TARGET_ENEMIES",""],["TARGET_ENEMIES_AFTER_CHARGING",""],["TARGET_PARTY",""],["TARGET_SPECIAL",""],["TARGET_TEAMMATES",""],["TARGET_USER",""]],"type":[["Type",""]]};

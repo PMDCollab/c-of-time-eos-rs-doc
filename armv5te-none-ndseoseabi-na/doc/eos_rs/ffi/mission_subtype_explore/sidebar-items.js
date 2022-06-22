@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["MISSION_EXPLORE_GOLDEN_CHAMBER",""],["MISSION_EXPLORE_NORMAL",""],["MISSION_EXPLORE_SEALED_CHAMBER",""]],"type":[["Type",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["MISSION_EXPLORE_GOLDEN_CHAMBER",""],["MISSION_EXPLORE_NORMAL",""],["MISSION_EXPLORE_SEALED_CHAMBER",""]],"type":[["Type",""]]};
