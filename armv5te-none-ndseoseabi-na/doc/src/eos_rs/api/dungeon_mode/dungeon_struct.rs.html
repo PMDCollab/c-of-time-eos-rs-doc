@@ -1579,6 +1579,18 @@
 <span id="1573">1573</span>
 <span id="1574">1574</span>
 <span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay::OverlayLoadLease</span>;
@@ -2672,9 +2684,11 @@
     }
 
     <span class="doccomment">/// Opens the message log window.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_message_log</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">ffi::undefined4</span>, <span class="ident">param_2</span>: <span class="ident">ffi::undefined4</span>) {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::OpenMessageLog</span>(<span class="ident">param_1</span>, <span class="ident">param_2</span>) }
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">open_message_log</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">ffi::undefined4</span>, <span class="ident">param_2</span>: <span class="ident">ffi::undefined4</span>) {
+        <span class="ident">ffi::OpenMessageLog</span>(<span class="ident">param_1</span>, <span class="ident">param_2</span>)
     }
 
     <span class="doccomment">/// Checks if a given dungeon tip was not displayed yet and if so, displays it.</span>
@@ -2686,25 +2700,29 @@
     }
 
     <span class="doccomment">/// Displays a message in a dialogue box that optionally waits for player input before closing.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_message</span>(
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">display_message</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">param_1</span>: <span class="ident">ffi::undefined4</span>,
         <span class="ident">message_id</span>: <span class="ident">i32</span>,
         <span class="ident">wait_for_input</span>: <span class="ident">bool</span>,
     ) {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::DisplayMessage</span>(<span class="ident">param_1</span>, <span class="ident">message_id</span>, <span class="ident">wait_for_input</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+        <span class="ident">ffi::DisplayMessage</span>(<span class="ident">param_1</span>, <span class="ident">message_id</span>, <span class="ident">wait_for_input</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>)
     }
 
     <span class="doccomment">/// Displays a message in a dialogue box that optionally waits for player input before closing.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_message2</span>(
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">display_message2</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">param_1</span>: <span class="ident">ffi::undefined4</span>,
         <span class="ident">message_id</span>: <span class="ident">i32</span>,
         <span class="ident">wait_for_input</span>: <span class="ident">bool</span>,
     ) {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::DisplayMessage2</span>(<span class="ident">param_1</span>, <span class="ident">message_id</span>, <span class="ident">wait_for_input</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+        <span class="ident">ffi::DisplayMessage2</span>(<span class="ident">param_1</span>, <span class="ident">message_id</span>, <span class="ident">wait_for_input</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>)
     }
 
     <span class="doccomment">/// Attempts to trigger a forced loss of the type set with [`Self::set_forced_loss_reason`].</span>
@@ -2769,9 +2787,11 @@
     <span class="doccomment">/// (and some others) pass, the function does not return until the leader performs an action.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns true, if the leader has performed an action.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_leader_turn</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">ffi::undefined</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::RunLeaderTurn</span>(<span class="ident">param_1</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">run_leader_turn</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">ffi::undefined</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">ffi::RunLeaderTurn</span>(<span class="ident">param_1</span>) <span class="op">&gt;</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Called at the beginning of [`Self::run_fractional_turn`]. Executed only if</span>
@@ -2811,13 +2831,15 @@
     }
 
     <span class="doccomment">/// Loads the sprite of the specified monster to use it in a dungeon.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_monster_sprite</span>(
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_monster_sprite</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>,
         <span class="ident">param_2</span>: <span class="ident">ffi::undefined</span>,
     ) {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::LoadMonsterSprite</span>(<span class="ident">monster_id</span>, <span class="ident">param_2</span>) }
+        <span class="ident">ffi::LoadMonsterSprite</span>(<span class="ident">monster_id</span>, <span class="ident">param_2</span>)
     }
 
     <span class="doccomment">/// If the monster id parameter is 0x97 (Mew), returns false if either</span>
@@ -2874,13 +2896,18 @@
     }
 
     <span class="doccomment">/// Initializes the team when entering a dungeon.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_team</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">ffi::undefined</span>) {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitTeam</span>(<span class="ident">param_1</span>) }
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">init_team</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">ffi::undefined</span>) {
+        <span class="ident">ffi::InitTeam</span>(<span class="ident">param_1</span>)
     }
 
     <span class="doccomment">/// Initializes a team member. Run at the start of each floor in a dungeon.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_team_member</span>(
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">init_team_member</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">arg1</span>: <span class="ident">monster_catalog::Type</span>,
         <span class="ident">type_1</span>: <span class="ident">type_catalog::Type</span>,
@@ -2892,20 +2919,17 @@
         <span class="ident">param_8</span>: <span class="ident">ffi::undefined</span>,
         <span class="ident">param_9</span>: <span class="ident">ffi::undefined</span>,
     ) {
-        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::InitTeamMember</span>(
-                <span class="ident">arg1</span>,
-                <span class="ident">type_1</span>,
-                <span class="ident">type_2</span>,
-                <span class="ident">team_member_data</span>,
-                <span class="ident">param_5</span>,
-                <span class="ident">param_6</span>,
-                <span class="ident">param_7</span>,
-                <span class="ident">param_8</span>,
-                <span class="ident">param_9</span>,
-            )
-        }
+        <span class="ident">ffi::InitTeamMember</span>(
+            <span class="ident">arg1</span>,
+            <span class="ident">type_1</span>,
+            <span class="ident">type_2</span>,
+            <span class="ident">team_member_data</span>,
+            <span class="ident">param_5</span>,
+            <span class="ident">param_6</span>,
+            <span class="ident">param_7</span>,
+            <span class="ident">param_8</span>,
+            <span class="ident">param_9</span>,
+        )
     }
 
     <span class="doccomment">/// Spawns the given monster on a tile. Returns None, if the game returned a null-pointer after</span>
@@ -3155,5 +3179,5 @@
     <span class="ident">res</span>
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (c396bb3b8 2022-07-10)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (38b72154d 2022-07-11)" ></div>
 </body></html>
