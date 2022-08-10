@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["eos_rs"] = [{"text":"impl Ord for <a class=\"enum\" href=\"eos_rs/api/gameplay/enum.SentryGameRank.html\" title=\"enum eos_rs::api::gameplay::SentryGameRank\">SentryGameRank</a>","synthetic":false,"types":["eos_rs::api::gameplay::SentryGameRank"]},{"text":"impl&lt;Storage:&nbsp;Ord&gt; Ord for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenBitfieldUnit.html\" title=\"struct eos_rs::ffi::__BindgenBitfieldUnit\">__BindgenBitfieldUnit</a>&lt;Storage&gt;","synthetic":false,"types":["eos_rs::ffi::__BindgenBitfieldUnit"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"eos_rs":[["impl Ord for <a class=\"enum\" href=\"eos_rs/api/gameplay/enum.SentryGameRank.html\" title=\"enum eos_rs::api::gameplay::SentryGameRank\">SentryGameRank</a>"],["impl&lt;Storage:&nbsp;Ord&gt; Ord for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenBitfieldUnit.html\" title=\"struct eos_rs::ffi::__BindgenBitfieldUnit\">__BindgenBitfieldUnit</a>&lt;Storage&gt;"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["eos_rs"] = [{"text":"impl&lt;Storage:&nbsp;Hash&gt; Hash for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenBitfieldUnit.html\" title=\"struct eos_rs::ffi::__BindgenBitfieldUnit\">__BindgenBitfieldUnit</a>&lt;Storage&gt;","synthetic":false,"types":["eos_rs::ffi::__BindgenBitfieldUnit"]},{"text":"impl&lt;T&gt; Hash for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenUnionField.html\" title=\"struct eos_rs::ffi::__BindgenUnionField\">__BindgenUnionField</a>&lt;T&gt;","synthetic":false,"types":["eos_rs::ffi::__BindgenUnionField"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"eos_rs":[["impl&lt;Storage:&nbsp;Hash&gt; Hash for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenBitfieldUnit.html\" title=\"struct eos_rs::ffi::__BindgenBitfieldUnit\">__BindgenBitfieldUnit</a>&lt;Storage&gt;"],["impl&lt;T&gt; Hash for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenUnionField.html\" title=\"struct eos_rs::ffi::__BindgenUnionField\">__BindgenUnionField</a>&lt;T&gt;"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["eos_rs"] = [{"text":"impl AsRef&lt;<a class=\"struct\" href=\"eos_rs/ffi/struct.dungeon.html\" title=\"struct eos_rs::ffi::dungeon\">dungeon</a>&gt; for <a class=\"struct\" href=\"eos_rs/ffi/struct.dungeon.html\" title=\"struct eos_rs::ffi::dungeon\">dungeon</a>","synthetic":false,"types":["eos_rs::ffi::dungeon"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"eos_rs":[["impl AsRef&lt;<a class=\"struct\" href=\"eos_rs/ffi/struct.dungeon.html\" title=\"struct eos_rs::ffi::dungeon\">dungeon</a>&gt; for <a class=\"struct\" href=\"eos_rs/ffi/struct.dungeon.html\" title=\"struct eos_rs::ffi::dungeon\">dungeon</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["eos_rs"] = [{"text":"impl From&lt;<a class=\"struct\" href=\"eos_rs/ffi/struct.move_target_and_range.html\" title=\"struct eos_rs::ffi::move_target_and_range\">move_target_and_range</a>&gt; for <a class=\"struct\" href=\"eos_rs/api/moves/struct.MoveTargetAndRange.html\" title=\"struct eos_rs::api::moves::MoveTargetAndRange\">MoveTargetAndRange</a>","synthetic":false,"types":["eos_rs::api::moves::MoveTargetAndRange"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"eos_rs":[["impl From&lt;<a class=\"struct\" href=\"eos_rs/ffi/struct.move_target_and_range.html\" title=\"struct eos_rs::ffi::move_target_and_range\">move_target_and_range</a>&gt; for <a class=\"struct\" href=\"eos_rs/api/moves/struct.MoveTargetAndRange.html\" title=\"struct eos_rs::api::moves::MoveTargetAndRange\">MoveTargetAndRange</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
