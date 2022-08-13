@@ -176,7 +176,7 @@
 <span class="doccomment">/// # Safety</span>
 <span class="doccomment">/// The caller needs to make sure the system is in a state where it is safe to enable interrupts.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">enable_all_interrupts</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">ffi::EnableAllInterrupts</span>() <span class="op">&gt;</span> <span class="number">0</span>
+    <span class="ident">ffi::EnableAllInterrupts</span>() &gt; <span class="number">0</span>
 }
 
 <span class="doccomment">/// Sets the Interrupt Master Enable (IME) register to 0, which disables all CPU interrupts</span>
@@ -189,7 +189,7 @@
 <span class="doccomment">/// # Safety</span>
 <span class="doccomment">/// The caller needs to make sure the system is in a state where it is safe to disable interrupts.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">disable_all_interrupts</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">ffi::DisableAllInterrupts</span>() <span class="op">&gt;</span> <span class="number">0</span>
+    <span class="ident">ffi::DisableAllInterrupts</span>() &gt; <span class="number">0</span>
 }
 
 <span class="doccomment">/// Get the current (system?) time as an IEEE 754 floating-point number.</span>
@@ -204,7 +204,7 @@
 <span class="doccomment">/// # Safety</span>
 <span class="doccomment">/// This function manipulates low-level global state.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">sound_resume</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">ffi::SoundResume</span>() <span class="op">&gt;</span> <span class="number">0</span>
+    <span class="ident">ffi::SoundResume</span>() &gt; <span class="number">0</span>
 }
 
 <span class="doccomment">/// Probably aborts the program with some status code? It seems to serve a similar purpose to the</span>
@@ -284,7 +284,7 @@
 <span class="doccomment">/// [GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_debug_flag_monster_spawns_enabled</span>() -&gt; <span class="ident">bool</span> {
     <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
-    <span class="kw">unsafe</span> { <span class="ident">ffi::MonsterSpawnsEnabled</span>() <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::MonsterSpawnsEnabled</span>() &gt; <span class="number">0</span> }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

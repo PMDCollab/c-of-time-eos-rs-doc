@@ -606,7 +606,7 @@
 <span class="kw">use</span> <span class="ident">core::iter::repeat_with</span>;
 
 <span class="doccomment">/// The capacity of the dungeon grid in both X and Y directions.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GRID_CAPACITY_DIM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">15</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GRID_CAPACITY_DIM</span>: <span class="ident">usize</span> = <span class="number">15</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::derivable_impls</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ffi::dungeon_grid_cell</span> {
@@ -655,10 +655,10 @@
 <span class="doccomment">/// The cell grid is used in one phase of the dungeon generation. Note that most</span>
 <span class="doccomment">/// of the generation functions here will generate tiles in the global dungeon struct.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonGridMutator</span> {
-    <span class="ident">cells</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DungeonGridCell</span><span class="op">&gt;</span>,
+    <span class="ident">cells</span>: <span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;,
     <span class="ident">width</span>: <span class="ident">usize</span>,
     <span class="ident">height</span>: <span class="ident">usize</span>,
-    <span class="ident">_lease</span>: <span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>,
+    <span class="ident">_lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
 }
 
 <span class="kw">impl</span> <span class="ident">DungeonGridMutator</span> {
@@ -686,22 +686,22 @@
     <span class="doccomment">/// The maximum values for `width` and `height` are [`GRID_CAPACITY_DIM`],</span>
     <span class="doccomment">/// otherwise this function will panic.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_vec</span>(
-        <span class="ident">in_cells</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DungeonGridCell</span><span class="op">&gt;</span>,
+        <span class="ident">in_cells</span>: <span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;,
         <span class="ident">width</span>: <span class="ident">usize</span>,
         <span class="ident">height</span>: <span class="ident">usize</span>,
-        <span class="ident">ov29</span>: <span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>,
+        <span class="ident">ov29</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
     ) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">width</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span> <span class="op">&amp;&amp;</span> <span class="ident">height</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="macro">assert!</span>(<span class="ident">in_cells</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">width</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">height</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert!</span>(<span class="ident">width</span> &lt;= <span class="ident">GRID_CAPACITY_DIM</span> &amp;&amp; <span class="ident">height</span> &lt;= <span class="ident">GRID_CAPACITY_DIM</span>);
+        <span class="macro">assert!</span>(<span class="ident">in_cells</span>.<span class="ident">len</span>() &gt;= <span class="ident">width</span> <span class="kw">as</span> <span class="ident">usize</span> * <span class="ident">height</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells_iter</span> <span class="op">=</span> <span class="ident">in_cells</span>.<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells_iter</span> = <span class="ident">in_cells</span>.<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">GRID_CAPACITY_DIM</span> <span class="op">*</span> (<span class="ident">width</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">+</span> <span class="ident">height</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells</span> = <span class="ident">Vec::with_capacity</span>(<span class="ident">GRID_CAPACITY_DIM</span> * (<span class="ident">width</span> - <span class="number">1</span>) + <span class="ident">height</span>);
 
         <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">GRID_CAPACITY_DIM</span> {
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">width</span> {
+            <span class="kw">if</span> <span class="ident">x</span> &lt; <span class="ident">width</span> {
                 <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">GRID_CAPACITY_DIM</span> {
-                    <span class="ident">cells</span>.<span class="ident">push</span>(<span class="kw">if</span> <span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">height</span> {
+                    <span class="ident">cells</span>.<span class="ident">push</span>(<span class="kw">if</span> <span class="ident">y</span> &lt; <span class="ident">height</span> {
                         <span class="ident">cells_iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()
                     } <span class="kw">else</span> {
                         <span class="ident">Default::default</span>()
@@ -741,18 +741,18 @@
     <span class="doccomment">/// missing values initialized with defaults.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `width` must be less than or equal to 15, otherwise this function will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">width</span>: <span class="ident">usize</span>, <span class="ident">ov29</span>: <span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">height</span> <span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span>;
-        <span class="macro">assert!</span>(<span class="ident">width</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">width</span>: <span class="ident">usize</span>, <span class="ident">ov29</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">height</span> = <span class="ident">GRID_CAPACITY_DIM</span>;
+        <span class="macro">assert!</span>(<span class="ident">width</span> &lt;= <span class="ident">GRID_CAPACITY_DIM</span>);
         <span class="comment">// The game stops after the last column that had cells, so this is the actual capacity:</span>
-        <span class="kw">let</span> <span class="ident">min_grid_size</span> <span class="op">=</span> (<span class="ident">GRID_CAPACITY_DIM</span> <span class="op">*</span> (<span class="ident">width</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">+</span> <span class="ident">height</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let</span> <span class="ident">min_grid_size</span> = (<span class="ident">GRID_CAPACITY_DIM</span> * (<span class="ident">width</span> - <span class="number">1</span>) + <span class="ident">height</span>) <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells</span>;
         <span class="comment">// SAFETY: We know the grid vector will be big enough.</span>
         <span class="comment">//         We also know the height is at least 15, so all cells will be initialized.</span>
         <span class="kw">unsafe</span> {
-            <span class="ident">cells</span> <span class="op">=</span> <span class="ident">repeat_with</span>(<span class="ident">Default::default</span>)
+            <span class="ident">cells</span> = <span class="ident">repeat_with</span>(<span class="ident">Default::default</span>)
                 .<span class="ident">take</span>(<span class="ident">min_grid_size</span>)
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DungeonGridCell</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                .<span class="ident">collect</span>::&lt;<span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;&gt;();
             <span class="ident">ffi::InitDungeonGrid</span>(<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>);
         }
         <span class="self">Self</span> {
@@ -768,17 +768,17 @@
     <span class="doccomment">/// The grid will always be a matrix with 15 rows per column and it might contain extra</span>
     <span class="doccomment">/// dangling rows, you need to ignore cells outside of the grid&#39;s actual width and height,</span>
     <span class="doccomment">/// see the notes for [`Self::new()`] for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DungeonGridCell</span><span class="op">&gt;</span>, <span class="ident">usize</span>, <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span> <span class="op">*</span> <span class="ident">GRID_CAPACITY_DIM</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;, <span class="ident">usize</span>, <span class="ident">usize</span>) {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() &lt;= <span class="ident">GRID_CAPACITY_DIM</span> * <span class="ident">GRID_CAPACITY_DIM</span>);
         (<span class="self">self</span>.<span class="ident">cells</span>, <span class="self">self</span>.<span class="ident">width</span>, <span class="self">self</span>.<span class="ident">height</span>)
     }
 
     <span class="doccomment">/// Get the cell at the given coordinates.</span>
     <span class="doccomment">/// Panics if the coordinates are out of bounds.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DungeonGridCell</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span> <span class="op">*</span> <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="kw">let</span> <span class="ident">coords</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
-        <span class="kw">if</span> <span class="ident">coords</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() &lt;= <span class="ident">GRID_CAPACITY_DIM</span> * <span class="ident">GRID_CAPACITY_DIM</span>);
+        <span class="kw">let</span> <span class="ident">coords</span> = <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
+        <span class="kw">if</span> <span class="ident">coords</span> &gt;= <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() {
             <span class="macro">panic!</span>(<span class="string">&quot;Grid cell at ({}, {}) is out of bounds&quot;</span>, <span class="ident">x</span>, <span class="ident">y</span>);
         }
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cells</span>[<span class="ident">coords</span>]
@@ -796,9 +796,9 @@
     <span class="doccomment">/// Get the cell at the given coordinates, mutably.</span>
     <span class="doccomment">/// Panics if the coordinates are out of bounds.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">DungeonGridCell</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">GRID_CAPACITY_DIM</span> <span class="op">*</span> <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="kw">let</span> <span class="ident">coords</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
-        <span class="kw">if</span> <span class="ident">coords</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() &lt;= <span class="ident">GRID_CAPACITY_DIM</span> * <span class="ident">GRID_CAPACITY_DIM</span>);
+        <span class="kw">let</span> <span class="ident">coords</span> = <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
+        <span class="kw">if</span> <span class="ident">coords</span> &gt;= <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() {
             <span class="macro">panic!</span>(<span class="string">&quot;Grid cell at ({}, {}) is out of bounds&quot;</span>, <span class="ident">x</span>, <span class="ident">y</span>);
         }
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cells</span>[<span class="ident">coords</span>]
@@ -811,7 +811,7 @@
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">/// The caller needs to make sure `x` and `y` are in bounds.</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mut_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">DungeonGridCell</span> {
-        <span class="kw">let</span> <span class="ident">coords</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
+        <span class="kw">let</span> <span class="ident">coords</span> = <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cells</span>[<span class="ident">coords</span>]
     }
 
@@ -829,11 +829,11 @@
         <span class="ident">y</span>: <span class="ident">i32</span>,
         <span class="ident">dy</span>: <span class="ident">i32</span>,
     ) {
-        <span class="macro">assert!</span>(<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">dy</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="ident">x</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="ident">y</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="ident">dy</span> &gt;= <span class="number">0</span>);
         <span class="macro">assert!</span>(
-            <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">width</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">height</span>
-                <span class="op">&amp;&amp;</span> (<span class="ident">y</span> <span class="op">+</span> <span class="ident">dy</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">height</span>
+            <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span> &lt;= <span class="self">self</span>.<span class="ident">width</span>
+                &amp;&amp; <span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> &lt;= <span class="self">self</span>.<span class="ident">height</span>
+                &amp;&amp; (<span class="ident">y</span> + <span class="ident">dy</span>) <span class="kw">as</span> <span class="ident">usize</span> &lt;= <span class="self">self</span>.<span class="ident">height</span>
         );
         <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
         <span class="kw">unsafe</span> { <span class="ident">ffi::MergeRoomsVertically</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">dy</span>, <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>()) }
@@ -866,11 +866,11 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_grid_positions</span>(
         <span class="ident">width</span>: <span class="ident">i32</span>,
         <span class="ident">height</span>: <span class="ident">i32</span>,
-        <span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) {
-        <span class="macro">assert!</span>(<span class="ident">width</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">height</span> <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x_positions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">width</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y_positions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">height</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
+    ) -&gt; (<span class="ident">Vec</span>&lt;<span class="ident">i32</span>&gt;, <span class="ident">Vec</span>&lt;<span class="ident">i32</span>&gt;) {
+        <span class="macro">assert!</span>(<span class="ident">width</span> &gt; <span class="number">0</span> &amp;&amp; <span class="ident">height</span> &gt; <span class="number">0</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x_positions</span> = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">width</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y_positions</span> = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">height</span> <span class="kw">as</span> <span class="ident">usize</span>];
 
         <span class="comment">// SAFETY: We have a lease.</span>
         <span class="kw">unsafe</span> {
@@ -999,10 +999,10 @@
         <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
     ) {
         <span class="macro">assert!</span>(
-            <span class="ident">cursor_x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>
-                <span class="op">&amp;&amp;</span> (<span class="ident">cursor_x</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">width</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">cursor_y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>
-                <span class="op">&amp;&amp;</span> (<span class="ident">cursor_y</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">height</span>
+            <span class="ident">cursor_x</span> &gt;= <span class="number">0</span>
+                &amp;&amp; (<span class="ident">cursor_x</span> <span class="kw">as</span> <span class="ident">usize</span>) &lt; <span class="self">self</span>.<span class="ident">width</span>
+                &amp;&amp; <span class="ident">cursor_y</span> &gt;= <span class="number">0</span>
+                &amp;&amp; (<span class="ident">cursor_y</span> <span class="kw">as</span> <span class="ident">usize</span>) &lt; <span class="self">self</span>.<span class="ident">height</span>
         );
         <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
         <span class="kw">unsafe</span> {
@@ -1043,7 +1043,7 @@
                 <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
                 <span class="ident">starts_x</span>.<span class="ident">as_mut_ptr</span>(),
                 <span class="ident">starts_y</span>.<span class="ident">as_mut_ptr</span>(),
-                (<span class="op">!</span><span class="ident">enable_room_merging</span>) <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+                (!<span class="ident">enable_room_merging</span>) <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
             )
         }
     }
@@ -1094,7 +1094,7 @@
     <span class="doccomment">/// special features, and has dimensions of at least 5x4. Kecleon shops will occupy the entire</span>
     <span class="doccomment">/// room interior, leaving a one tile margin from the room walls.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_kecleon_shop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">spawn_chance</span>: <span class="ident">u8</span>) {
-        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">100</span>);
+        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> &lt;= <span class="number">100</span>);
         <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::GenerateKecleonShop</span>(
@@ -1115,7 +1115,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `spawn_chance` is the percentage chance that a Monster House will be generated (0-100).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_monster_house</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">spawn_chance</span>: <span class="ident">u8</span>) {
-        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">100</span>);
+        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> &lt;= <span class="number">100</span>);
         <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::GenerateMonsterHouse</span>(
@@ -1135,7 +1135,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `spawn_chance` is the percentage chance that a Monster House will be generated (0-100).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_maze_room</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">spawn_chance</span>: <span class="ident">u8</span>) {
-        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">100</span>);
+        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> &lt;= <span class="number">100</span>);
         <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::GenerateMazeRoom</span>(
@@ -1155,7 +1155,7 @@
     <span class="doccomment">/// tile, as a starting point.</span>
     <span class="doccomment">/// This ensures that there are stripes of walkable open terrain surrounded by stripes of</span>
     <span class="doccomment">/// obstacles (the maze walls).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_maze</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_maze</span>&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::dungeon_grid_cell</span>,
         <span class="ident">secondary_terrain_instead_of_walls</span>: <span class="ident">bool</span>,
@@ -1169,22 +1169,22 @@
     }
 
     <span class="doccomment">/// Set spawn flag 5 (0b100000 or 0x20) on all tiles in a room.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_spawn_flag_5</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::dungeon_grid_cell</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_spawn_flag_5</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::dungeon_grid_cell</span>) {
         <span class="kw">unsafe</span> { <span class="ident">ffi::SetSpawnFlag5</span>(<span class="ident">cell</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
     }
 
     <span class="kw">fn</span> <span class="ident">get_coords</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">x</span> <span class="op">*</span> <span class="ident">GRID_CAPACITY_DIM</span> <span class="op">+</span> <span class="ident">y</span>
+        <span class="ident">x</span> * <span class="ident">GRID_CAPACITY_DIM</span> + <span class="ident">y</span>
     }
 
     <span class="kw">fn</span> <span class="ident">assert_start_positions_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starts_x</span>: <span class="kw-2">&amp;</span>[<span class="ident">i32</span>], <span class="ident">starts_y</span>: <span class="kw-2">&amp;</span>[<span class="ident">i32</span>]) {
         <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">starts_x</span> {
-            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>);
+            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">x</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="kw-2">*</span><span class="ident">x</span> &lt; <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>);
         }
         <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="ident">starts_y</span> {
-            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">y</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>);
+            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">y</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="kw-2">*</span><span class="ident">y</span> &lt; <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

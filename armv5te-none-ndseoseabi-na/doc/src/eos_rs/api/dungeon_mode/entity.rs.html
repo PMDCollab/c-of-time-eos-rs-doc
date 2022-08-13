@@ -158,37 +158,37 @@
     <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="ident">slf</span>: <span class="kw-2">*mut</span> <span class="self">Self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Entity type. Invalid values will return None.</span>
-    <span class="kw">fn</span> <span class="ident">entity_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonEntityType</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">entity_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonEntityType</span>&gt;;
 
     <span class="doccomment">/// This returns the monster info struct for the entity,</span>
     <span class="doccomment">/// panics if the entity is not a monster.</span>
-    <span class="kw">fn</span> <span class="ident">info_for_monster</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonMonsterRef</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">info_for_monster</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonMonsterRef</span>&gt;;
 
     <span class="doccomment">/// This returns the item info struct for the entity,</span>
     <span class="doccomment">/// panics if the entity is not an item.</span>
-    <span class="kw">fn</span> <span class="ident">info_for_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonItem</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">info_for_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonItem</span>&gt;;
 
     <span class="doccomment">/// This returns the trap info struct for the entity,</span>
     <span class="doccomment">/// panics if the entity is not a trap.</span>
-    <span class="kw">fn</span> <span class="ident">info_for_trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonTrap</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">info_for_trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTrap</span>&gt;;
 
     <span class="doccomment">/// This returns the monster info struct for the entity,</span>
     <span class="doccomment">/// panics if the entity is not a monster.</span>
-    <span class="kw">fn</span> <span class="ident">info_for_monster_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonMonsterMut</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">info_for_monster_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonMonsterMut</span>&gt;;
 
     <span class="doccomment">/// This returns the item info struct for the entity,</span>
     <span class="doccomment">/// panics if the entity is not an item.</span>
-    <span class="kw">fn</span> <span class="ident">info_for_item_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonItem</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">info_for_item_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonItem</span>&gt;;
 
     <span class="doccomment">/// This returns the trap info struct for the entity,</span>
     <span class="doccomment">/// panics if the entity is not a trap.</span>
-    <span class="kw">fn</span> <span class="ident">info_for_trap_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonTrap</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">info_for_trap_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonTrap</span>&gt;;
 
     <span class="doccomment">/// Returns the tile, that the entity is located at.</span>
-    <span class="kw">fn</span> <span class="ident">get_tile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonTile</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_tile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTile</span>&gt;;
 
     <span class="doccomment">/// Returns the tile, that the entity is located at.</span>
-    <span class="kw">fn</span> <span class="ident">get_tile_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonTile</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_tile_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonTile</span>&gt;;
 }
 
 <span class="kw">impl</span> <span class="ident">DungeonEntityExt</span> <span class="kw">for</span> <span class="ident">DungeonEntity</span> {
@@ -197,15 +197,15 @@
         <span class="comment">// SAFETY: The lease passed into the function promises us that the overlay is loaded.</span>
         <span class="comment">//         Since this function is intended to actually check if the entity is valid,</span>
         <span class="comment">//         it&#39;s safe to call, even if the `slf` pointer is invalid.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EntityIsValid</span>(<span class="ident">slf</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::EntityIsValid</span>(<span class="ident">slf</span>) &gt; <span class="number">0</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">entity_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonEntityType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">entity_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonEntityType</span>&gt; {
         <span class="self">self</span>.<span class="ident">type_</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">info_for_monster</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonMonsterRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Monster</span>) {
+    <span class="kw">fn</span> <span class="ident">info_for_monster</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonMonsterRef</span>&gt; {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() == <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Monster</span>) {
             <span class="kw">unsafe</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">DungeonMonsterRef</span>(
                     <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ffi::monster</span>),
@@ -217,24 +217,24 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">info_for_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonItem</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Item</span>) {
+    <span class="kw">fn</span> <span class="ident">info_for_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonItem</span>&gt; {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() == <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Item</span>) {
             <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">DungeonItem</span>)) }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">info_for_trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonTrap</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Trap</span>) {
+    <span class="kw">fn</span> <span class="ident">info_for_trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTrap</span>&gt; {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() == <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Trap</span>) {
             <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">DungeonTrap</span>)) }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">info_for_monster_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonMonsterMut</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Monster</span>) {
+    <span class="kw">fn</span> <span class="ident">info_for_monster_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonMonsterMut</span>&gt; {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() == <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Monster</span>) {
             <span class="kw">unsafe</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">DungeonMonsterMut</span>(
                     <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">ffi::monster</span>),
@@ -246,24 +246,24 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">info_for_item_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonItem</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Item</span>) {
+    <span class="kw">fn</span> <span class="ident">info_for_item_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonItem</span>&gt; {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() == <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Item</span>) {
             <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">DungeonItem</span>)) }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">info_for_trap_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonTrap</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Trap</span>) {
+    <span class="kw">fn</span> <span class="ident">info_for_trap_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonTrap</span>&gt; {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entity_type</span>() == <span class="prelude-val">Some</span>(<span class="ident">DungeonEntityType::Trap</span>) {
             <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">DungeonTrap</span>)) }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_tile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonTile</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::GetTileAtEntity</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) };
+    <span class="kw">fn</span> <span class="ident">get_tile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTile</span>&gt; {
+        <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetTileAtEntity</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) };
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -271,8 +271,8 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_tile_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DungeonTile</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::GetTileAtEntity</span>(<span class="self">self</span>) };
+    <span class="kw">fn</span> <span class="ident">get_tile_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonTile</span>&gt; {
+        <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetTileAtEntity</span>(<span class="self">self</span>) };
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -281,4 +281,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

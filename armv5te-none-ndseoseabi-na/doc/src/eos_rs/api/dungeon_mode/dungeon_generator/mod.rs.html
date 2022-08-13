@@ -104,7 +104,7 @@
 
 <span class="doccomment">/// A generation cell in the dungeon grid. This is a temporary artifact used during generation,</span>
 <span class="doccomment">/// it clusters the grid of dungeon tiles into multiple areas.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonGridCell</span> <span class="op">=</span> <span class="ident">ffi::dungeon_grid_cell</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonGridCell</span> = <span class="ident">ffi::dungeon_grid_cell</span>;
 
 <span class="doccomment">/// High-level trait for generating new dungeons and replacing the current global dungeon.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonFloorGeneration</span> {
@@ -135,7 +135,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Implementors</span>
     <span class="doccomment">/// Implementations must call `cb`.</span>
-    <span class="kw">fn</span> <span class="ident">entities</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EntityGenerator</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cb</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">entities</span>&lt;<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EntityGenerator</span>)&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cb</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
 
     <span class="doccomment">/// Write the finished generated dungeon to the global dungeon struct.</span>
     <span class="doccomment">///</span>
@@ -161,4 +161,4 @@
     );
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

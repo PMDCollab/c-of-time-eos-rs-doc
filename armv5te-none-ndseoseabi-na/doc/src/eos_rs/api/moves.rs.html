@@ -253,20 +253,20 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Move target (i.e., who does a move affect when used?).</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveTarget</span> {
-    <span class="ident">Enemies</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_ENEMIES</span>,
-    <span class="ident">Party</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_PARTY</span>,
-    <span class="ident">All</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_ALL</span>,
-    <span class="ident">User</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_USER</span>,
-    <span class="ident">EnemiesAfterCharging</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_ENEMIES_AFTER_CHARGING</span>,
-    <span class="ident">AllExceptUser</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_ALL_EXCEPT_USER</span>,
-    <span class="ident">Teammates</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_TEAMMATES</span>,
-    <span class="ident">Special</span> <span class="op">=</span> <span class="ident">ffi::move_target::TARGET_SPECIAL</span>,
+    <span class="ident">Enemies</span> = <span class="ident">ffi::move_target::TARGET_ENEMIES</span>,
+    <span class="ident">Party</span> = <span class="ident">ffi::move_target::TARGET_PARTY</span>,
+    <span class="ident">All</span> = <span class="ident">ffi::move_target::TARGET_ALL</span>,
+    <span class="ident">User</span> = <span class="ident">ffi::move_target::TARGET_USER</span>,
+    <span class="ident">EnemiesAfterCharging</span> = <span class="ident">ffi::move_target::TARGET_ENEMIES_AFTER_CHARGING</span>,
+    <span class="ident">AllExceptUser</span> = <span class="ident">ffi::move_target::TARGET_ALL_EXCEPT_USER</span>,
+    <span class="ident">Teammates</span> = <span class="ident">ffi::move_target::TARGET_TEAMMATES</span>,
+    <span class="ident">Special</span> = <span class="ident">ffi::move_target::TARGET_SPECIAL</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">MoveTarget</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::move_target::Type</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+<span class="kw">impl</span> <span class="ident">TryInto</span>&lt;<span class="ident">MoveTarget</span>&gt; <span class="kw">for</span> <span class="ident">ffi::move_target::Type</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> = ();
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MoveTarget</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="ident">MoveTarget</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ffi::move_target::TARGET_ENEMIES</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveTarget::Enemies</span>),
             <span class="ident">ffi::move_target::TARGET_PARTY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveTarget::Party</span>),
@@ -285,23 +285,23 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Move range.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveRange</span> {
-    <span class="ident">Front</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT</span>,
-    <span class="ident">FrontAndSides</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_AND_SIDES</span>,
-    <span class="ident">Nearby</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_NEARBY</span>,
-    <span class="ident">Room</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_ROOM</span>,
-    <span class="ident">Front2</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_2</span>,
-    <span class="ident">Front10</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_10</span>,
-    <span class="ident">Floor</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FLOOR</span>,
-    <span class="ident">User</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_USER</span>,
-    <span class="ident">FrontWithCornerCutting</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_WITH_CORNER_CUTTING</span>,
-    <span class="ident">Front2WithCornerCutting</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_FRONT_2_WITH_CORNER_CUTTING</span>,
-    <span class="ident">Special</span> <span class="op">=</span> <span class="ident">ffi::move_range::RANGE_SPECIAL</span>,
+    <span class="ident">Front</span> = <span class="ident">ffi::move_range::RANGE_FRONT</span>,
+    <span class="ident">FrontAndSides</span> = <span class="ident">ffi::move_range::RANGE_FRONT_AND_SIDES</span>,
+    <span class="ident">Nearby</span> = <span class="ident">ffi::move_range::RANGE_NEARBY</span>,
+    <span class="ident">Room</span> = <span class="ident">ffi::move_range::RANGE_ROOM</span>,
+    <span class="ident">Front2</span> = <span class="ident">ffi::move_range::RANGE_FRONT_2</span>,
+    <span class="ident">Front10</span> = <span class="ident">ffi::move_range::RANGE_FRONT_10</span>,
+    <span class="ident">Floor</span> = <span class="ident">ffi::move_range::RANGE_FLOOR</span>,
+    <span class="ident">User</span> = <span class="ident">ffi::move_range::RANGE_USER</span>,
+    <span class="ident">FrontWithCornerCutting</span> = <span class="ident">ffi::move_range::RANGE_FRONT_WITH_CORNER_CUTTING</span>,
+    <span class="ident">Front2WithCornerCutting</span> = <span class="ident">ffi::move_range::RANGE_FRONT_2_WITH_CORNER_CUTTING</span>,
+    <span class="ident">Special</span> = <span class="ident">ffi::move_range::RANGE_SPECIAL</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">MoveRange</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::move_range::Type</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+<span class="kw">impl</span> <span class="ident">TryInto</span>&lt;<span class="ident">MoveRange</span>&gt; <span class="kw">for</span> <span class="ident">ffi::move_range::Type</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> = ();
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MoveRange</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="ident">MoveRange</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ffi::move_range::RANGE_FRONT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveRange::Front</span>),
             <span class="ident">ffi::move_range::RANGE_FRONT_AND_SIDES</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveRange::FrontAndSides</span>),
@@ -328,26 +328,26 @@
 <span class="doccomment">/// Conditions checked by the AI to determine when a move should be used.</span>
 <span class="doccomment">/// It does not affect how the move works.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveAiCondition</span> {
-    <span class="prelude-val">None</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_NONE</span>,
+    <span class="prelude-val">None</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_NONE</span>,
     <span class="doccomment">/// The AI will consider a target elegible wirh a chance equal to the</span>
     <span class="doccomment">/// move&#39;s &quot;ai_condition_random_chance&quot; value.</span>
-    <span class="ident">Random</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_RANDOM</span>,
+    <span class="ident">Random</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_RANDOM</span>,
     <span class="doccomment">/// Target has HP &lt;= 25%</span>
-    <span class="ident">Hp25</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25</span>,
+    <span class="ident">Hp25</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25</span>,
     <span class="doccomment">/// Target has a negative status condition</span>
-    <span class="ident">Status</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_STATUS</span>,
+    <span class="ident">Status</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_STATUS</span>,
     <span class="doccomment">/// Target is asleep, napping or in a nightmare</span>
-    <span class="ident">Asleep</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_ASLEEP</span>,
+    <span class="ident">Asleep</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_ASLEEP</span>,
     <span class="doccomment">/// Target is ghost-type and not exposed</span>
-    <span class="ident">Ghost</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_GHOST</span>,
+    <span class="ident">Ghost</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_GHOST</span>,
     <span class="doccomment">/// Target has HP &lt;= 25% or a negative status condition</span>
-    <span class="ident">Hp25OrStatus</span> <span class="op">=</span> <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25_OR_STATUS</span>,
+    <span class="ident">Hp25OrStatus</span> = <span class="ident">ffi::move_ai_condition::AI_CONDITION_HP_25_OR_STATUS</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">MoveAiCondition</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::move_ai_condition::Type</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+<span class="kw">impl</span> <span class="ident">TryInto</span>&lt;<span class="ident">MoveAiCondition</span>&gt; <span class="kw">for</span> <span class="ident">ffi::move_ai_condition::Type</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> = ();
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MoveAiCondition</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="ident">MoveAiCondition</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ffi::move_ai_condition::AI_CONDITION_NONE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::None</span>),
             <span class="ident">ffi::move_ai_condition::AI_CONDITION_RANDOM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveAiCondition::Random</span>),
@@ -366,13 +366,13 @@
 <span class="doccomment">/// Range, target and AI data for a move.</span>
 <span class="doccomment">/// Values are None, if they are invalid / non-standard.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoveTargetAndRange</span> {
-    <span class="kw">pub</span> <span class="ident">target</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveTarget</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveRange</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">ai_condition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveAiCondition</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">target</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">MoveTarget</span>&gt;,
+    <span class="kw">pub</span> <span class="ident">range</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">MoveRange</span>&gt;,
+    <span class="kw">pub</span> <span class="ident">ai_condition</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">MoveAiCondition</span>&gt;,
     <span class="kw">pub</span> <span class="ident">unused</span>: <span class="ident">u16</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ffi::move_target_and_range</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MoveTargetAndRange</span> {
+<span class="kw">impl</span> <span class="ident">From</span>&lt;<span class="ident">ffi::move_target_and_range</span>&gt; <span class="kw">for</span> <span class="ident">MoveTargetAndRange</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tr</span>: <span class="ident">ffi::move_target_and_range</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">MoveTargetAndRange</span> {
             <span class="ident">target</span>: <span class="ident">tr</span>.<span class="ident">target</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>(),
@@ -384,11 +384,11 @@
 }
 
 <span class="doccomment">/// Will fail, if any values are None in MoveTargetAndRange.</span>
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">MoveTargetAndRange</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ffi::move_target_and_range</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">MoveTargetAndRange</span>&gt; <span class="kw">for</span> <span class="ident">ffi::move_target_and_range</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">MoveTargetAndRange</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">target</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">range</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">ai_condition</span>.<span class="ident">is_none</span>() {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">MoveTargetAndRange</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
+        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">target</span>.<span class="ident">is_none</span>() || <span class="ident">value</span>.<span class="ident">range</span>.<span class="ident">is_none</span>() || <span class="ident">value</span>.<span class="ident">ai_condition</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
         }
         <span class="prelude-val">Ok</span>(<span class="ident">ffi::move_target_and_range</span> {
@@ -426,7 +426,7 @@
     <span class="kw">fn</span> <span class="ident">is_punch_move</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Gets a move&#39;s category (physical, special, status). Returns None if the catgeory is invalid.</span>
-    <span class="kw">fn</span> <span class="ident">get_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveCategory</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">MoveCategory</span>&gt;;
 
     <span class="doccomment">/// Gets the type of the move.</span>
     <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">type_catalog::Type</span>;
@@ -459,14 +459,14 @@
     }
 
     <span class="kw">fn</span> <span class="ident">is_recoil_move</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsRecoilMove</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">val</span>()) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsRecoilMove</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">val</span>()) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">is_punch_move</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsPunchMove</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">val</span>()) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsPunchMove</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">val</span>()) &gt; <span class="number">0</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MoveCategory</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">MoveCategory</span>&gt; {
         <span class="kw">unsafe</span> { <span class="ident">ffi::GetMoveCategory</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">val</span>()) }
             .<span class="ident">try_into</span>()
             .<span class="ident">ok</span>()
@@ -489,4 +489,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

@@ -123,7 +123,7 @@
 <span class="doccomment">/// are set up correctly and no references to the area exist.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">reset_damage_desc</span>(<span class="ident">damage_desc</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">reset_damage_desc</span>(<span class="ident">damage_desc</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
     <span class="ident">ffi::ResetDamageDesc</span>(<span class="ident">damage_desc</span>);
 }
 
@@ -133,7 +133,7 @@
 <span class="doccomment">/// # Safety</span>
 <span class="doccomment">/// This resets some global data. The caller needs to make sure pointers to this space</span>
 <span class="doccomment">/// are set up correctly and no references to the area exist.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">reset_damage_calc_scratch_space</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">reset_damage_calc_scratch_space</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
     <span class="ident">ffi::ResetDamageCalcScratchSpace</span>();
 }
 
@@ -143,17 +143,17 @@
 <span class="doccomment">/// If you&#39;re in a special episode, they turn green , otherwise, they turn blue or pink depending</span>
 <span class="doccomment">/// on your character&#39;s sex</span>
 <span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_both_screens_window_color_to_default</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_both_screens_window_color_to_default</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
     <span class="kw">unsafe</span> { <span class="ident">ffi::SetBothScreensWindowColorToDefault</span>() }
 }
 
 <span class="doccomment">/// Fades the screen to black across several frames.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fade_to_black</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fade_to_black</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
     <span class="kw">unsafe</span> { <span class="ident">ffi::FadeToBlack</span>() }
 }
 
 <span class="doccomment">/// Advances one frame. Does not return until the next frame starts.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_frame</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_frame</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
     <span class="kw">unsafe</span> { <span class="ident">ffi::AdvanceFrame</span>(<span class="number">0</span> <span class="kw">as</span> <span class="ident">ffi::undefined</span>) }
 }
 
@@ -164,9 +164,9 @@
 <span class="doccomment">/// to display multiple monsters moving at once even though they take turns sequentially.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Seems to return true if there were any pending actions to display.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_actions</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>, <span class="ident">entity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">entity</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">force_mut_ptr!</span>(<span class="ident">e</span>)).<span class="ident">unwrap_or</span>(<span class="ident">ptr::null_mut</span>());
-    <span class="kw">unsafe</span> { <span class="ident">ffi::DisplayActions</span>(<span class="ident">ptr</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_actions</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;, <span class="ident">entity</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>&gt;) -&gt; <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="ident">entity</span>.<span class="ident">map</span>(|<span class="ident">e</span>| <span class="macro">force_mut_ptr!</span>(<span class="ident">e</span>)).<span class="ident">unwrap_or</span>(<span class="ident">ptr::null_mut</span>());
+    <span class="kw">unsafe</span> { <span class="ident">ffi::DisplayActions</span>(<span class="ident">ptr</span>) &gt; <span class="number">0</span> }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

@@ -26,9 +26,9 @@
 <span class="doccomment">/// # Safety</span>
 <span class="doccomment">/// The caller needs to make sure `src` points to a valid SIR0 file buffer.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">translate_sir0</span>(<span class="ident">src</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> = <span class="ident">ptr::null_mut</span>();
     <span class="ident">ffi::HandleSir0Translation</span>((<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">src</span>);
     <span class="ident">dst</span>
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

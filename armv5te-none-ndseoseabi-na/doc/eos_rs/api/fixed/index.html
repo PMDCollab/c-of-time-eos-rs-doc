@@ -34,27 +34,27 @@ amount of fractional digits/bits that are fully accurate.</p>
 </ul>
 <p>You have several options to create a fixed-point number:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">n1</span> <span class="op">=</span> <span class="ident">I24F8::from_num</span>(<span class="number">10</span>);
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">n1</span> = <span class="ident">I24F8::from_num</span>(<span class="number">10</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">n1</span>, <span class="number">10.0</span>);
 
 <span class="comment">// This will round to the nearest possible fixed representation. In this case,</span>
 <span class="comment">// this value will fit, since 2 fits in a 24-bit integer and 75 fits in an</span>
 <span class="comment">// 8-bit integer.</span>
-<span class="kw">let</span> <span class="ident">n2</span> <span class="op">=</span> <span class="ident">I24F8::from_num</span>(<span class="number">2.75</span>);
+<span class="kw">let</span> <span class="ident">n2</span> = <span class="ident">I24F8::from_num</span>(<span class="number">2.75</span>);
 <span class="comment">// Note that due to precision differences this assertion can fail with some values.</span>
 <span class="macro">assert_eq!</span>(<span class="ident">n2</span>, <span class="number">2.75</span>);
 
 <span class="comment">// It&#39;s also possible (and probably faster) to directly use a number already encoded</span>
 <span class="comment">// as a fixed number. This has the lower byte set to 0, which means the fractional</span>
 <span class="comment">// bit will be 0, and the upper byte to 1, which means this is &quot;1.0&quot;.</span>
-<span class="kw">let</span> <span class="ident">n3</span> <span class="op">=</span> <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_00</span>);
+<span class="kw">let</span> <span class="ident">n3</span> = <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_00</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">n3</span>, <span class="number">1.0</span>);
 
-<span class="kw">let</span> <span class="ident">n4</span> <span class="op">=</span> <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_AB</span>);
+<span class="kw">let</span> <span class="ident">n4</span> = <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_AB</span>);
 <span class="comment">// Using strings here to compare, due to the before mentioned accuracy issues.</span>
 <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">n4</span>), <span class="string">&quot;1.668&quot;</span>);
 
-<span class="kw">let</span> <span class="ident">n5</span> <span class="op">=</span> <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_FF</span>);
+<span class="kw">let</span> <span class="ident">n5</span> = <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_FF</span>);
 <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">n5</span>), <span class="string">&quot;1.996&quot;</span>);</code></pre></div>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="extra/index.html" title="eos_rs::api::fixed::extra mod">extra</a></div><div class="item-right docblock-short"><p>Extra types that do not need to be handled directly.</p>
 </div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FixedI8.html" title="eos_rs::api::fixed::FixedI8 struct">FixedI8</a></div><div class="item-right docblock-short"><p>An eight-bit signed number with <code>Frac</code> fractional bits.</p>
@@ -569,4 +569,4 @@ amount of fractional digits/bits that are fully accurate.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.U126F2.html" title="eos_rs::api::fixed::U126F2 type">U126F2</a></div><div class="item-right docblock-short"><p><a href="https://docs.rs/fixed/~1.15/fixed/struct.FixedU128.html" title="FixedU128"><code>FixedU128</code></a> with 126 integer bits and two fractional bits.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.U127F1.html" title="eos_rs::api::fixed::U127F1 type">U127F1</a></div><div class="item-right docblock-short"><p><a href="https://docs.rs/fixed/~1.15/fixed/struct.FixedU128.html" title="FixedU128"><code>FixedU128</code></a> with 127 integer bits and one fractional bit.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.U128F0.html" title="eos_rs::api::fixed::U128F0 type">U128F0</a></div><div class="item-right docblock-short"><p><a href="https://docs.rs/fixed/~1.15/fixed/struct.FixedU128.html" title="FixedU128"><code>FixedU128</code></a> with 128 integer bits and no fractional bits.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

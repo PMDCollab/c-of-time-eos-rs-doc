@@ -680,25 +680,25 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Move index of a monster, used by some functions.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TargetTypeIndex</span> {
-    <span class="ident">FirstType</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="ident">SecondType</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">FirstType</span> = <span class="number">0</span>,
+    <span class="ident">SecondType</span> = <span class="number">1</span>,
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="doccomment">/// The rank a player scored in the sentry duty (footprint) minigame.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SentryGameRank</span> {
-    <span class="ident">First</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="ident">Second</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Third</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Fourth</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">Fifth</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">First</span> = <span class="number">0</span>,
+    <span class="ident">Second</span> = <span class="number">1</span>,
+    <span class="ident">Third</span> = <span class="number">2</span>,
+    <span class="ident">Fourth</span> = <span class="number">3</span>,
+    <span class="ident">Fifth</span> = <span class="number">4</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SentryGameRank</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">i32</span>&gt; <span class="kw">for</span> <span class="ident">SentryGameRank</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::First</span>),
             <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::Second</span>),
@@ -721,7 +721,7 @@
 
 <span class="doccomment">/// Checks if an item is one of the aura bows received at the start of the game.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_aura_bow</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsAuraBow</span>(<span class="ident">item_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsAuraBow</span>(<span class="ident">item_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Sets the amount of money the player is carrying, clamping the value to the range</span>
@@ -738,7 +738,7 @@
 
 <span class="doccomment">/// Checks if the player&#39;s bag is full.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bag_full</span>() -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsBagFull</span>() <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsBagFull</span>() &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Count the amount of the specified item in the player&#39;s bag.</span>
@@ -756,7 +756,7 @@
                 <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
             },
             <span class="ident">amount</span>,
-        }) <span class="op">&gt;</span> <span class="number">0</span>
+        }) &gt; <span class="number">0</span>
     }
 }
 
@@ -764,7 +764,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is *probably* is_storage_full: checks if the player&#39;s storage is full.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_storage_full</span>() -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x39</span>() <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x39</span>() &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Count the amount of the specified item in the player&#39;s storage.</span>
@@ -789,7 +789,7 @@
                 <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
             },
             <span class="ident">amount</span>,
-        }) <span class="op">&gt;</span> <span class="number">0</span>
+        }) &gt; <span class="number">0</span>
     }
 }
 
@@ -803,7 +803,7 @@
                 <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
             },
             <span class="ident">amount</span>,
-        }) <span class="op">&gt;</span> <span class="number">0</span>
+        }) &gt; <span class="number">0</span>
     }
 }
 
@@ -845,7 +845,7 @@
     <span class="ident">effect_flags</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span>,
     <span class="ident">effect_id</span>: <span class="ident">exclusive_item_effect_id::Type</span>,
 ) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemEffectFlagTest</span>(<span class="ident">effect_flags</span>, <span class="ident">effect_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemEffectFlagTest</span>(<span class="ident">effect_flags</span>, <span class="ident">effect_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Gets the single-byte language ID of the current program.</span>
@@ -917,7 +917,7 @@
 
     <span class="doccomment">/// Checks if one adventure log entry is completed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_entry_completed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry_id</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetAdventureLogCompleted</span>(<span class="ident">entry_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::GetAdventureLogCompleted</span>(<span class="ident">entry_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Marks one of the adventure log entry as completed.</span>
@@ -927,7 +927,7 @@
 
     <span class="doccomment">/// Checks if none of of the adventure log entry is completed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsAdventureLogNotEmpty</span>() <span class="op">==</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsAdventureLogNotEmpty</span>() == <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Gets the number of dungeons cleared.</span>
@@ -1097,7 +1097,7 @@
     }
 
     <span class="doccomment">/// Sets the points for the associated rank in the footprints minigame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sentry_duty_game_points</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">points</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SentryGameRank</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sentry_duty_game_points</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">points</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">SentryGameRank</span>&gt; {
         <span class="kw">unsafe</span> { <span class="ident">ffi::SetSentryDutyGamePoints</span>(<span class="ident">points</span>) }
             .<span class="ident">try_into</span>()
             .<span class="ident">ok</span>()
@@ -1106,37 +1106,37 @@
 
 <span class="doccomment">/// Returns whether the specified dungeon is considered as going upward or not</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dungeon_goes_up</span>(<span class="ident">dungeon_id</span>: <span class="ident">dungeon_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonGoesUp</span>(<span class="ident">dungeon_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonGoesUp</span>(<span class="ident">dungeon_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Checks if a monster ID is an Unown.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unown</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsUnown</span>(<span class="ident">monster_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsUnown</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Checks if a monster ID is a Shaymin.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_shaymin</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsShaymin</span>(<span class="ident">monster_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsShaymin</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Checks if a monster ID is a Castform.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_castform</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsCastform</span>(<span class="ident">monster_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsCastform</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Checks if a monster ID is a Cherrim.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cherrim</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsCherrim</span>(<span class="ident">monster_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsCherrim</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Checks if a monster ID is a Deoxys.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_deoxys</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsDeoxys</span>(<span class="ident">monster_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsDeoxys</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Checks if a given monster is on the exploration team (not necessarily the active party)?</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_monster_on_team</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>, <span class="ident">param_2</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsMonsterOnTeam</span>(<span class="ident">monster_id</span>, <span class="ident">param_2</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IsMonsterOnTeam</span>(<span class="ident">monster_id</span>, <span class="ident">param_2</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Sets the team setup of the currently active party.</span>
@@ -1151,10 +1151,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Output is a slice-like of 2-byte values (they seem to be indexes of some sort) describing each</span>
 <span class="doccomment">/// party member.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_party_members</span>() -&gt; <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u16</span>]<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_party_members</span>() -&gt; <span class="kw">impl</span> <span class="ident">AsRef</span>&lt;[<span class="ident">u16</span>]&gt; {
     <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">party_members</span>: [<span class="ident">u16</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="kw">let</span> <span class="ident">nb</span> <span class="op">=</span> <span class="ident">ffi::GetPartyMembers</span>(<span class="ident">party_members</span>.<span class="ident">as_mut_ptr</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">party_members</span>: [<span class="ident">u16</span>; <span class="number">4</span>] = [<span class="number">0</span>; <span class="number">4</span>];
+        <span class="kw">let</span> <span class="ident">nb</span> = <span class="ident">ffi::GetPartyMembers</span>(<span class="ident">party_members</span>.<span class="ident">as_mut_ptr</span>());
         <span class="ident">OwnedSlice::new</span>(<span class="ident">party_members</span>, <span class="number">0</span>, <span class="ident">nb</span> <span class="kw">as</span> <span class="ident">usize</span>)
     }
 }
@@ -1166,7 +1166,7 @@
 
 <span class="doccomment">/// Tests whether an IQ skill with a given ID is active.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iq_skill_flag_test</span>(<span class="ident">iq_skill_flags</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span>, <span class="ident">iq_id</span>: <span class="ident">iq_skill_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IqSkillFlagTest</span>(<span class="ident">iq_skill_flags</span>, <span class="ident">iq_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::IqSkillFlagTest</span>(<span class="ident">iq_skill_flags</span>, <span class="ident">iq_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Returns the number of SOS mails.</span>
@@ -1199,7 +1199,7 @@
 <span class="doccomment">/// Once we find out more about the item table, this function will probably move to a wrapper</span>
 <span class="doccomment">/// struct.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">item_at_table_idx</span>(<span class="ident">table_idx</span>: <span class="ident">i32</span>) -&gt; <span class="ident">ffi::owned_item</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ffi::owned_item</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> = <span class="ident">ffi::owned_item</span> {
         <span class="ident">id</span>: <span class="ident">item_id_16</span> {
             <span class="ident">_bitfield_align_1</span>: [],
             <span class="ident">_bitfield_1</span>: <span class="ident">Default::default</span>(),
@@ -1217,7 +1217,7 @@
 
 <span class="doccomment">/// Checks if a dungeon tip has already been shown before or not.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">was_dungeon_tip_shown</span>(<span class="ident">tip_id</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetDungeonTipShown</span>(<span class="ident">tip_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+    <span class="kw">unsafe</span> { <span class="ident">ffi::GetDungeonTipShown</span>(<span class="ident">tip_id</span>) &gt; <span class="number">0</span> }
 }
 
 <span class="doccomment">/// Returns whether a certain joined_at field value is between</span>
@@ -1227,7 +1227,7 @@
         <span class="ident">ffi::JoinedAtRangeCheck</span>(<span class="ident">ffi::dungeon_id_8</span> {
             <span class="ident">_bitfield_align_1</span>: [],
             <span class="ident">_bitfield_1</span>: <span class="ident">ffi::dungeon_id_8::new_bitfield_1</span>(<span class="ident">joined_at</span>),
-        }) <span class="op">&gt;</span> <span class="number">0</span>
+        }) &gt; <span class="number">0</span>
     }
 }
 
@@ -1238,7 +1238,7 @@
         <span class="ident">ffi::ShouldCauseGameOverOnFaint</span>(<span class="ident">ffi::dungeon_id_8</span> {
             <span class="ident">_bitfield_align_1</span>: [],
             <span class="ident">_bitfield_1</span>: <span class="ident">ffi::dungeon_id_8::new_bitfield_1</span>(<span class="ident">joined_at</span>),
-        }) <span class="op">&gt;</span> <span class="number">0</span>
+        }) &gt; <span class="number">0</span>
     }
 }
 
@@ -1280,8 +1280,8 @@
 }
 
 <span class="doccomment">/// Returns a struct containing information about a team member.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_team_member_data</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">member_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::team_member</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::GetTeamMemberData</span>(<span class="ident">member_id</span>) };
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_team_member_data</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">member_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::team_member</span>&gt; {
+    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetTeamMemberData</span>(<span class="ident">member_id</span>) };
     <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
@@ -1290,8 +1290,8 @@
 }
 
 <span class="doccomment">/// Returns a struct containing information about a team member.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_team_member_data_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">member_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::team_member</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::GetTeamMemberData</span>(<span class="ident">member_id</span>) };
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_team_member_data_mut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">member_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::team_member</span>&gt; {
+    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetTeamMemberData</span>(<span class="ident">member_id</span>) };
     <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
@@ -1302,8 +1302,8 @@
 <span class="doccomment">/// Returns the data of a monster sent into the Explorer Dojo using the &quot;exchange teams&quot; option.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// `entry_number` must be a value between \[0,3\].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_explorer_dojo_monster_data</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">entry_number</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::ground_monster</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::GetExplorerMazeMonster</span>(<span class="ident">entry_number</span>) };
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_explorer_dojo_monster_data</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">entry_number</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::ground_monster</span>&gt; {
+    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetExplorerMazeMonster</span>(<span class="ident">entry_number</span>) };
     <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
@@ -1314,10 +1314,10 @@
 <span class="doccomment">/// Returns the data of a monster sent into the Explorer Dojo using the &quot;exchange teams&quot; option.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// `entry_number` must be a value between \[0,3\].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_explorer_dojo_monster_data_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_explorer_dojo_monster_data_mut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(
     <span class="ident">entry_number</span>: <span class="ident">u8</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::ground_monster</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::GetExplorerMazeMonster</span>(<span class="ident">entry_number</span>) };
+) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::ground_monster</span>&gt; {
+    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetExplorerMazeMonster</span>(<span class="ident">entry_number</span>) };
     <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
@@ -1325,4 +1325,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

@@ -1002,7 +1002,7 @@
         <span class="ident">defender</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>,
         <span class="ident">target_type_index</span>: <span class="ident">TargetTypeIndex</span>,
         <span class="ident">attack_type</span>: <span class="ident">type_catalog::Type</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonTypeMatchup</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonTypeMatchup</span>&gt;;
 
     <span class="doccomment">/// Probably the damage calculation function.</span>
     <span class="doccomment">/// The result seems to get written to the unknown struct behind the pointer provided by</span>
@@ -1150,7 +1150,7 @@
     <span class="kw">fn</span> <span class="ident">get_move_target_and_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">the_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>, <span class="ident">is_ai</span>: <span class="ident">bool</span>) -&gt; <span class="ident">MoveTargetAndRange</span>;
 
     <span class="doccomment">/// Get the weather, as experienced by the monster.</span>
-    <span class="kw">fn</span> <span class="ident">get_apparent_weather</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weather</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_apparent_weather</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">Weather</span>&gt;;
 
     <span class="doccomment">/// Checks if the monster has a certain held item.</span>
     <span class="kw">fn</span> <span class="ident">has_held_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">bool</span>;
@@ -1178,7 +1178,7 @@
 
     <span class="doccomment">/// Checks if the monster is under the effect of Conversion 2 (its type was changed). Returns</span>
     <span class="doccomment">/// `None` if the value is invalid.</span>
-    <span class="kw">fn</span> <span class="ident">is_conversion2_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Conversion2Status</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">is_conversion2_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">Conversion2Status</span>&gt;;
 
     <span class="doccomment">/// Check the type of a move when used by a certain monster. Accounts for special cases</span>
     <span class="doccomment">/// such as Hidden Power, Weather Ball, the regular attack...</span>
@@ -1254,37 +1254,37 @@
     <span class="kw">fn</span> <span class="ident">execute_action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DungeonMonsterExtRead</span> <span class="kw">for</span> <span class="ident">DungeonMonsterRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DungeonMonsterExtRead</span> <span class="kw">for</span> <span class="ident">DungeonMonsterRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn</span> <span class="ident">is_special_story_ally</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsSpecialStoryAlly</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">0</span>)) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsSpecialStoryAlly</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">0</span>)) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">is_experience_locked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsExperienceLocked</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">0</span>)) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsExperienceLocked</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">0</span>)) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">is_holding_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item_id</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ItemIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">item_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::ItemIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">item_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">has_low_health</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::HasLowHealth</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::HasLowHealth</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">gastro_acid_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::NoGastroAcidStatus</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">0</span>)) <span class="op">==</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::NoGastroAcidStatus</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">0</span>)) == <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">is_ability_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ability_id</span>: <span class="ident">ability_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::AbilityIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">ability_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::AbilityIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">ability_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">has_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">type_id</span>: <span class="ident">type_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::MonsterIsType</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">type_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::MonsterIsType</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">type_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">is_iq_skill_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">iq_skill_id</span>: <span class="ident">iq_skill_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IqSkillIsEnabled</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">iq_skill_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IqSkillIsEnabled</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">iq_skill_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">is_defender_ability_active</span>(
@@ -1299,7 +1299,7 @@
                 <span class="macro">force_mut_ptr!</span>(<span class="ident">defender</span>),
                 <span class="ident">defender_ability_id</span>,
                 <span class="ident">own_ability_is_active</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) <span class="op">&gt;</span> <span class="number">0</span>
+            ) &gt; <span class="number">0</span>
         }
     }
 
@@ -1307,7 +1307,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">effect_id</span>: <span class="ident">exclusive_item_effect_catalog::Type</span>,
     ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemEffectIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">effect_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemEffectIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">effect_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">get_type_matchup</span>(
@@ -1315,7 +1315,7 @@
         <span class="ident">defender</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>,
         <span class="ident">target_type_index</span>: <span class="ident">TargetTypeIndex</span>,
         <span class="ident">attack_type</span>: <span class="ident">type_catalog::Type</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonTypeMatchup</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonTypeMatchup</span>&gt; {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::GetTypeMatchup</span>(
                 <span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>),
@@ -1481,25 +1481,25 @@
     }
 
     <span class="kw">fn</span> <span class="ident">is_aura_bow_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::AuraBowIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::AuraBowIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">get_exclusive_item_offense_boost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">move_category</span>: <span class="ident">MoveCategory</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">if</span> <span class="ident">move_category</span> <span class="op">==</span> <span class="ident">MoveCategory::Special</span> <span class="op">|</span><span class="op">|</span> <span class="ident">move_category</span> <span class="op">==</span> <span class="ident">MoveCategory::None</span> {
+        <span class="kw">if</span> <span class="ident">move_category</span> == <span class="ident">MoveCategory::Special</span> || <span class="ident">move_category</span> == <span class="ident">MoveCategory::None</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;get_exclusive_item_offense_boost called with invalid move category&quot;</span>);
         }
         <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemOffenseBoost</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">move_category</span> <span class="kw">as</span> <span class="ident">c_int</span>) }
     }
 
     <span class="kw">fn</span> <span class="ident">get_exclusive_item_defense_boost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">move_category</span>: <span class="ident">MoveCategory</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">if</span> <span class="ident">move_category</span> <span class="op">==</span> <span class="ident">MoveCategory::Special</span> <span class="op">|</span><span class="op">|</span> <span class="ident">move_category</span> <span class="op">==</span> <span class="ident">MoveCategory::None</span> {
+        <span class="kw">if</span> <span class="ident">move_category</span> == <span class="ident">MoveCategory::Special</span> || <span class="ident">move_category</span> == <span class="ident">MoveCategory::None</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;get_exclusive_item_offense_boost called with invalid move category&quot;</span>);
         }
         <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemDefenseBoost</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">move_category</span> <span class="kw">as</span> <span class="ident">c_int</span>) }
     }
 
     <span class="kw">fn</span> <span class="ident">has_conditional_ground_immunity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::HasConditionalGroundImmunity</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::HasConditionalGroundImmunity</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">get_move_target_and_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">the_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>, <span class="ident">is_ai</span>: <span class="ident">bool</span>) -&gt; <span class="ident">MoveTargetAndRange</span> {
@@ -1513,14 +1513,14 @@
         .<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">get_apparent_weather</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weather</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_apparent_weather</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">Weather</span>&gt; {
         <span class="kw">unsafe</span> { <span class="ident">ffi::GetApparentWeather</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) }
             .<span class="ident">try_into</span>()
             .<span class="ident">ok</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">has_held_item</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::HasHeldItem</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">item_id</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::HasHeldItem</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">item_id</span>) &gt; <span class="number">0</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">get_move_power</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">the_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>) -&gt; <span class="ident">i32</span> {
@@ -1542,10 +1542,10 @@
     }
 
     <span class="kw">fn</span> <span class="ident">is_levitating</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::LevitateIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::LevitateIsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) &gt; <span class="number">0</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_conversion2_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Conversion2Status</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">is_conversion2_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">Conversion2Status</span>&gt; {
         <span class="kw">unsafe</span> { <span class="ident">ffi::Conversion2IsActive</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>)) }
             .<span class="ident">try_into</span>()
             .<span class="ident">ok</span>()
@@ -1560,11 +1560,11 @@
     }
 
     <span class="kw">fn</span> <span class="ident">is_blinded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">check_held_item</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsBlinded</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">check_held_item</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) <span class="op">&gt;</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">ffi::IsBlinded</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.<span class="number">1</span>), <span class="ident">check_held_item</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) &gt; <span class="number">0</span> }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DungeonMonsterExtRead</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DungeonMonsterExtRead</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn</span> <span class="ident">is_special_story_ally</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">is_special_story_ally</span>()
     }
@@ -1622,7 +1622,7 @@
         <span class="ident">defender</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>,
         <span class="ident">target_type_index</span>: <span class="ident">TargetTypeIndex</span>,
         <span class="ident">attack_type</span>: <span class="ident">type_catalog::Type</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DungeonTypeMatchup</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">DungeonTypeMatchup</span>&gt; {
         <span class="self">self</span>.<span class="ident">as_ref</span>()
             .<span class="ident">get_type_matchup</span>(<span class="ident">defender</span>, <span class="ident">target_type_index</span>, <span class="ident">attack_type</span>)
     }
@@ -1788,7 +1788,7 @@
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">get_move_target_and_range</span>(<span class="ident">the_move</span>, <span class="ident">is_ai</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_apparent_weather</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weather</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_apparent_weather</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">Weather</span>&gt; {
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">get_apparent_weather</span>()
     }
 
@@ -1812,7 +1812,7 @@
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">is_levitating</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_conversion2_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Conversion2Status</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">is_conversion2_active</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">Conversion2Status</span>&gt; {
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">is_conversion2_active</span>()
     }
 
@@ -1829,7 +1829,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DungeonMonsterExtWrite</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DungeonMonsterExtWrite</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn</span> <span class="ident">update_move_pp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">should_consume_pp</span>: <span class="ident">bool</span>) {
         <span class="kw">unsafe</span> { <span class="ident">ffi::UpdateMovePp</span>(<span class="self">self</span>.<span class="number">1</span>, <span class="ident">should_consume_pp</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
     }
@@ -1879,4 +1879,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

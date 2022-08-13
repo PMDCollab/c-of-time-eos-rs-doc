@@ -62,19 +62,19 @@
 <span class="kw">use</span> <span class="ident">alloc::format</span>;
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">Level</span>, <span class="ident">LevelFilter</span>, <span class="ident">Metadata</span>, <span class="ident">Record</span>};
 
-<span class="kw">static</span> <span class="ident">LOGGER</span>: <span class="ident">EoSLogger</span> <span class="op">=</span> <span class="ident">EoSLogger</span>;
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">LOGGER_INIT</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+<span class="kw">static</span> <span class="ident">LOGGER</span>: <span class="ident">EoSLogger</span> = <span class="ident">EoSLogger</span>;
+<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">LOGGER_INIT</span>: <span class="ident">bool</span> = <span class="bool-val">false</span>;
 
 <span class="doccomment">/// Registers the logger at the [`log`] crate. This is safe to be called multiple times.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_logger</span>() {
     <span class="comment">// We will ignore errors during logger setup.</span>
     <span class="comment">// SAFETY: We only have one thread, we are sure we are the only ones calling this.</span>
     <span class="kw">unsafe</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">LOGGER_INIT</span> {
+        <span class="kw">if</span> !<span class="ident">LOGGER_INIT</span> {
             <span class="ident">log::set_logger_racy</span>(<span class="kw-2">&amp;</span><span class="ident">LOGGER</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">log::set_max_level</span>(<span class="ident">LevelFilter::Debug</span>))
+                .<span class="ident">map</span>(|()| <span class="ident">log::set_max_level</span>(<span class="ident">LevelFilter::Debug</span>))
                 .<span class="ident">ok</span>();
-            <span class="ident">LOGGER_INIT</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="ident">LOGGER_INIT</span> = <span class="bool-val">true</span>;
         }
     }
 }
@@ -83,12 +83,12 @@
 
 <span class="kw">impl</span> <span class="ident">log::Log</span> <span class="kw">for</span> <span class="ident">EoSLogger</span> {
     <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">metadata</span>.<span class="ident">level</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">Level::Debug</span>
+        <span class="ident">metadata</span>.<span class="ident">level</span>() &lt;= <span class="ident">Level::Debug</span>
     }
 
     <span class="kw">fn</span> <span class="ident">log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">enabled</span>(<span class="ident">record</span>.<span class="ident">metadata</span>()) {
-            <span class="kw">let</span> <span class="ident">c_str</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="macro">format!</span>(
+            <span class="kw">let</span> <span class="ident">c_str</span> = <span class="ident">CString::new</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;[rs] {} : {} -- {} [{}:{}]&quot;</span>,
                 <span class="ident">record</span>.<span class="ident">level</span>(),
                 <span class="ident">record</span>.<span class="ident">target</span>(),
@@ -97,7 +97,7 @@
                 <span class="ident">record</span>.<span class="ident">line</span>().<span class="ident">unwrap_or_default</span>()
             ))
             .<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">c_ptr</span> <span class="op">=</span> <span class="ident">c_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>;
+            <span class="kw">let</span> <span class="ident">c_ptr</span> = <span class="ident">c_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>;
             <span class="kw">unsafe</span> {
                 <span class="kw">match</span> <span class="ident">record</span>.<span class="ident">level</span>() {
                     <span class="ident">Level::Error</span> =&gt; <span class="ident">ffi::DebugPrint</span>(<span class="number">2</span>, <span class="ident">c_ptr</span>),
@@ -111,4 +111,4 @@
     <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

@@ -143,10 +143,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ignore_sprite_size</span>: <span class="ident">bool</span>,
         <span class="ident">include_shedinja</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MonsterSpeciesInfo</span><span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">MAX_EVOLUTIONS</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_list</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">MAX_EVOLUTIONS</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+    ) -&gt; <span class="ident">Vec</span>&lt;<span class="ident">MonsterSpeciesInfo</span>&gt; {
+        <span class="kw">const</span> <span class="ident">MAX_EVOLUTIONS</span>: <span class="ident">i32</span> = <span class="number">32</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_list</span> = [<span class="number">0</span>; <span class="ident">MAX_EVOLUTIONS</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="kw">let</span> <span class="ident">count</span> = <span class="kw">unsafe</span> {
             <span class="ident">ffi::GetEvolutions</span>(
                 <span class="self">self</span>.<span class="number">0</span>,
                 <span class="ident">output_list</span>.<span class="ident">as_mut_ptr</span>(),
@@ -154,7 +154,7 @@
                 <span class="ident">include_shedinja</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
             )
         };
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MAX_EVOLUTIONS</span> {
+        <span class="kw">if</span> <span class="ident">count</span> &gt;= <span class="ident">MAX_EVOLUTIONS</span> {
             <span class="comment">// uh oh. Memory is corrupted now, so time to bail.</span>
             <span class="comment">// THIS PANIC IS NOT UNWIND SAFE (not that it matters).</span>
             <span class="macro">panic!</span>(<span class="string">&quot;Monster has more than {} evolutions.&quot;</span>, <span class="ident">MAX_EVOLUTIONS</span>);
@@ -167,4 +167,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

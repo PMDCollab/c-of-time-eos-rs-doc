@@ -142,15 +142,15 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Also see [`crate::api::messages::GameStringBuilder`]; this is using pretty much the same</span>
 <span class="doccomment">/// principles for building the actual message strings.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LogMessageBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">_lease</span>: <span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LogMessageBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="ident">_lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
     <span class="ident">popup</span>: <span class="ident">bool</span>,
     <span class="ident">check_user</span>: <span class="ident">bool</span>,
-    <span class="ident">target_check_fainted</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonEntity</span><span class="op">&gt;</span>,
+    <span class="ident">target_check_fainted</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonEntity</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreatableWithLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LogMessageBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">_create</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">CreatableWithLease</span>&lt;<span class="number">29</span>&gt; <span class="kw">for</span> <span class="ident">LogMessageBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn</span> <span class="ident">_create</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">_lease</span>: <span class="ident">lease</span>,
             <span class="ident">popup</span>: <span class="bool-val">false</span>,
@@ -159,15 +159,15 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lease</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span><span class="op">&lt;</span><span class="number">29</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">lease</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">_lease</span>
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LogMessageBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">LogMessageBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Show a message popup when the message is displayed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">popup</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">popup</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="self">self</span>.<span class="ident">popup</span> = <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
 
@@ -177,14 +177,14 @@
     <span class="doccomment">/// [`Self::target_check_fainted`] will take precedence over this, both can not be active</span>
     <span class="doccomment">/// at the same time.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_user_fainted</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">check_user</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="self">self</span>.<span class="ident">check_user</span> = <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
 
     <span class="comment">// Do not show the message if the target is fainted and an unknown check</span>
     <span class="comment">// regarding the user passes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_check_fainted</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonEntity</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">target_check_fainted</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target</span>);
+        <span class="self">self</span>.<span class="ident">target_check_fainted</span> = <span class="prelude-val">Some</span>(<span class="ident">target</span>);
         <span class="self">self</span>
     }
 
@@ -231,12 +231,12 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_str</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message</span>: <span class="ident">S</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_str</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">str</span>&gt; + <span class="ident">Debug</span>&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message</span>: <span class="ident">S</span>) {
         <span class="self">self</span>.<span class="ident">log_cstr</span>(<span class="ident">user</span>, <span class="ident">str_to_cstring</span>(<span class="ident">message</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_cstr</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">CStr</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message</span>: <span class="ident">S</span>) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_cstr</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">CStr</span>&gt;&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message</span>: <span class="ident">S</span>) {
+        <span class="kw">let</span> <span class="ident">message</span> = <span class="ident">message</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>;
         <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
         <span class="kw">unsafe</span> {
             <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">popup</span>, <span class="self">self</span>.<span class="ident">check_user</span>, <span class="self">self</span>.<span class="ident">target_check_fainted</span>) {
@@ -253,4 +253,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>

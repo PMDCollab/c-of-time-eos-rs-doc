@@ -67,8 +67,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">/// The path must point to a valid WTE file.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_from_rom</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">CStr</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">C</span>, <span class="ident">malloc_flags</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_from_rom</span>&lt;<span class="ident">C</span>: <span class="ident">AsRef</span>&lt;<span class="ident">CStr</span>&gt;&gt;(<span class="ident">path</span>: <span class="ident">C</span>, <span class="ident">malloc_flags</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> = <span class="ident">MaybeUninit::uninit</span>();
         <span class="ident">ffi::LoadWteFromRom</span>(<span class="ident">handle</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>(), <span class="ident">malloc_flags</span>);
         <span class="self">Self</span>(<span class="ident">handle</span>.<span class="ident">assume_init</span>())
     }
@@ -78,7 +78,7 @@
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">/// The path must point to a valid WTE file.</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_from_dir</span>(<span class="ident">pack_file_id</span>: <span class="ident">u16</span>, <span class="ident">file_index</span>: <span class="ident">u16</span>, <span class="ident">malloc_flags</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> = <span class="ident">MaybeUninit::uninit</span>();
         <span class="ident">ffi::LoadWteFromFileDirectory</span>(<span class="ident">handle</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">pack_file_id</span>, <span class="ident">file_index</span>, <span class="ident">malloc_flags</span>);
         <span class="self">Self</span>(<span class="ident">handle</span>.<span class="ident">assume_init</span>())
     }
@@ -93,4 +93,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>
