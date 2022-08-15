@@ -282,289 +282,289 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Functions for formatting and printing game messages and other &quot;message box&quot; and menu related</span>
-<span class="doccomment">//! operations.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions for formatting and printing game messages and other &quot;message box&quot; and menu related
+//! operations.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes::c_char</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::string_util::str_to_cstring</span>;
-<span class="kw">use</span> <span class="ident">alloc::borrow::ToOwned</span>;
-<span class="kw">use</span> <span class="ident">alloc::ffi::CString</span>;
-<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">az::SaturatingAs</span>;
-<span class="kw">use</span> <span class="ident">core::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">core::mem::ManuallyDrop</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ctypes::c_char;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span><span class="kw">crate</span>::string_util::str_to_cstring;
+<span class="kw">use </span>alloc::borrow::ToOwned;
+<span class="kw">use </span>alloc::ffi::CString;
+<span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>alloc::vec;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>az::SaturatingAs;
+<span class="kw">use </span>core::ffi::CStr;
+<span class="kw">use </span>core::mem::ManuallyDrop;
 
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">NULL</span>: <span class="ident">c_char</span> = <span class="number">0</span>;
+<span class="kw">static </span><span class="kw-2">mut </span>NULL: c_char = <span class="number">0</span>;
 
-<span class="kw">enum</span> <span class="ident">PreprocessorArgs</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="ident">Owned</span>(<span class="ident">ffi::preprocessor_args</span>),
-    <span class="ident">Borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::preprocessor_args</span>),
+<span class="kw">enum </span>PreprocessorArgs&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Owned(ffi::preprocessor_args),
+    Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::preprocessor_args),
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">PreprocessorArgs</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut</span>&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">ffi::preprocessor_args</span>
-    <span class="kw">where</span>
-        <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PreprocessorArgs&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>as_mut&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>ffi::preprocessor_args
+    <span class="kw">where
+        </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PreprocessorArgs::Owned</span>(<span class="ident">args</span>) =&gt; <span class="ident">args</span>,
-            <span class="ident">PreprocessorArgs::Borrowed</span>(<span class="ident">args</span>) =&gt; <span class="ident">args</span>,
+        <span class="kw">match </span><span class="self">self </span>{
+            PreprocessorArgs::Owned(args) =&gt; args,
+            PreprocessorArgs::Borrowed(args) =&gt; args,
         }
     }
 }
 
-<span class="doccomment">/// Builds a string using an &quot;enhanced sprintf&quot;, which recognizes certain tags and replaces them</span>
-<span class="doccomment">/// with appropriate game values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The output buffer is calculated to have a capacity of the input format string times 3</span>
-<span class="doccomment">/// (or i32::MAX). Should that not be enough, you can use [`Self::output_buffer_size`] to override</span>
-<span class="doccomment">/// this.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &lt;https://textbox.skytemple.org&gt; for a reference about message tags and a preview tool.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GameStringBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="ident">output_size</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">i32</span>&gt;, <span class="comment">// Note: Auto</span>
-    <span class="ident">flags</span>: <span class="ident">ffi::preprocessor_flags</span>,
-    <span class="ident">args</span>: <span class="ident">PreprocessorArgs</span>&lt;<span class="lifetime">&#39;a</span>&gt;,
+<span class="doccomment">/// Builds a string using an &quot;enhanced sprintf&quot;, which recognizes certain tags and replaces them
+/// with appropriate game values.
+///
+/// The output buffer is calculated to have a capacity of the input format string times 3
+/// (or i32::MAX). Should that not be enough, you can use [`Self::output_buffer_size`] to override
+/// this.
+///
+/// See &lt;https://textbox.skytemple.org&gt; for a reference about message tags and a preview tool.
+</span><span class="kw">pub struct </span>GameStringBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    output_size: <span class="prelude-ty">Option</span>&lt;i32&gt;, <span class="comment">// Note: Auto
+    </span>flags: ffi::preprocessor_flags,
+    args: PreprocessorArgs&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">GameStringBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="comment">// SAFETY: We assume the game won&#39;t try to change the strings values.</span>
-        <span class="kw">unsafe</span> {
-            <span class="self">Self</span> {
-                <span class="ident">output_size</span>: <span class="prelude-val">None</span>,
-                <span class="ident">flags</span>: <span class="ident">ffi::preprocessor_flags</span> {
-                    <span class="ident">_bitfield_align_1</span>: [],
-                    <span class="ident">_bitfield_1</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GameStringBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="comment">// SAFETY: We assume the game won&#39;t try to change the strings values.
+        </span><span class="kw">unsafe </span>{
+            <span class="self">Self </span>{
+                output_size: <span class="prelude-val">None</span>,
+                flags: ffi::preprocessor_flags {
+                    _bitfield_align_1: [],
+                    _bitfield_1: Default::default(),
                 },
-                <span class="ident">args</span>: <span class="ident">PreprocessorArgs::Owned</span>(<span class="ident">ffi::preprocessor_args</span> {
-                    <span class="ident">flag_vals</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
-                    <span class="ident">id_vals</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
-                    <span class="ident">number_vals</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
-                    <span class="ident">strings</span>: [<span class="kw-2">&amp;mut</span> <span class="ident">NULL</span>, <span class="kw-2">&amp;mut</span> <span class="ident">NULL</span>, <span class="kw-2">&amp;mut</span> <span class="ident">NULL</span>, <span class="kw-2">&amp;mut</span> <span class="ident">NULL</span>, <span class="kw-2">&amp;mut</span> <span class="ident">NULL</span>],
-                    <span class="ident">speaker_id</span>: <span class="number">0</span>,
+                args: PreprocessorArgs::Owned(ffi::preprocessor_args {
+                    flag_vals: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+                    id_vals: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+                    number_vals: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+                    strings: [<span class="kw-2">&amp;mut </span>NULL, <span class="kw-2">&amp;mut </span>NULL, <span class="kw-2">&amp;mut </span>NULL, <span class="kw-2">&amp;mut </span>NULL, <span class="kw-2">&amp;mut </span>NULL],
+                    speaker_id: <span class="number">0</span>,
                 }),
             }
         }
     }
 
-    <span class="doccomment">/// Sets the unknown0 value of the preprocessor flags.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flag_unknown0</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">set_unknown0</span>(<span class="ident">value</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the unknown0 value of the preprocessor flags.
+    </span><span class="kw">pub fn </span>set_flag_unknown0(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.flags.set_unknown0(value);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Tells the game to show the speaker in the formatted message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Sets the speaker value of the preprocessor flags to true.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If [`Self::set_speaker`] was not called, this will probably(...?) show the speech</span>
-    <span class="doccomment">/// bubble icon as the speaker.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">show_speaker</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">set_show_speaker</span>(<span class="bool-val">true</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Tells the game to show the speaker in the formatted message.
+    ///
+    /// Sets the speaker value of the preprocessor flags to true.
+    ///
+    /// If [`Self::set_speaker`] was not called, this will probably(...?) show the speech
+    /// bubble icon as the speaker.
+    </span><span class="kw">pub fn </span>show_speaker(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.flags.set_show_speaker(<span class="bool-val">true </span><span class="kw">as </span>ffi::bool_);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the unknown18 value of the preprocessor flags.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flag_unknown18</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">set_unknown18</span>(<span class="ident">value</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the unknown18 value of the preprocessor flags.
+    </span><span class="kw">pub fn </span>set_flag_unknown18(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.flags.set_unknown18(value);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the speaker of the message to the given entity (probably actor or monster ID...?).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To actually also show the speaker, use [`Self::show_speaker`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_speaker</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">speaker</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">as_mut</span>().<span class="ident">speaker_id</span> = <span class="ident">speaker</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the speaker of the message to the given entity (probably actor or monster ID...?).
+    ///
+    /// To actually also show the speaker, use [`Self::show_speaker`].
+    </span><span class="kw">pub fn </span>set_speaker(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, speaker: u32) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.args.as_mut().speaker_id = speaker;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets flag values. Currently unknown what they do.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Max flag ID is 3.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flag_value</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag_id</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">as_mut</span>().<span class="ident">flag_vals</span>[<span class="ident">flag_id</span>] = <span class="ident">value</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets flag values. Currently unknown what they do.
+    ///
+    /// Max flag ID is 3.
+    </span><span class="kw">pub fn </span>set_flag_value(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, flag_id: usize, value: u32) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.args.as_mut().flag_vals[flag_id] = value;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets an ID for a message placeholder. This is *probably* used by the `\[name:id\]`,</span>
-    <span class="doccomment">/// `\[item:id\]` etc. placeholders,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Max ID ID is 4.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_id_value</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id_id</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">as_mut</span>().<span class="ident">id_vals</span>[<span class="ident">id_id</span>] = <span class="ident">value</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets an ID for a message placeholder. This is *probably* used by the `\[name:id\]`,
+    /// `\[item:id\]` etc. placeholders,
+    ///
+    /// Max ID ID is 4.
+    </span><span class="kw">pub fn </span>set_id_value(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, id_id: usize, value: u32) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.args.as_mut().id_vals[id_id] = value;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a number for a message placeholder. This is *probably* used by the `\[digits_c:0]`,</span>
-    <span class="doccomment">/// etc. placeholders.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Max number ID is 4.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_number_value</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">number_id</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">as_mut</span>().<span class="ident">number_vals</span>[<span class="ident">number_id</span>] = <span class="ident">value</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets a number for a message placeholder. This is *probably* used by the `\[digits_c:0]`,
+    /// etc. placeholders.
+    ///
+    /// Max number ID is 4.
+    </span><span class="kw">pub fn </span>set_number_value(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, number_id: usize, value: i32) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.args.as_mut().number_vals[number_id] = value;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a string for message placeholders.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Replace all occurrences of `\[string:&lt;string_id&gt;\]` with the value of the string passed in.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Max string ID is 4.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_string</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">string_id</span>: <span class="ident">usize</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CString</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">as_mut</span>().<span class="ident">strings</span>[<span class="ident">string_id</span>] = <span class="ident">string</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets a string for message placeholders.
+    ///
+    /// Replace all occurrences of `\[string:&lt;string_id&gt;\]` with the value of the string passed in.
+    ///
+    /// Max string ID is 4.
+    </span><span class="kw">pub fn </span>set_string(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, string_id: usize, string: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CString) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.args.as_mut().strings[string_id] = string.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Overwrites the size of the output buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">output_buffer_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">i32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">output_size</span> = <span class="prelude-val">Some</span>(<span class="ident">size</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Overwrites the size of the output buffer.
+    </span><span class="kw">pub fn </span>output_buffer_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: i32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.output_size = <span class="prelude-val">Some</span>(size);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns a reference to the internal args. This will panic if [`Self::borrow_args`] was</span>
-    <span class="doccomment">/// called before.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ffi::preprocessor_args</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span> {
-            <span class="ident">PreprocessorArgs::Owned</span>(<span class="ident">args</span>) =&gt; <span class="ident">args</span>,
-            <span class="ident">PreprocessorArgs::Borrowed</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid `args` call.&quot;</span>),
+    <span class="doccomment">/// Returns a reference to the internal args. This will panic if [`Self::borrow_args`] was
+    /// called before.
+    </span><span class="kw">pub fn </span>args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ffi::preprocessor_args {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.args {
+            PreprocessorArgs::Owned(args) =&gt; args,
+            PreprocessorArgs::Borrowed(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid `args` call.&quot;</span>),
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the internal flags.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ffi::preprocessor_flags</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flags</span>
+    <span class="doccomment">/// Returns a reference to the internal flags.
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ffi::preprocessor_flags {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.flags
     }
 
-    <span class="doccomment">/// Overwrite the internal flags with the specified ones.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful if you want to re-use flags.</span>
-    <span class="doccomment">/// You probably want to use [`Self::set_flag_unknown0`], [`Self::show_speaker`],</span>
-    <span class="doccomment">/// [`Self::set_flag_unknown18`] instead in most cases.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::preprocessor_flags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span> = <span class="ident">ffi::preprocessor_flags</span> {
-            <span class="ident">_bitfield_align_1</span>: <span class="ident">flags</span>.<span class="ident">_bitfield_align_1</span>,
-            <span class="ident">_bitfield_1</span>: <span class="ident">flags</span>.<span class="ident">_bitfield_1</span>,
+    <span class="doccomment">/// Overwrite the internal flags with the specified ones.
+    ///
+    /// This is useful if you want to re-use flags.
+    /// You probably want to use [`Self::set_flag_unknown0`], [`Self::show_speaker`],
+    /// [`Self::set_flag_unknown18`] instead in most cases.
+    </span><span class="kw">pub fn </span>set_flags(<span class="kw-2">&amp;mut </span><span class="self">self</span>, flags: <span class="kw-2">&amp;</span>ffi::preprocessor_flags) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.flags = ffi::preprocessor_flags {
+            _bitfield_align_1: flags._bitfield_align_1,
+            _bitfield_1: flags._bitfield_1,
         };
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the internal arguments to use the arguments passed in.
+    ///
+    /// This is useful if you want to re-use args.
+    ///
+    /// Subsequent calls to [`Self::set_speaker`], [`Self::set_flag_value`], [`Self::set_id_value`],
+    /// [`Self::set_number_value`],[`Self::set_string`] will manipulate the args passed in.
+    ///
+    /// You probably don&#39;t need to use this method in most cases, just use the above mentioned
+    /// methods instead.
+    </span><span class="kw">pub fn </span>borrow_args(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::preprocessor_args) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.args = PreprocessorArgs::Borrowed(args);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Converts the format string to the formatted string.
+    ///
+    /// Builds String from a str. The input is the format string to use.
+    </span><span class="attribute">#[allow(clippy::needless_return)]</span>
+    <span class="kw">pub fn </span>build&lt;S: AsRef&lt;str&gt;&gt;(<span class="self">self</span>, format: S) -&gt; String {
+        <span class="attribute">#[cfg(debug_assertions)]</span>
+        <span class="kw">return </span><span class="self">self
+            </span>.build_from_cstr_as_cstring(str_to_cstring(format.as_ref()))
+            .into_string()
+            .expect(<span class="string">&quot;Failed to convert game string to String (invalid UTF-8)&quot;</span>);
+        <span class="comment">// Save some precious size in release mode
+        </span><span class="attribute">#[cfg(not(debug_assertions))]</span>
+        <span class="self">self</span>.build_from_cstr_as_cstring(str_to_cstring(format.as_ref()))
+            .into_string()
+            .unwrap()
     }
 
-    <span class="doccomment">/// Sets the internal arguments to use the arguments passed in.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful if you want to re-use args.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Subsequent calls to [`Self::set_speaker`], [`Self::set_flag_value`], [`Self::set_id_value`],</span>
-    <span class="doccomment">/// [`Self::set_number_value`],[`Self::set_string`] will manipulate the args passed in.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You probably don&#39;t need to use this method in most cases, just use the above mentioned</span>
-    <span class="doccomment">/// methods instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow_args</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::preprocessor_args</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">args</span> = <span class="ident">PreprocessorArgs::Borrowed</span>(<span class="ident">args</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Converts the format string to the formatted string.
+    ///
+    /// Builds String from a CStr. The input is the format string to use.
+    </span><span class="attribute">#[allow(clippy::needless_return)]</span>
+    <span class="kw">pub fn </span>build_from_cstr&lt;S: AsRef&lt;CStr&gt;&gt;(<span class="self">self</span>, format: S) -&gt; String {
+        <span class="attribute">#[cfg(debug_assertions)]</span>
+        <span class="kw">return </span><span class="self">self
+            </span>.build_from_cstr_as_cstring(format.as_ref())
+            .into_string()
+            .expect(<span class="string">&quot;Failed to convert game string to String (invalid UTF-8)&quot;</span>);
+        <span class="comment">// Save some precious size in release mode
+        </span><span class="attribute">#[cfg(not(debug_assertions))]</span>
+        <span class="self">self</span>.build_from_cstr_as_cstring(format.as_ref())
+            .into_string()
+            .unwrap()
     }
 
-    <span class="doccomment">/// Converts the format string to the formatted string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Builds String from a str. The input is the format string to use.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_return</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">str</span>&gt;&gt;(<span class="self">self</span>, <span class="ident">format</span>: <span class="ident">S</span>) -&gt; <span class="ident">String</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        <span class="kw">return</span> <span class="self">self</span>
-            .<span class="ident">build_from_cstr_as_cstring</span>(<span class="ident">str_to_cstring</span>(<span class="ident">format</span>.<span class="ident">as_ref</span>()))
-            .<span class="ident">into_string</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Failed to convert game string to String (invalid UTF-8)&quot;</span>);
-        <span class="comment">// Save some precious size in release mode</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-        <span class="self">self</span>.<span class="ident">build_from_cstr_as_cstring</span>(<span class="ident">str_to_cstring</span>(<span class="ident">format</span>.<span class="ident">as_ref</span>()))
-            .<span class="ident">into_string</span>()
-            .<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Converts the format string to the formatted string.
+    ///
+    /// Builds CString from a str. The input is the format string to use.
+    </span><span class="kw">pub fn </span>build_as_cstring&lt;S: AsRef&lt;str&gt;&gt;(<span class="self">self</span>, format: S) -&gt; CString {
+        <span class="self">self</span>.build_from_cstr_as_cstring(str_to_cstring(format.as_ref()))
     }
 
-    <span class="doccomment">/// Converts the format string to the formatted string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Builds String from a CStr. The input is the format string to use.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_return</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_from_cstr</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">CStr</span>&gt;&gt;(<span class="self">self</span>, <span class="ident">format</span>: <span class="ident">S</span>) -&gt; <span class="ident">String</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        <span class="kw">return</span> <span class="self">self</span>
-            .<span class="ident">build_from_cstr_as_cstring</span>(<span class="ident">format</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">into_string</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Failed to convert game string to String (invalid UTF-8)&quot;</span>);
-        <span class="comment">// Save some precious size in release mode</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-        <span class="self">self</span>.<span class="ident">build_from_cstr_as_cstring</span>(<span class="ident">format</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">into_string</span>()
-            .<span class="ident">unwrap</span>()
-    }
-
-    <span class="doccomment">/// Converts the format string to the formatted string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Builds CString from a str. The input is the format string to use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_as_cstring</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">str</span>&gt;&gt;(<span class="self">self</span>, <span class="ident">format</span>: <span class="ident">S</span>) -&gt; <span class="ident">CString</span> {
-        <span class="self">self</span>.<span class="ident">build_from_cstr_as_cstring</span>(<span class="ident">str_to_cstring</span>(<span class="ident">format</span>.<span class="ident">as_ref</span>()))
-    }
-
-    <span class="doccomment">/// Converts the format string to the formatted string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Builds CString from a CStr. The input is the format string to use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_from_cstr_as_cstring</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">CStr</span>&gt;&gt;(<span class="self">self</span>, <span class="ident">format</span>: <span class="ident">S</span>) -&gt; <span class="ident">CString</span> {
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">output_size</span>,
-            <span class="ident">flags</span>,
-            <span class="kw-2">mut</span> <span class="ident">args</span>,
+    <span class="doccomment">/// Converts the format string to the formatted string.
+    ///
+    /// Builds CString from a CStr. The input is the format string to use.
+    </span><span class="kw">pub fn </span>build_from_cstr_as_cstring&lt;S: AsRef&lt;CStr&gt;&gt;(<span class="self">self</span>, format: S) -&gt; CString {
+        <span class="kw">let </span><span class="self">Self </span>{
+            output_size,
+            flags,
+            <span class="kw-2">mut </span>args,
         } = <span class="self">self</span>;
 
-        <span class="kw">let</span> <span class="ident">output_size</span> = <span class="kw">match</span> <span class="ident">output_size</span> {
-            <span class="prelude-val">None</span> =&gt; (<span class="ident">format</span>.<span class="ident">as_ref</span>().<span class="ident">to_bytes</span>().<span class="ident">len</span>() * <span class="number">3</span>).<span class="ident">saturating_as</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">size</span>) =&gt; <span class="ident">size</span>,
+        <span class="kw">let </span>output_size = <span class="kw">match </span>output_size {
+            <span class="prelude-val">None </span>=&gt; (format.as_ref().to_bytes().len() * <span class="number">3</span>).saturating_as(),
+            <span class="prelude-val">Some</span>(size) =&gt; size,
         };
-        <span class="comment">// We manually transfer the internals of the output vector later, since we convert it to an</span>
-        <span class="comment">// u8 vector.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> = <span class="ident">ManuallyDrop::new</span>(<span class="macro">vec!</span>[<span class="number">0</span> <span class="kw">as</span> <span class="ident">c_char</span>; <span class="ident">output_size</span> <span class="kw">as</span> <span class="ident">usize</span>]);
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">size</span> = <span class="ident">ffi::PreprocessString</span>(
-                <span class="ident">output</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">output_size</span>,
-                <span class="ident">format</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>(),
-                <span class="ident">flags</span>,
-                <span class="ident">args</span>.<span class="ident">as_mut</span>(),
+        <span class="comment">// We manually transfer the internals of the output vector later, since we convert it to an
+        // u8 vector.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>output = ManuallyDrop::new(<span class="macro">vec!</span>[<span class="number">0 </span><span class="kw">as </span>c_char; output_size <span class="kw">as </span>usize]);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>size = ffi::PreprocessString(
+                output.as_mut_ptr(),
+                output_size,
+                format.as_ref().as_ptr(),
+                flags,
+                args.as_mut(),
             );
-            <span class="ident">output</span>.<span class="ident">truncate</span>(<span class="ident">size</span> <span class="kw">as</span> <span class="ident">usize</span> + <span class="number">1</span>); <span class="comment">// + 1 for the null byte.</span>
+            output.truncate(size <span class="kw">as </span>usize + <span class="number">1</span>); <span class="comment">// + 1 for the null byte.
 
-            <span class="comment">// Convert output from Vec&lt;i8&gt; to Vec&lt;u8&gt; at no cost.</span>
-            <span class="kw">let</span> <span class="ident">output</span> = <span class="ident">Vec::from_raw_parts</span>(
-                <span class="ident">output</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-                <span class="ident">output</span>.<span class="ident">len</span>(),
-                <span class="ident">output</span>.<span class="ident">capacity</span>(),
+            // Convert output from Vec&lt;i8&gt; to Vec&lt;u8&gt; at no cost.
+            </span><span class="kw">let </span>output = Vec::from_raw_parts(
+                output.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+                output.len(),
+                output.capacity(),
             );
 
-            <span class="ident">CString::from_vec_with_nul_unchecked</span>(<span class="ident">output</span>)
+            CString::from_vec_with_nul_unchecked(output)
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GameStringBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>GameStringBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="doccomment">/// Gets the string corresponding to a given message ID.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_string_from_message_id</span>(<span class="ident">message_id</span>: <span class="ident">i32</span>) -&gt; <span class="ident">CString</span> {
-    <span class="comment">// SAFETY: We assume the game returns a valid C-String and does bounds checking.</span>
-    <span class="kw">unsafe</span> { <span class="ident">CStr::from_ptr</span>(<span class="ident">ffi::StringFromMessageId</span>(<span class="ident">message_id</span>)) }.<span class="ident">to_owned</span>()
+<span class="doccomment">/// Gets the string corresponding to a given message ID.
+</span><span class="kw">pub fn </span>get_string_from_message_id(message_id: i32) -&gt; CString {
+    <span class="comment">// SAFETY: We assume the game returns a valid C-String and does bounds checking.
+    </span><span class="kw">unsafe </span>{ CStr::from_ptr(ffi::StringFromMessageId(message_id)) }.to_owned()
 }
 
-<span class="doccomment">/// Sets the palette of the frames of windows in the specified screen.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_screen_windows_color</span>(<span class="ident">palette_idx</span>: <span class="ident">u8</span>, <span class="ident">is_upper_window</span>: <span class="ident">bool</span>) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetScreenWindowsColor</span>(<span class="ident">palette_idx</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">is_upper_window</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+<span class="doccomment">/// Sets the palette of the frames of windows in the specified screen.
+</span><span class="kw">pub fn </span>set_screen_windows_color(palette_idx: u8, is_upper_window: bool) {
+    <span class="kw">unsafe </span>{ ffi::SetScreenWindowsColor(palette_idx <span class="kw">as </span>i32, is_upper_window <span class="kw">as </span>ffi::bool_) }
 }
 
-<span class="doccomment">/// Sets the palette of the frames of windows in both screens.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_both_screens_windows_color</span>(<span class="ident">palette_idx</span>: <span class="ident">u8</span>) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetBothScreensWindowsColor</span>(<span class="ident">palette_idx</span> <span class="kw">as</span> <span class="ident">i32</span>) }
+<span class="doccomment">/// Sets the palette of the frames of windows in both screens.
+</span><span class="kw">pub fn </span>set_both_screens_windows_color(palette_idx: u8) {
+    <span class="kw">unsafe </span>{ ffi::SetBothScreensWindowsColor(palette_idx <span class="kw">as </span>i32) }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

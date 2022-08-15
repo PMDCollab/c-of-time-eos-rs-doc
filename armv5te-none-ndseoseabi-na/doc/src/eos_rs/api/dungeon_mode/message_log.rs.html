@@ -125,132 +125,132 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay</span>::{<span class="ident">CreatableWithLease</span>, <span class="ident">OverlayLoadLease</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::string_util::str_to_cstring</span>;
-<span class="kw">use</span> <span class="ident">core::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::overlay::{CreatableWithLease, OverlayLoadLease};
+<span class="kw">use </span><span class="kw">crate</span>::ctypes::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span><span class="kw">crate</span>::string_util::str_to_cstring;
+<span class="kw">use </span>core::ffi::CStr;
+<span class="kw">use </span>core::fmt::Debug;
 
-<span class="doccomment">/// Builder for creating dungeon message log messages.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default message will be shown &#39;quiet&#39;, meaning there will be no popup</span>
-<span class="doccomment">/// shown when the message is logged. You can force a popup to be shown with [`Self::popup`],</span>
-<span class="doccomment">/// but please also note that with some configurations, a popup will always be displayed, even</span>
-<span class="doccomment">/// if [`Self::popup`] is not called. See the implementation for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Also see [`crate::api::messages::GameStringBuilder`]; this is using pretty much the same</span>
-<span class="doccomment">/// principles for building the actual message strings.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LogMessageBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="ident">_lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
-    <span class="ident">popup</span>: <span class="ident">bool</span>,
-    <span class="ident">check_user</span>: <span class="ident">bool</span>,
-    <span class="ident">target_check_fainted</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonEntity</span>&gt;,
+<span class="doccomment">/// Builder for creating dungeon message log messages.
+///
+/// By default message will be shown &#39;quiet&#39;, meaning there will be no popup
+/// shown when the message is logged. You can force a popup to be shown with [`Self::popup`],
+/// but please also note that with some configurations, a popup will always be displayed, even
+/// if [`Self::popup`] is not called. See the implementation for more details.
+///
+/// Also see [`crate::api::messages::GameStringBuilder`]; this is using pretty much the same
+/// principles for building the actual message strings.
+</span><span class="kw">pub struct </span>LogMessageBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    _lease: OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    popup: bool,
+    check_user: bool,
+    target_check_fainted: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DungeonEntity&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">CreatableWithLease</span>&lt;<span class="number">29</span>&gt; <span class="kw">for</span> <span class="ident">LogMessageBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">_create</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">_lease</span>: <span class="ident">lease</span>,
-            <span class="ident">popup</span>: <span class="bool-val">false</span>,
-            <span class="ident">check_user</span>: <span class="bool-val">false</span>,
-            <span class="ident">target_check_fainted</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CreatableWithLease&lt;<span class="number">29</span>&gt; <span class="kw">for </span>LogMessageBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>_create(lease: OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            _lease: lease,
+            popup: <span class="bool-val">false</span>,
+            check_user: <span class="bool-val">false</span>,
+            target_check_fainted: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lease</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">_lease</span>
+    <span class="kw">fn </span>lease(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>._lease
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">LogMessageBuilder</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="doccomment">/// Show a message popup when the message is displayed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">popup</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">popup</span> = <span class="bool-val">true</span>;
-        <span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LogMessageBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Show a message popup when the message is displayed.
+    </span><span class="kw">pub fn </span>popup(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.popup = <span class="bool-val">true</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Do not show the message if the user is fainted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// [`Self::target_check_fainted`] will take precedence over this, both can not be active</span>
-    <span class="doccomment">/// at the same time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_user_fainted</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">check_user</span> = <span class="bool-val">true</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Do not show the message if the user is fainted.
+    ///
+    /// # Note
+    /// [`Self::target_check_fainted`] will take precedence over this, both can not be active
+    /// at the same time.
+    </span><span class="kw">pub fn </span>check_user_fainted(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.check_user = <span class="bool-val">true</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="comment">// Do not show the message if the target is fainted and an unknown check</span>
-    <span class="comment">// regarding the user passes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_check_fainted</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonEntity</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">target_check_fainted</span> = <span class="prelude-val">Some</span>(<span class="ident">target</span>);
-        <span class="self">self</span>
-    }
+    <span class="comment">// Do not show the message if the target is fainted and an unknown check
+    // regarding the user passes.
+    </span><span class="kw">pub fn </span>target_check_fainted(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, target: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DungeonEntity) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.target_check_fainted = <span class="prelude-val">Some</span>(target);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Replaces instances of a given placeholder tag by the string representation of the given entity.</span>
-    <span class="doccomment">/// Concretely this means that any occurrences of `\[string:&lt;string_id&gt;\]` will be replaced by the</span>
-    <span class="doccomment">/// name of the given entity.</span>
-    <span class="doccomment">/// Example: If use pass `string_id` with 1, it will replace all occurrences of `\[string:1\]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// As a performance optimization this will immediately reserve that string with the game when</span>
-    <span class="doccomment">/// called. This can have weird effects if you expect to show the message built by this builder</span>
-    <span class="doccomment">/// at a later time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">string_id</span>: <span class="ident">u16</span>, <span class="ident">entity</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::SubstitutePlaceholderStringTags</span>(<span class="ident">string_id</span> <span class="kw">as</span> <span class="ident">c_int</span>, <span class="macro">force_mut_ptr!</span>(<span class="ident">entity</span>), <span class="number">0</span>)
+    <span class="doccomment">/// Replaces instances of a given placeholder tag by the string representation of the given entity.
+    /// Concretely this means that any occurrences of `\[string:&lt;string_id&gt;\]` will be replaced by the
+    /// name of the given entity.
+    /// Example: If use pass `string_id` with 1, it will replace all occurrences of `\[string:1\]`.
+    ///
+    /// # Note
+    /// As a performance optimization this will immediately reserve that string with the game when
+    /// called. This can have weird effects if you expect to show the message built by this builder
+    /// at a later time.
+    </span><span class="kw">pub fn </span>string(<span class="kw-2">&amp;mut </span><span class="self">self</span>, string_id: u16, entity: <span class="kw-2">&amp;</span>DungeonEntity) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::SubstitutePlaceholderStringTags(string_id <span class="kw">as </span>c_int, <span class="macro">force_mut_ptr!</span>(entity), <span class="number">0</span>)
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Writes a log entry using the message with the given message ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_msg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message_id</span>: <span class="ident">i32</span>) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">popup</span>, <span class="self">self</span>.<span class="ident">check_user</span>, <span class="self">self</span>.<span class="ident">target_check_fainted</span>) {
-                (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">ffi::LogMessageByIdQuiet</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>), <span class="ident">message_id</span>),
+    <span class="doccomment">/// Writes a log entry using the message with the given message ID.
+    </span><span class="kw">pub fn </span>log_msg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>DungeonEntity, message_id: i32) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            <span class="kw">match </span>(<span class="self">self</span>.popup, <span class="self">self</span>.check_user, <span class="self">self</span>.target_check_fainted) {
+                (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; ffi::LogMessageByIdQuiet(<span class="macro">force_mut_ptr!</span>(user), message_id),
                 (<span class="kw">_</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>) =&gt; {
-                    <span class="ident">ffi::LogMessageByIdWithPopupCheckUser</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>), <span class="ident">message_id</span>)
+                    ffi::LogMessageByIdWithPopupCheckUser(<span class="macro">force_mut_ptr!</span>(user), message_id)
                 }
-                (<span class="bool-val">false</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">target</span>)) =&gt; <span class="ident">ffi::LogMessageByIdQuietCheckUserTarget</span>(
-                    <span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>),
-                    <span class="macro">force_mut_ptr!</span>(<span class="ident">target</span>),
-                    <span class="ident">message_id</span>,
+                (<span class="bool-val">false</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(target)) =&gt; ffi::LogMessageByIdQuietCheckUserTarget(
+                    <span class="macro">force_mut_ptr!</span>(user),
+                    <span class="macro">force_mut_ptr!</span>(target),
+                    message_id,
                 ),
                 (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; {
-                    <span class="ident">ffi::LogMessageByIdWithPopup</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>), <span class="ident">message_id</span>)
+                    ffi::LogMessageByIdWithPopup(<span class="macro">force_mut_ptr!</span>(user), message_id)
                 }
-                (<span class="bool-val">true</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">target</span>)) =&gt; <span class="ident">ffi::LogMessageByIdWithPopupCheckUserTarget</span>(
-                    <span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>),
-                    <span class="macro">force_mut_ptr!</span>(<span class="ident">target</span>),
-                    <span class="ident">message_id</span>,
+                (<span class="bool-val">true</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(target)) =&gt; ffi::LogMessageByIdWithPopupCheckUserTarget(
+                    <span class="macro">force_mut_ptr!</span>(user),
+                    <span class="macro">force_mut_ptr!</span>(target),
+                    message_id,
                 ),
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_str</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">str</span>&gt; + <span class="ident">Debug</span>&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message</span>: <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">log_cstr</span>(<span class="ident">user</span>, <span class="ident">str_to_cstring</span>(<span class="ident">message</span>))
+    <span class="kw">pub fn </span>log_str&lt;S: AsRef&lt;str&gt; + Debug&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>DungeonEntity, message: S) {
+        <span class="self">self</span>.log_cstr(user, str_to_cstring(message))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_cstr</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">CStr</span>&gt;&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>, <span class="ident">message</span>: <span class="ident">S</span>) {
-        <span class="kw">let</span> <span class="ident">message</span> = <span class="ident">message</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>;
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">popup</span>, <span class="self">self</span>.<span class="ident">check_user</span>, <span class="self">self</span>.<span class="ident">target_check_fainted</span>) {
-                (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">ffi::LogMessageQuiet</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>), <span class="ident">message</span>),
-                (<span class="kw">_</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">ffi::LogMessageWithPopupCheckUser</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>), <span class="ident">message</span>),
-                (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">ffi::LogMessageWithPopup</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>), <span class="ident">message</span>),
-                (<span class="kw">_</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">target</span>)) =&gt; <span class="ident">ffi::LogMessageWithPopupCheckUserTarget</span>(
-                    <span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>),
-                    <span class="macro">force_mut_ptr!</span>(<span class="ident">target</span>),
-                    <span class="ident">message</span>,
+    <span class="kw">pub fn </span>log_cstr&lt;S: AsRef&lt;CStr&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>DungeonEntity, message: S) {
+        <span class="kw">let </span>message = message.as_ref().as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char;
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            <span class="kw">match </span>(<span class="self">self</span>.popup, <span class="self">self</span>.check_user, <span class="self">self</span>.target_check_fainted) {
+                (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; ffi::LogMessageQuiet(<span class="macro">force_mut_ptr!</span>(user), message),
+                (<span class="kw">_</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>) =&gt; ffi::LogMessageWithPopupCheckUser(<span class="macro">force_mut_ptr!</span>(user), message),
+                (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; ffi::LogMessageWithPopup(<span class="macro">force_mut_ptr!</span>(user), message),
+                (<span class="kw">_</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(target)) =&gt; ffi::LogMessageWithPopupCheckUserTarget(
+                    <span class="macro">force_mut_ptr!</span>(user),
+                    <span class="macro">force_mut_ptr!</span>(target),
+                    message,
                 ),
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

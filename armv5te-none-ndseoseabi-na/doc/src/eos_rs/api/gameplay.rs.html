@@ -661,668 +661,668 @@
 <span id="661">661</span>
 <span id="662">662</span>
 <span id="663">663</span>
-</pre><pre class="rust"><code><span class="doccomment">//! General gameplay related functions that are always available.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! General gameplay related functions that are always available.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>::{<span class="ident">exclusive_item_effect_id</span>, <span class="ident">item_id_16</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::OwnedSlice</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span><span class="kw">crate</span>::ffi::{exclusive_item_effect_id, item_id_16};
+<span class="kw">use </span><span class="kw">crate</span>::util::OwnedSlice;
+<span class="kw">use </span>core::ptr;
 
-<span class="doccomment">/// Describes an active team setup</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TeamSetup</span> {
-    <span class="ident">HeroOnly</span>,
-    <span class="ident">HeroAndPartnerOnly</span>,
+<span class="doccomment">/// Describes an active team setup
+</span><span class="attribute">#[non_exhaustive]</span>
+<span class="kw">pub enum </span>TeamSetup {
+    HeroOnly,
+    HeroAndPartnerOnly,
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Move index of a monster, used by some functions.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TargetTypeIndex</span> {
-    <span class="ident">FirstType</span> = <span class="number">0</span>,
-    <span class="ident">SecondType</span> = <span class="number">1</span>,
+<span class="attribute">#[repr(i32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Move index of a monster, used by some functions.
+</span><span class="kw">pub enum </span>TargetTypeIndex {
+    FirstType = <span class="number">0</span>,
+    SecondType = <span class="number">1</span>,
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="doccomment">/// The rank a player scored in the sentry duty (footprint) minigame.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SentryGameRank</span> {
-    <span class="ident">First</span> = <span class="number">0</span>,
-    <span class="ident">Second</span> = <span class="number">1</span>,
-    <span class="ident">Third</span> = <span class="number">2</span>,
-    <span class="ident">Fourth</span> = <span class="number">3</span>,
-    <span class="ident">Fifth</span> = <span class="number">4</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq)]</span>
+<span class="doccomment">/// The rank a player scored in the sentry duty (footprint) minigame.
+</span><span class="kw">pub enum </span>SentryGameRank {
+    First = <span class="number">0</span>,
+    Second = <span class="number">1</span>,
+    Third = <span class="number">2</span>,
+    Fourth = <span class="number">3</span>,
+    Fifth = <span class="number">4</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">i32</span>&gt; <span class="kw">for</span> <span class="ident">SentryGameRank</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;i32&gt; <span class="kw">for </span>SentryGameRank {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::First</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::Second</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::Third</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::Fourth</span>),
-            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SentryGameRank::Fifth</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(SentryGameRank::First),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(SentryGameRank::Second),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(SentryGameRank::Third),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(SentryGameRank::Fourth),
+            <span class="number">4 </span>=&gt; <span class="prelude-val">Ok</span>(SentryGameRank::Fifth),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="doccomment">/// Initializes the key wait process.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Implements (most of?) SPECIAL_PROC_KEY_WAIT_INIT (see ScriptSpecialProcessCall).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_wait_init</span>() {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::KeyWaitInit</span>();
+<span class="doccomment">/// Initializes the key wait process.
+///
+/// Implements (most of?) SPECIAL_PROC_KEY_WAIT_INIT (see ScriptSpecialProcessCall).
+</span><span class="kw">pub fn </span>key_wait_init() {
+    <span class="kw">unsafe </span>{
+        ffi::KeyWaitInit();
     }
 }
 
-<span class="doccomment">/// Checks if an item is one of the aura bows received at the start of the game.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_aura_bow</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsAuraBow</span>(<span class="ident">item_id</span>) &gt; <span class="number">0</span> }
+<span class="doccomment">/// Checks if an item is one of the aura bows received at the start of the game.
+</span><span class="kw">pub fn </span>is_aura_bow(item_id: item_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsAuraBow(item_id) &gt; <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// Sets the amount of money the player is carrying, clamping the value to the range</span>
-<span class="doccomment">/// [0, MAX_MONEY_CARRIED].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_money_carried</span>(<span class="ident">money</span>: <span class="ident">i32</span>) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetMoneyCarried</span>(<span class="ident">money</span>) }
+<span class="doccomment">/// Sets the amount of money the player is carrying, clamping the value to the range
+/// [0, MAX_MONEY_CARRIED].
+</span><span class="kw">pub fn </span>set_money_carried(money: i32) {
+    <span class="kw">unsafe </span>{ ffi::SetMoneyCarried(money) }
 }
 
-<span class="doccomment">/// Sets the amount of money the player has stored in the Duskull Bank, clamping the value to the</span>
-<span class="doccomment">/// range [0, MAX_MONEY_STORED].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_money_stored</span>(<span class="ident">money</span>: <span class="ident">i32</span>) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetMoneyStored</span>(<span class="ident">money</span>) }
+<span class="doccomment">/// Sets the amount of money the player has stored in the Duskull Bank, clamping the value to the
+/// range [0, MAX_MONEY_STORED].
+</span><span class="kw">pub fn </span>set_money_stored(money: i32) {
+    <span class="kw">unsafe </span>{ ffi::SetMoneyStored(money) }
 }
 
-<span class="doccomment">/// Checks if the player&#39;s bag is full.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bag_full</span>() -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsBagFull</span>() &gt; <span class="number">0</span> }
+<span class="doccomment">/// Checks if the player&#39;s bag is full.
+</span><span class="kw">pub fn </span>is_bag_full() -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsBagFull() &gt; <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// Count the amount of the specified item in the player&#39;s bag.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_item_type_in_bag</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::CountItemTypeInBag</span>(<span class="ident">item_id</span>) }
+<span class="doccomment">/// Count the amount of the specified item in the player&#39;s bag.
+</span><span class="kw">pub fn </span>count_item_type_in_bag(item_id: item_catalog::Type) -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::CountItemTypeInBag(item_id) }
 }
 
-<span class="doccomment">/// Adds the specified amount of an item to the player&#39;s bag. Returns whether or not any</span>
-<span class="doccomment">/// items could be added.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_item_to_bag</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>, <span class="ident">amount</span>: <span class="ident">u16</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::AddItemToBag</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ffi::owned_item</span> {
-            <span class="ident">id</span>: <span class="ident">item_id_16</span> {
-                <span class="ident">_bitfield_align_1</span>: [],
-                <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
+<span class="doccomment">/// Adds the specified amount of an item to the player&#39;s bag. Returns whether or not any
+/// items could be added.
+</span><span class="kw">pub fn </span>add_item_to_bag(item_id: item_catalog::Type, amount: u16) -&gt; bool {
+    <span class="kw">unsafe </span>{
+        ffi::AddItemToBag(<span class="kw-2">&amp;mut </span>ffi::owned_item {
+            id: item_id_16 {
+                _bitfield_align_1: [],
+                _bitfield_1: item_id_16::new_bitfield_1(item_id),
             },
-            <span class="ident">amount</span>,
-        }) &gt; <span class="number">0</span>
-    }
+            amount,
+        }) &gt; <span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// Special process 0x39.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is *probably* is_storage_full: checks if the player&#39;s storage is full.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_storage_full</span>() -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x39</span>() &gt; <span class="number">0</span> }
+<span class="doccomment">/// Special process 0x39.
+///
+/// This is *probably* is_storage_full: checks if the player&#39;s storage is full.
+</span><span class="kw">pub fn </span>is_storage_full() -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x39() &gt; <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// Count the amount of the specified item in the player&#39;s storage.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_item_type_in_storage</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::CountItemTypeInStorage</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ffi::owned_item</span> {
-            <span class="ident">id</span>: <span class="ident">item_id_16</span> {
-                <span class="ident">_bitfield_align_1</span>: [],
-                <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
+<span class="doccomment">/// Count the amount of the specified item in the player&#39;s storage.
+</span><span class="kw">pub fn </span>count_item_type_in_storage(item_id: item_catalog::Type) -&gt; i32 {
+    <span class="kw">unsafe </span>{
+        ffi::CountItemTypeInStorage(<span class="kw-2">&amp;mut </span>ffi::owned_item {
+            id: item_id_16 {
+                _bitfield_align_1: [],
+                _bitfield_1: item_id_16::new_bitfield_1(item_id),
             },
-            <span class="ident">amount</span>: <span class="number">0</span>,
+            amount: <span class="number">0</span>,
         })
     }
 }
 
-<span class="doccomment">/// Removes (the specified amount...?) of the given item type from the storage.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_items_type_in_storage</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>, <span class="ident">amount</span>: <span class="ident">u16</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::RemoveItemsTypeInStorage</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ffi::owned_item</span> {
-            <span class="ident">id</span>: <span class="ident">item_id_16</span> {
-                <span class="ident">_bitfield_align_1</span>: [],
-                <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
+<span class="doccomment">/// Removes (the specified amount...?) of the given item type from the storage.
+</span><span class="kw">pub fn </span>remove_items_type_in_storage(item_id: item_catalog::Type, amount: u16) -&gt; bool {
+    <span class="kw">unsafe </span>{
+        ffi::RemoveItemsTypeInStorage(<span class="kw-2">&amp;mut </span>ffi::owned_item {
+            id: item_id_16 {
+                _bitfield_align_1: [],
+                _bitfield_1: item_id_16::new_bitfield_1(item_id),
             },
-            <span class="ident">amount</span>,
-        }) &gt; <span class="number">0</span>
-    }
+            amount,
+        }) &gt; <span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// Adds (the specified amount...?) of the given item type to the storage. Returns whether or not</span>
-<span class="doccomment">/// any items could be added.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_item_to_storage</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>, <span class="ident">amount</span>: <span class="ident">u16</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::AddItemToStorage</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ffi::owned_item</span> {
-            <span class="ident">id</span>: <span class="ident">item_id_16</span> {
-                <span class="ident">_bitfield_align_1</span>: [],
-                <span class="ident">_bitfield_1</span>: <span class="ident">item_id_16::new_bitfield_1</span>(<span class="ident">item_id</span>),
+<span class="doccomment">/// Adds (the specified amount...?) of the given item type to the storage. Returns whether or not
+/// any items could be added.
+</span><span class="kw">pub fn </span>add_item_to_storage(item_id: item_catalog::Type, amount: u16) -&gt; bool {
+    <span class="kw">unsafe </span>{
+        ffi::AddItemToStorage(<span class="kw-2">&amp;mut </span>ffi::owned_item {
+            id: item_id_16 {
+                _bitfield_align_1: [],
+                _bitfield_1: item_id_16::new_bitfield_1(item_id),
             },
-            <span class="ident">amount</span>,
-        }) &gt; <span class="number">0</span>
-    }
+            amount,
+        }) &gt; <span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// Gets the exclusive item offset, which is the item ID relative to that of the first exclusive</span>
-<span class="doccomment">/// item, the Prism Ruff.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_exclusive_item_offset</span>(<span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetExclusiveItemOffset</span>(<span class="ident">item_id</span>) }
+<span class="doccomment">/// Gets the exclusive item offset, which is the item ID relative to that of the first exclusive
+/// item, the Prism Ruff.
+</span><span class="kw">pub fn </span>get_exclusive_item_offset(item_id: item_catalog::Type) -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::GetExclusiveItemOffset(item_id) }
 }
 
-<span class="doccomment">/// Applies stat boosts from an exclusive item.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_exclusive_item_stat_boosts</span>(
-    <span class="ident">item_id</span>: <span class="ident">item_catalog::Type</span>,
-    <span class="ident">atk_to_modify</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u8</span>,
-    <span class="ident">sp_atk_to_modify</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u8</span>,
-    <span class="ident">def_to_modify</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u8</span>,
-    <span class="ident">sp_def_to_modify</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u8</span>,
+<span class="doccomment">/// Applies stat boosts from an exclusive item.
+</span><span class="kw">pub fn </span>apply_exclusive_item_stat_boosts(
+    item_id: item_catalog::Type,
+    atk_to_modify: <span class="kw-2">&amp;mut </span>u8,
+    sp_atk_to_modify: <span class="kw-2">&amp;mut </span>u8,
+    def_to_modify: <span class="kw-2">&amp;mut </span>u8,
+    sp_def_to_modify: <span class="kw-2">&amp;mut </span>u8,
 ) {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::ApplyExclusiveItemStatBoosts</span>(
-            <span class="ident">item_id</span>,
-            <span class="ident">atk_to_modify</span>,
-            <span class="ident">sp_atk_to_modify</span>,
-            <span class="ident">def_to_modify</span>,
-            <span class="ident">sp_def_to_modify</span>,
+    <span class="kw">unsafe </span>{
+        ffi::ApplyExclusiveItemStatBoosts(
+            item_id,
+            atk_to_modify,
+            sp_atk_to_modify,
+            def_to_modify,
+            sp_def_to_modify,
         )
     }
 }
 
-<span class="doccomment">/// Sets the bit for an exclusive item effect.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_exclusive_item_effect</span>(
-    <span class="ident">effect_flags</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span>,
-    <span class="ident">effect_id</span>: <span class="ident">exclusive_item_effect_id::Type</span>,
+<span class="doccomment">/// Sets the bit for an exclusive item effect.
+</span><span class="kw">pub fn </span>set_exclusive_item_effect(
+    effect_flags: <span class="kw-2">&amp;mut </span>u32,
+    effect_id: exclusive_item_effect_id::Type,
 ) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetExclusiveItemEffect</span>(<span class="ident">effect_flags</span>, <span class="ident">effect_id</span>) }
+    <span class="kw">unsafe </span>{ ffi::SetExclusiveItemEffect(effect_flags, effect_id) }
 }
 
-<span class="doccomment">/// Tests the exclusive item bitvector for a specific exclusive item effect.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_exclusive_item_effect_flag</span>(
-    <span class="ident">effect_flags</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span>,
-    <span class="ident">effect_id</span>: <span class="ident">exclusive_item_effect_id::Type</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ExclusiveItemEffectFlagTest</span>(<span class="ident">effect_flags</span>, <span class="ident">effect_id</span>) &gt; <span class="number">0</span> }
+<span class="doccomment">/// Tests the exclusive item bitvector for a specific exclusive item effect.
+</span><span class="kw">pub fn </span>test_exclusive_item_effect_flag(
+    effect_flags: <span class="kw-2">&amp;mut </span>u32,
+    effect_id: exclusive_item_effect_id::Type,
+) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::ExclusiveItemEffectFlagTest(effect_flags, effect_id) &gt; <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// Gets the single-byte language ID of the current program.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The language ID appears to be used to index some global tables.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is probably the firmware language ID...?</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_language</span>() -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetLanguage</span>() }
+<span class="doccomment">/// Gets the single-byte language ID of the current program.
+///
+/// The language ID appears to be used to index some global tables.
+///
+/// It is probably the firmware language ID...?
+</span><span class="kw">pub fn </span>get_language() -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::GetLanguage() }
 }
 
-<span class="doccomment">/// Initializes the main team. If the personality quest was just passed, the data will be taken</span>
-<span class="doccomment">/// from there, otherwise the default fallback team will be set.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_main_team_after_quiz</span>() {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::InitMainTeamAfterQuiz</span>() }
+<span class="doccomment">/// Initializes the main team. If the personality quest was just passed, the data will be taken
+/// from there, otherwise the default fallback team will be set.
+</span><span class="kw">pub fn </span>init_main_team_after_quiz() {
+    <span class="kw">unsafe </span>{ ffi::InitMainTeamAfterQuiz() }
 }
 
-<span class="doccomment">/// Implements SPECIAL_PROC_0x3.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_special_process_3</span>() {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x3</span>() }
+<span class="doccomment">/// Implements SPECIAL_PROC_0x3.
+</span><span class="kw">pub fn </span>script_special_process_3() {
+    <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x3() }
 }
 
-<span class="doccomment">/// Implements SPECIAL_PROC_0x4.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_special_process_4</span>() {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x4</span>() }
+<span class="doccomment">/// Implements SPECIAL_PROC_0x4.
+</span><span class="kw">pub fn </span>script_special_process_4() {
+    <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x4() }
 }
 
-<span class="doccomment">/// Probably related to saving or quicksaving?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug message &quot;NoteSave Base %d %d&quot; with some values. It&#39;s also the</span>
-<span class="doccomment">/// only place where GetRngSeed is called.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">note_save_base</span>(<span class="ident">param_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::NoteSaveBase</span>(<span class="ident">param_1</span>) }
+<span class="doccomment">/// Probably related to saving or quicksaving?
+///
+/// This function prints the debug message &quot;NoteSave Base %d %d&quot; with some values. It&#39;s also the
+/// only place where GetRngSeed is called.
+</span><span class="kw">pub fn </span>note_save_base(param_1: i32) -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::NoteSaveBase(param_1) }
 }
 
-<span class="doccomment">/// Probably related to saving or quicksaving?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug message &quot;NoteLoad Base %d&quot; with some value. It&#39;s also the</span>
-<span class="doccomment">/// only place where SetRngSeed is called.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">note_load_base</span>() -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::NoteLoadBase</span>() }
+<span class="doccomment">/// Probably related to saving or quicksaving?
+///
+/// This function prints the debug message &quot;NoteLoad Base %d&quot; with some value. It&#39;s also the
+/// only place where SetRngSeed is called.
+</span><span class="kw">pub fn </span>note_load_base() -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::NoteLoadBase() }
 }
 
-<span class="doccomment">/// Adventure log helper</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AdventureLog</span>;
+<span class="doccomment">/// Adventure log helper
+</span><span class="kw">pub struct </span>AdventureLog;
 
-<span class="kw">impl</span> <span class="ident">AdventureLog</span> {
-    <span class="doccomment">/// Sets the location of the adventure log struct in memory.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Sets it in a static memory location.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_struct_location</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetAdventureLogStructLocation</span>() }
+<span class="kw">impl </span>AdventureLog {
+    <span class="doccomment">/// Sets the location of the adventure log struct in memory.
+    ///
+    /// Sets it in a static memory location.
+    </span><span class="kw">pub fn </span>set_struct_location(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::SetAdventureLogStructLocation() }
     }
 
-    <span class="doccomment">/// Clears the adventure log structure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_struct</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ClearAdventureLogStruct</span>() }
+    <span class="doccomment">/// Clears the adventure log structure.
+    </span><span class="kw">pub fn </span>clear_struct(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::ClearAdventureLogStruct() }
     }
 
-    <span class="doccomment">/// Returns the current dungeon floor pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_dungeon_floor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ffi::dungeon_floor_pair</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetAdventureLogDungeonFloor</span>() }
+    <span class="doccomment">/// Returns the current dungeon floor pair.
+    </span><span class="kw">pub fn </span>get_dungeon_floor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ffi::dungeon_floor_pair {
+        <span class="kw">unsafe </span>{ ffi::GetAdventureLogDungeonFloor() }
     }
 
-    <span class="doccomment">/// Sets the current dungeon floor pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dungeon_floor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dungeon_floor</span>: <span class="ident">ffi::dungeon_floor_pair</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetAdventureLogDungeonFloor</span>(<span class="ident">dungeon_floor</span>) }
+    <span class="doccomment">/// Sets the current dungeon floor pair.
+    </span><span class="kw">pub fn </span>set_dungeon_floor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dungeon_floor: ffi::dungeon_floor_pair) {
+        <span class="kw">unsafe </span>{ ffi::SetAdventureLogDungeonFloor(dungeon_floor) }
     }
 
-    <span class="doccomment">/// Checks if one adventure log entry is completed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_entry_completed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry_id</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetAdventureLogCompleted</span>(<span class="ident">entry_id</span>) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Checks if one adventure log entry is completed.
+    </span><span class="kw">pub fn </span>is_entry_completed(<span class="kw-2">&amp;</span><span class="self">self</span>, entry_id: u32) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::GetAdventureLogCompleted(entry_id) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Marks one of the adventure log entry as completed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_entry_completed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">entry_id</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetAdventureLogCompleted</span>(<span class="ident">entry_id</span>) }
+    <span class="doccomment">/// Marks one of the adventure log entry as completed.
+    </span><span class="kw">pub fn </span>mark_entry_completed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, entry_id: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetAdventureLogCompleted(entry_id) }
     }
 
-    <span class="doccomment">/// Checks if none of of the adventure log entry is completed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsAdventureLogNotEmpty</span>() == <span class="number">0</span> }
+    <span class="doccomment">/// Checks if none of of the adventure log entry is completed.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsAdventureLogNotEmpty() == <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Gets the number of dungeons cleared.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_dungeons_cleared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbDungeonsCleared</span>() }
+    <span class="doccomment">/// Gets the number of dungeons cleared.
+    </span><span class="kw">pub fn </span>get_number_dungeons_cleared(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbDungeonsCleared() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of dungeons cleared.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_dungeons_cleared</span>() {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbDungeonsCleared</span>() };
+    <span class="doccomment">/// Increments by 1 the number of dungeons cleared.
+    </span><span class="kw">pub fn </span>increment_number_dungeons_cleared() {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbDungeonsCleared() };
     }
 
-    <span class="doccomment">/// Gets the number of successful friend rescues.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_friend_rescues</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbFriendRescues</span>() }
+    <span class="doccomment">/// Gets the number of successful friend rescues.
+    </span><span class="kw">pub fn </span>get_number_friend_rescues(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbFriendRescues() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of successful friend rescues.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_friend_rescues</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbFriendRescues</span>() };
+    <span class="doccomment">/// Increments by 1 the number of successful friend rescues.
+    </span><span class="kw">pub fn </span>increment_number_friend_rescues(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbFriendRescues() };
     }
 
-    <span class="doccomment">/// Gets the number of evolutions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_evolutions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbEvolutions</span>() }
+    <span class="doccomment">/// Gets the number of evolutions.
+    </span><span class="kw">pub fn </span>get_number_evolutions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbEvolutions() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of evolutions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_evolutions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbEvolutions</span>() };
+    <span class="doccomment">/// Increments by 1 the number of evolutions.
+    </span><span class="kw">pub fn </span>increment_number_evolutions(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbEvolutions() };
     }
 
-    <span class="doccomment">/// Leftover from Time &amp; Darkness. Does not do anything.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calls to this matches the ones for incrementing the number of successful steals in Time &amp; Darkness.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_steals</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbSteals</span>() };
+    <span class="doccomment">/// Leftover from Time &amp; Darkness. Does not do anything.
+    ///
+    /// Calls to this matches the ones for incrementing the number of successful steals in Time &amp; Darkness.
+    </span><span class="kw">pub fn </span>increment_number_steals(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbSteals() };
     }
 
-    <span class="doccomment">/// Gets the number of eggs hatched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_eggs_hatched</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbEggsHatched</span>() }
+    <span class="doccomment">/// Gets the number of eggs hatched.
+    </span><span class="kw">pub fn </span>get_number_eggs_hatched(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbEggsHatched() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of eggs hatched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_eggs_hatched</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbEggsHatched</span>() };
+    <span class="doccomment">/// Increments by 1 the number of eggs hatched.
+    </span><span class="kw">pub fn </span>increment_number_eggs_hatched(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbEggsHatched() };
     }
 
-    <span class="doccomment">/// Gets the number of different monsters that joined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_monsters_joined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbPokemonJoined</span>() }
+    <span class="doccomment">/// Gets the number of different monsters that joined.
+    </span><span class="kw">pub fn </span>get_number_monsters_joined(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbPokemonJoined() }
     }
 
-    <span class="doccomment">/// Gets the number of different moves learned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_moves_learned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbMovesLearned</span>() }
+    <span class="doccomment">/// Gets the number of different moves learned.
+    </span><span class="kw">pub fn </span>get_number_moves_learned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbMovesLearned() }
     }
 
-    <span class="doccomment">/// Gets the record of victories on one floor.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_victories_on_one_floor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetVictoriesOnOneFloor</span>() }
+    <span class="doccomment">/// Gets the record of victories on one floor.
+    </span><span class="kw">pub fn </span>get_victories_on_one_floor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetVictoriesOnOneFloor() }
     }
 
-    <span class="doccomment">/// Sets the record of victories on one floor.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_victories_on_one_floor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">victories</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetVictoriesOnOneFloor</span>(<span class="ident">victories</span>) };
+    <span class="doccomment">/// Sets the record of victories on one floor.
+    </span><span class="kw">pub fn </span>set_victories_on_one_floor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, victories: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetVictoriesOnOneFloor(victories) };
     }
 
-    <span class="doccomment">/// Gets the number of different monsters that battled against you.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_monsters_battled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbPokemonBattled</span>() }
+    <span class="doccomment">/// Gets the number of different monsters that battled against you.
+    </span><span class="kw">pub fn </span>get_number_monsters_battled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbPokemonBattled() }
     }
 
-    <span class="doccomment">/// Marks one monster as battled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_monster_battled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">monster_id</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetPokemonBattled</span>(<span class="ident">monster_id</span>) };
+    <span class="doccomment">/// Marks one monster as battled.
+    </span><span class="kw">pub fn </span>set_monster_battled(<span class="kw-2">&amp;mut </span><span class="self">self</span>, monster_id: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetPokemonBattled(monster_id) };
     }
 
-    <span class="doccomment">/// Marks one monster as joined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_monster_joined</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">monster_id</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetPokemonJoined</span>(<span class="ident">monster_id</span>) };
+    <span class="doccomment">/// Marks one monster as joined.
+    </span><span class="kw">pub fn </span>set_monster_joined(<span class="kw-2">&amp;mut </span><span class="self">self</span>, monster_id: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetPokemonJoined(monster_id) };
     }
 
-    <span class="doccomment">/// Gets the number of big treasure wins.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_big_treasure_wins</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbBigTreasureWins</span>() }
+    <span class="doccomment">/// Gets the number of big treasure wins.
+    </span><span class="kw">pub fn </span>get_number_big_treasure_wins(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbBigTreasureWins() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of big treasure wins.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_of_big_treasure_wins</span>() {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbBigTreasureWins</span>() };
+    <span class="doccomment">/// Increments by 1 the number of big treasure wins.
+    </span><span class="kw">pub fn </span>increment_number_of_big_treasure_wins() {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbBigTreasureWins() };
     }
 
-    <span class="doccomment">/// Sets the number of big treasure wins.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_number_big_treasure_wins</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetNbBigTreasureWins</span>(<span class="ident">number</span>) };
+    <span class="doccomment">/// Sets the number of big treasure wins.
+    </span><span class="kw">pub fn </span>set_number_big_treasure_wins(<span class="kw-2">&amp;mut </span><span class="self">self</span>, number: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetNbBigTreasureWins(number) };
     }
 
-    <span class="doccomment">/// Gets the number of items recycled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_recycled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbRecycled</span>() }
+    <span class="doccomment">/// Gets the number of items recycled.
+    </span><span class="kw">pub fn </span>get_number_recycled(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbRecycled() }
     }
 
-    <span class="doccomment">/// Sets the number of items recycled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_number_recycled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetNbRecycled</span>(<span class="ident">number</span>) };
+    <span class="doccomment">/// Sets the number of items recycled.
+    </span><span class="kw">pub fn </span>set_number_recycled(<span class="kw-2">&amp;mut </span><span class="self">self</span>, number: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetNbRecycled(number) };
     }
 
-    <span class="doccomment">/// Gets the number of Sky Gifts sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_sky_gifts_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbSkyGiftsSent</span>() }
+    <span class="doccomment">/// Gets the number of Sky Gifts sent.
+    </span><span class="kw">pub fn </span>get_number_sky_gifts_sent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbSkyGiftsSent() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of sky gifts sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_of_gifts_sent</span>() {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbSkyGiftsSent</span>() };
+    <span class="doccomment">/// Increments by 1 the number of sky gifts sent.
+    </span><span class="kw">pub fn </span>increment_number_of_gifts_sent() {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbSkyGiftsSent() };
     }
 
-    <span class="doccomment">/// Sets the number of Sky Gifts sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_number_sky_gifts_sent</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetNbSkyGiftsSent</span>(<span class="ident">number</span>) };
+    <span class="doccomment">/// Sets the number of Sky Gifts sent.
+    </span><span class="kw">pub fn </span>set_number_sky_gifts_sent(<span class="kw-2">&amp;mut </span><span class="self">self</span>, number: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetNbSkyGiftsSent(number) };
     }
 
-    <span class="doccomment">/// Computes the counters from the bit fields in the adventure log, as they are not updated</span>
-    <span class="doccomment">/// automatically when bit fields are altered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Affects [`Self::get_number_monsters_joined`], [`Self::get_number_moves_learned`],</span>
-    <span class="doccomment">/// [`Self::get_number_monsters_battled`] and [`Self::get_number_items_acquired`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_special_counters</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ComputeSpecialCounters</span>() };
+    <span class="doccomment">/// Computes the counters from the bit fields in the adventure log, as they are not updated
+    /// automatically when bit fields are altered.
+    ///
+    /// Affects [`Self::get_number_monsters_joined`], [`Self::get_number_moves_learned`],
+    /// [`Self::get_number_monsters_battled`] and [`Self::get_number_items_acquired`].
+    </span><span class="kw">pub fn </span>compute_special_counters(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::ComputeSpecialCounters() };
     }
 
-    <span class="doccomment">/// Marks a specified special monster as recruited in the adventure log.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_special_monster_recruited</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">monster_id</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::RecruitSpecialPokemonLog</span>(<span class="ident">monster_id</span>) };
+    <span class="doccomment">/// Marks a specified special monster as recruited in the adventure log.
+    </span><span class="kw">pub fn </span>set_special_monster_recruited(<span class="kw-2">&amp;mut </span><span class="self">self</span>, monster_id: u32) {
+        <span class="kw">unsafe </span>{ ffi::RecruitSpecialPokemonLog(monster_id) };
     }
 
-    <span class="doccomment">/// Gets the number of times the player fainted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_fainted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbFainted</span>() }
+    <span class="doccomment">/// Gets the number of times the player fainted.
+    </span><span class="kw">pub fn </span>get_number_fainted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbFainted() }
     }
 
-    <span class="doccomment">/// Increments by 1 the number of times the player fainted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_number_of_fainted</span>() {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IncrementNbFainted</span>() };
+    <span class="doccomment">/// Increments by 1 the number of times the player fainted.
+    </span><span class="kw">pub fn </span>increment_number_of_fainted() {
+        <span class="kw">unsafe </span>{ ffi::IncrementNbFainted() };
     }
 
-    <span class="doccomment">/// Gets the number of items acquired.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_number_items_acquired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNbItemAcquired</span>() }
+    <span class="doccomment">/// Gets the number of items acquired.
+    </span><span class="kw">pub fn </span>get_number_items_acquired(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetNbItemAcquired() }
     }
 
-    <span class="doccomment">/// Marks one specific item as acquired.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_item_acquired</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item_id</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetItemAcquired</span>(<span class="ident">item_id</span>) };
+    <span class="doccomment">/// Marks one specific item as acquired.
+    </span><span class="kw">pub fn </span>set_item_acquired(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item_id: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetItemAcquired(item_id) };
     }
 
-    <span class="doccomment">/// Sets a challenge letter as cleared.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_challenge_letter_cleared</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">challenge_letter</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetChallengeLetterCleared</span>(<span class="ident">challenge_letter</span>) };
+    <span class="doccomment">/// Sets a challenge letter as cleared.
+    </span><span class="kw">pub fn </span>set_challenge_letter_cleared(<span class="kw-2">&amp;mut </span><span class="self">self</span>, challenge_letter: u32) {
+        <span class="kw">unsafe </span>{ ffi::SetChallengeLetterCleared(challenge_letter) };
     }
 
-    <span class="doccomment">/// Gets the points for the associated rank in the footprints minigame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_sentry_duty_game_points</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rank</span>: <span class="ident">SentryGameRank</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetSentryDutyGamePoints</span>(<span class="ident">rank</span> <span class="kw">as</span> <span class="ident">i32</span>) }
+    <span class="doccomment">/// Gets the points for the associated rank in the footprints minigame.
+    </span><span class="kw">pub fn </span>get_sentry_duty_game_points(<span class="kw-2">&amp;</span><span class="self">self</span>, rank: SentryGameRank) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::GetSentryDutyGamePoints(rank <span class="kw">as </span>i32) }
     }
 
-    <span class="doccomment">/// Sets the points for the associated rank in the footprints minigame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sentry_duty_game_points</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">points</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">SentryGameRank</span>&gt; {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetSentryDutyGamePoints</span>(<span class="ident">points</span>) }
-            .<span class="ident">try_into</span>()
-            .<span class="ident">ok</span>()
-    }
-}
-
-<span class="doccomment">/// Returns whether the specified dungeon is considered as going upward or not</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dungeon_goes_up</span>(<span class="ident">dungeon_id</span>: <span class="ident">dungeon_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::DungeonGoesUp</span>(<span class="ident">dungeon_id</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Checks if a monster ID is an Unown.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unown</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsUnown</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Checks if a monster ID is a Shaymin.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_shaymin</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsShaymin</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Checks if a monster ID is a Castform.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_castform</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsCastform</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Checks if a monster ID is a Cherrim.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cherrim</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsCherrim</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Checks if a monster ID is a Deoxys.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_deoxys</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsDeoxys</span>(<span class="ident">monster_id</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Checks if a given monster is on the exploration team (not necessarily the active party)?</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_monster_on_team</span>(<span class="ident">monster_id</span>: <span class="ident">monster_catalog::Type</span>, <span class="ident">param_2</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IsMonsterOnTeam</span>(<span class="ident">monster_id</span>, <span class="ident">param_2</span>) &gt; <span class="number">0</span> }
-}
-
-<span class="doccomment">/// Sets the team setup of the currently active party.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_team_setup</span>(<span class="ident">team_setup</span>: <span class="ident">TeamSetup</span>) {
-    <span class="kw">match</span> <span class="ident">team_setup</span> {
-        <span class="ident">TeamSetup::HeroOnly</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">ffi::SetTeamSetupHeroOnly</span>() },
-        <span class="ident">TeamSetup::HeroAndPartnerOnly</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">ffi::SetTeamSetupHeroAndPartnerOnly</span>() },
+    <span class="doccomment">/// Sets the points for the associated rank in the footprints minigame.
+    </span><span class="kw">pub fn </span>set_sentry_duty_game_points(<span class="kw-2">&amp;mut </span><span class="self">self</span>, points: u32) -&gt; <span class="prelude-ty">Option</span>&lt;SentryGameRank&gt; {
+        <span class="kw">unsafe </span>{ ffi::SetSentryDutyGamePoints(points) }
+            .try_into()
+            .ok()
     }
 }
 
-<span class="doccomment">/// Appears to get the team&#39;s active party members.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Output is a slice-like of 2-byte values (they seem to be indexes of some sort) describing each</span>
-<span class="doccomment">/// party member.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_party_members</span>() -&gt; <span class="kw">impl</span> <span class="ident">AsRef</span>&lt;[<span class="ident">u16</span>]&gt; {
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">party_members</span>: [<span class="ident">u16</span>; <span class="number">4</span>] = [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="kw">let</span> <span class="ident">nb</span> = <span class="ident">ffi::GetPartyMembers</span>(<span class="ident">party_members</span>.<span class="ident">as_mut_ptr</span>());
-        <span class="ident">OwnedSlice::new</span>(<span class="ident">party_members</span>, <span class="number">0</span>, <span class="ident">nb</span> <span class="kw">as</span> <span class="ident">usize</span>)
+<span class="doccomment">/// Returns whether the specified dungeon is considered as going upward or not
+</span><span class="kw">pub fn </span>dungeon_goes_up(dungeon_id: dungeon_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::DungeonGoesUp(dungeon_id) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Checks if a monster ID is an Unown.
+</span><span class="kw">pub fn </span>is_unown(monster_id: monster_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsUnown(monster_id) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Checks if a monster ID is a Shaymin.
+</span><span class="kw">pub fn </span>is_shaymin(monster_id: monster_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsShaymin(monster_id) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Checks if a monster ID is a Castform.
+</span><span class="kw">pub fn </span>is_castform(monster_id: monster_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsCastform(monster_id) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Checks if a monster ID is a Cherrim.
+</span><span class="kw">pub fn </span>is_cherrim(monster_id: monster_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsCherrim(monster_id) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Checks if a monster ID is a Deoxys.
+</span><span class="kw">pub fn </span>is_deoxys(monster_id: monster_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsDeoxys(monster_id) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Checks if a given monster is on the exploration team (not necessarily the active party)?
+</span><span class="kw">pub fn </span>is_monster_on_team(monster_id: monster_catalog::Type, param_2: i32) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IsMonsterOnTeam(monster_id, param_2) &gt; <span class="number">0 </span>}
+}
+
+<span class="doccomment">/// Sets the team setup of the currently active party.
+</span><span class="kw">pub fn </span>set_team_setup(team_setup: TeamSetup) {
+    <span class="kw">match </span>team_setup {
+        TeamSetup::HeroOnly =&gt; <span class="kw">unsafe </span>{ ffi::SetTeamSetupHeroOnly() },
+        TeamSetup::HeroAndPartnerOnly =&gt; <span class="kw">unsafe </span>{ ffi::SetTeamSetupHeroAndPartnerOnly() },
     }
 }
 
-<span class="doccomment">/// Counts the number of monsters in the active team.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_party_members</span>() -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetPartyMembers</span>(<span class="ident">ptr::null_mut</span>()) }
+<span class="doccomment">/// Appears to get the team&#39;s active party members.
+///
+/// Output is a slice-like of 2-byte values (they seem to be indexes of some sort) describing each
+/// party member.
+</span><span class="kw">pub fn </span>get_party_members() -&gt; <span class="kw">impl </span>AsRef&lt;[u16]&gt; {
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>party_members: [u16; <span class="number">4</span>] = [<span class="number">0</span>; <span class="number">4</span>];
+        <span class="kw">let </span>nb = ffi::GetPartyMembers(party_members.as_mut_ptr());
+        OwnedSlice::new(party_members, <span class="number">0</span>, nb <span class="kw">as </span>usize)
+    }
 }
 
-<span class="doccomment">/// Tests whether an IQ skill with a given ID is active.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iq_skill_flag_test</span>(<span class="ident">iq_skill_flags</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span>, <span class="ident">iq_id</span>: <span class="ident">iq_skill_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::IqSkillFlagTest</span>(<span class="ident">iq_skill_flags</span>, <span class="ident">iq_id</span>) &gt; <span class="number">0</span> }
+<span class="doccomment">/// Counts the number of monsters in the active team.
+</span><span class="kw">pub fn </span>count_party_members() -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::GetPartyMembers(ptr::null_mut()) }
 }
 
-<span class="doccomment">/// Returns the number of SOS mails.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_sos_mail_count</span>(<span class="ident">param_1</span>: <span class="ident">i32</span>, <span class="ident">param_2</span>: <span class="ident">bool</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetSosMailCount</span>(<span class="ident">param_1</span>, <span class="ident">param_2</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+<span class="doccomment">/// Tests whether an IQ skill with a given ID is active.
+</span><span class="kw">pub fn </span>iq_skill_flag_test(iq_skill_flags: <span class="kw-2">&amp;mut </span>u32, iq_id: iq_skill_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::IqSkillFlagTest(iq_skill_flags, iq_id) &gt; <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// Returns the number of missions completed.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dungeon_had_request_done</span>(<span class="ident">param_1</span>: <span class="ident">i32</span>, <span class="ident">param_2</span>: <span class="ident">bool</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetSosMailCount</span>(<span class="ident">param_1</span>, <span class="ident">param_2</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+<span class="doccomment">/// Returns the number of SOS mails.
+</span><span class="kw">pub fn </span>get_sos_mail_count(param_1: i32, param_2: bool) -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::GetSosMailCount(param_1, param_2 <span class="kw">as </span>ffi::bool_) }
 }
 
-<span class="doccomment">/// Implements SPECIAL_PROC_0x3D.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_special_process_x3d</span>() {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x3D</span>() }
+<span class="doccomment">/// Returns the number of missions completed.
+</span><span class="kw">pub fn </span>dungeon_had_request_done(param_1: i32, param_2: bool) -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::GetSosMailCount(param_1, param_2 <span class="kw">as </span>ffi::bool_) }
 }
 
-<span class="doccomment">/// Implements SPECIAL_PROC_0x3E.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_special_process_x3e</span>() {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x3E</span>() }
+<span class="doccomment">/// Implements SPECIAL_PROC_0x3D.
+</span><span class="kw">pub fn </span>script_special_process_x3d() {
+    <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x3D() }
 }
 
-<span class="doccomment">/// Implements SPECIAL_PROC_0x17.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_special_process_x17</span>() {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x17</span>() }
+<span class="doccomment">/// Implements SPECIAL_PROC_0x3E.
+</span><span class="kw">pub fn </span>script_special_process_x3e() {
+    <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x3E() }
 }
 
-<span class="doccomment">/// Gets info about the item at a given item table (not sure what this table is...) index.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Once we find out more about the item table, this function will probably move to a wrapper</span>
-<span class="doccomment">/// struct.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">item_at_table_idx</span>(<span class="ident">table_idx</span>: <span class="ident">i32</span>) -&gt; <span class="ident">ffi::owned_item</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> = <span class="ident">ffi::owned_item</span> {
-        <span class="ident">id</span>: <span class="ident">item_id_16</span> {
-            <span class="ident">_bitfield_align_1</span>: [],
-            <span class="ident">_bitfield_1</span>: <span class="ident">Default::default</span>(),
+<span class="doccomment">/// Implements SPECIAL_PROC_0x17.
+</span><span class="kw">pub fn </span>script_special_process_x17() {
+    <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x17() }
+}
+
+<span class="doccomment">/// Gets info about the item at a given item table (not sure what this table is...) index.
+///
+/// Once we find out more about the item table, this function will probably move to a wrapper
+/// struct.
+</span><span class="kw">pub fn </span>item_at_table_idx(table_idx: i32) -&gt; ffi::owned_item {
+    <span class="kw">let </span><span class="kw-2">mut </span>out = ffi::owned_item {
+        id: item_id_16 {
+            _bitfield_align_1: [],
+            _bitfield_1: Default::default(),
         },
-        <span class="ident">amount</span>: <span class="number">0</span>,
+        amount: <span class="number">0</span>,
     };
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ItemAtTableIdx</span>(<span class="ident">table_idx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>) }
-    <span class="ident">out</span>
+    <span class="kw">unsafe </span>{ ffi::ItemAtTableIdx(table_idx, <span class="kw-2">&amp;mut </span>out) }
+    out
 }
 
-<span class="doccomment">/// Marks a dungeon tip as already shown to the player</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dungeon_tip_shown</span>(<span class="ident">tip_id</span>: <span class="ident">i32</span>) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetDungeonTipShown</span>(<span class="ident">tip_id</span>) }
+<span class="doccomment">/// Marks a dungeon tip as already shown to the player
+</span><span class="kw">pub fn </span>set_dungeon_tip_shown(tip_id: i32) {
+    <span class="kw">unsafe </span>{ ffi::SetDungeonTipShown(tip_id) }
 }
 
-<span class="doccomment">/// Checks if a dungeon tip has already been shown before or not.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">was_dungeon_tip_shown</span>(<span class="ident">tip_id</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetDungeonTipShown</span>(<span class="ident">tip_id</span>) &gt; <span class="number">0</span> }
+<span class="doccomment">/// Checks if a dungeon tip has already been shown before or not.
+</span><span class="kw">pub fn </span>was_dungeon_tip_shown(tip_id: i32) -&gt; bool {
+    <span class="kw">unsafe </span>{ ffi::GetDungeonTipShown(tip_id) &gt; <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// Returns whether a certain joined_at field value is between</span>
-<span class="doccomment">/// [`dungeon_catalog::DUNGEON_JOINED_AT_BIDOOF`] and [`dungeon_catalog::DUNGEON_DUMMY_0xE3`].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_special_joined_at_location</span>(<span class="ident">joined_at</span>: <span class="ident">dungeon_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::JoinedAtRangeCheck</span>(<span class="ident">ffi::dungeon_id_8</span> {
-            <span class="ident">_bitfield_align_1</span>: [],
-            <span class="ident">_bitfield_1</span>: <span class="ident">ffi::dungeon_id_8::new_bitfield_1</span>(<span class="ident">joined_at</span>),
-        }) &gt; <span class="number">0</span>
-    }
+<span class="doccomment">/// Returns whether a certain joined_at field value is between
+/// [`dungeon_catalog::DUNGEON_JOINED_AT_BIDOOF`] and [`dungeon_catalog::DUNGEON_DUMMY_0xE3`].
+</span><span class="kw">pub fn </span>is_special_joined_at_location(joined_at: dungeon_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{
+        ffi::JoinedAtRangeCheck(ffi::dungeon_id_8 {
+            _bitfield_align_1: [],
+            _bitfield_1: ffi::dungeon_id_8::new_bitfield_1(joined_at),
+        }) &gt; <span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// Returns whether a game over should happen when a monster with the specified joined_at ID faints</span>
-<span class="doccomment">/// (as long as the other conditions are met). It might have a more generic meaning.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_cause_game_over_on_faint</span>(<span class="ident">joined_at</span>: <span class="ident">dungeon_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::ShouldCauseGameOverOnFaint</span>(<span class="ident">ffi::dungeon_id_8</span> {
-            <span class="ident">_bitfield_align_1</span>: [],
-            <span class="ident">_bitfield_1</span>: <span class="ident">ffi::dungeon_id_8::new_bitfield_1</span>(<span class="ident">joined_at</span>),
-        }) &gt; <span class="number">0</span>
-    }
+<span class="doccomment">/// Returns whether a game over should happen when a monster with the specified joined_at ID faints
+/// (as long as the other conditions are met). It might have a more generic meaning.
+</span><span class="kw">pub fn </span>should_cause_game_over_on_faint(joined_at: dungeon_catalog::Type) -&gt; bool {
+    <span class="kw">unsafe </span>{
+        ffi::ShouldCauseGameOverOnFaint(ffi::dungeon_id_8 {
+            _bitfield_align_1: [],
+            _bitfield_1: ffi::dungeon_id_8::new_bitfield_1(joined_at),
+        }) &gt; <span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// Returns the monster ID of the specified monster spawn entry.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_monster_id_from_spawn_entry</span>(
-    <span class="ident">spawn_entry</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::monster_spawn_entry</span>,
-) -&gt; <span class="ident">monster_catalog::Type</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetMonsterIdFromSpawnEntry</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">spawn_entry</span>)) }
+<span class="doccomment">/// Returns the monster ID of the specified monster spawn entry.
+</span><span class="kw">pub fn </span>get_monster_id_from_spawn_entry(
+    spawn_entry: <span class="kw-2">&amp;</span>ffi::monster_spawn_entry,
+) -&gt; monster_catalog::Type {
+    <span class="kw">unsafe </span>{ ffi::GetMonsterIdFromSpawnEntry(<span class="macro">force_mut_ptr!</span>(spawn_entry)) }
 }
 
-<span class="doccomment">/// Returns the level of the monster defined in the specified monster spawn entry.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_monster_level_from_spawn_entry</span>(<span class="ident">spawn_entry</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::monster_spawn_entry</span>) -&gt; <span class="ident">u8</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetMonsterLevelFromSpawnEntry</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">spawn_entry</span>)) }
+<span class="doccomment">/// Returns the level of the monster defined in the specified monster spawn entry.
+</span><span class="kw">pub fn </span>get_monster_level_from_spawn_entry(spawn_entry: <span class="kw-2">&amp;</span>ffi::monster_spawn_entry) -&gt; u8 {
+    <span class="kw">unsafe </span>{ ffi::GetMonsterLevelFromSpawnEntry(<span class="macro">force_mut_ptr!</span>(spawn_entry)) }
 }
 
-<span class="doccomment">/// Applies the IQ boosts from eating a Gummi to the target monster.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You should not use this in dungeon mode.</span>
-<span class="doccomment">/// Use [`crate::api::dungeon_mode::DungeonEffectsEmitter::apply_gummi_boosts`] instead.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// The caller must make sure the undefined params and buffer are valid for this function.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">apply_gummi_boosts</span>(
-    <span class="ident">param_1</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined2</span>,
-    <span class="ident">param_2</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined2</span>,
-    <span class="ident">param_3</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined</span>,
-    <span class="ident">param_4</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined</span>,
-    <span class="ident">param_5</span>: <span class="ident">ffi::undefined2</span>,
-    <span class="ident">param_6</span>: <span class="ident">ffi::undefined</span>,
-    <span class="ident">buffer</span>: <span class="kw-2">*mut</span> <span class="ident"><span class="kw">crate</span>::ctypes::c_void</span>,
+<span class="doccomment">/// Applies the IQ boosts from eating a Gummi to the target monster.
+///
+/// You should not use this in dungeon mode.
+/// Use [`crate::api::dungeon_mode::DungeonEffectsEmitter::apply_gummi_boosts`] instead.
+///
+/// # Safety
+/// The caller must make sure the undefined params and buffer are valid for this function.
+</span><span class="kw">pub unsafe fn </span>apply_gummi_boosts(
+    param_1: <span class="kw-2">*mut </span>ffi::undefined2,
+    param_2: <span class="kw-2">*mut </span>ffi::undefined2,
+    param_3: <span class="kw-2">*mut </span>ffi::undefined,
+    param_4: <span class="kw-2">*mut </span>ffi::undefined,
+    param_5: ffi::undefined2,
+    param_6: ffi::undefined,
+    buffer: <span class="kw-2">*mut </span><span class="kw">crate</span>::ctypes::c_void,
 ) {
-    <span class="ident">ffi::ApplyGummiBoostsGroundMode</span>(<span class="ident">param_1</span>, <span class="ident">param_2</span>, <span class="ident">param_3</span>, <span class="ident">param_4</span>, <span class="ident">param_5</span>, <span class="ident">param_6</span>, <span class="ident">buffer</span>)
+    ffi::ApplyGummiBoostsGroundMode(param_1, param_2, param_3, param_4, param_5, param_6, buffer)
 }
 
-<span class="doccomment">/// Returns the maximum rescue attempts allowed in the specified dungeon,</span>
-<span class="doccomment">/// or -1 if rescues are disabled.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_max_rescue_attempts</span>(<span class="ident">dungeon_id</span>: <span class="ident">dungeon_catalog::Type</span>) -&gt; <span class="ident">i8</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetMaxRescueAttempts</span>(<span class="ident">dungeon_id</span>) }
+<span class="doccomment">/// Returns the maximum rescue attempts allowed in the specified dungeon,
+/// or -1 if rescues are disabled.
+</span><span class="kw">pub fn </span>get_max_rescue_attempts(dungeon_id: dungeon_catalog::Type) -&gt; i8 {
+    <span class="kw">unsafe </span>{ ffi::GetMaxRescueAttempts(dungeon_id) }
 }
 
-<span class="doccomment">/// Returns a struct containing information about a team member.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_team_member_data</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">member_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::team_member</span>&gt; {
-    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetTeamMemberData</span>(<span class="ident">member_id</span>) };
-    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span> })
+<span class="doccomment">/// Returns a struct containing information about a team member.
+</span><span class="kw">pub fn </span>get_team_member_data&lt;<span class="lifetime">&#39;a</span>&gt;(member_id: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ffi::team_member&gt; {
+    <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetTeamMemberData(member_id) };
+    <span class="kw">if </span>ptr.is_null() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>ptr })
     }
 }
 
-<span class="doccomment">/// Returns a struct containing information about a team member.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_team_member_data_mut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">member_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::team_member</span>&gt; {
-    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetTeamMemberData</span>(<span class="ident">member_id</span>) };
-    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> })
+<span class="doccomment">/// Returns a struct containing information about a team member.
+</span><span class="kw">pub fn </span>get_team_member_data_mut&lt;<span class="lifetime">&#39;a</span>&gt;(member_id: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::team_member&gt; {
+    <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetTeamMemberData(member_id) };
+    <span class="kw">if </span>ptr.is_null() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr })
     }
 }
 
-<span class="doccomment">/// Returns the data of a monster sent into the Explorer Dojo using the &quot;exchange teams&quot; option.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `entry_number` must be a value between \[0,3\].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_explorer_dojo_monster_data</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">entry_number</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::ground_monster</span>&gt; {
-    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetExplorerMazeMonster</span>(<span class="ident">entry_number</span>) };
-    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span> })
+<span class="doccomment">/// Returns the data of a monster sent into the Explorer Dojo using the &quot;exchange teams&quot; option.
+///
+/// `entry_number` must be a value between \[0,3\].
+</span><span class="kw">pub fn </span>get_explorer_dojo_monster_data&lt;<span class="lifetime">&#39;a</span>&gt;(entry_number: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ffi::ground_monster&gt; {
+    <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetExplorerMazeMonster(entry_number) };
+    <span class="kw">if </span>ptr.is_null() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>ptr })
     }
 }
 
-<span class="doccomment">/// Returns the data of a monster sent into the Explorer Dojo using the &quot;exchange teams&quot; option.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `entry_number` must be a value between \[0,3\].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_explorer_dojo_monster_data_mut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(
-    <span class="ident">entry_number</span>: <span class="ident">u8</span>,
-) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::ground_monster</span>&gt; {
-    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="kw">unsafe</span> { <span class="ident">ffi::GetExplorerMazeMonster</span>(<span class="ident">entry_number</span>) };
-    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> })
+<span class="doccomment">/// Returns the data of a monster sent into the Explorer Dojo using the &quot;exchange teams&quot; option.
+///
+/// `entry_number` must be a value between \[0,3\].
+</span><span class="kw">pub fn </span>get_explorer_dojo_monster_data_mut&lt;<span class="lifetime">&#39;a</span>&gt;(
+    entry_number: u8,
+) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::ground_monster&gt; {
+    <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetExplorerMazeMonster(entry_number) };
+    <span class="kw">if </span>ptr.is_null() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

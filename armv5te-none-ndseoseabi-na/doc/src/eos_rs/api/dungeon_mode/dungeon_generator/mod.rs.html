@@ -79,86 +79,86 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The dungeon generation as a collection of traits with two implementations.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - The game&#39;s implementation ([`game_builtin`]). Limited in flexibility. Works on the current</span>
-<span class="doccomment">//!   global dungeon struct directly.</span>
-<span class="doccomment">//!   Some parameters do not work as advertised since the game is hardcoded to expect some values</span>
-<span class="doccomment">//!   (probably compiler / linker optimizations).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   To get an instance of the game&#39;s implementation, use</span>
-<span class="doccomment">//!   [`super::GlobalDungeonData::get_builtin_dungeon_generator`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - A reimplementation ([`reimplementation`]). Incomplete but hopefully more flexible and</span>
-<span class="doccomment">//!   expandable/modular in the long term.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The generator modules may expose some more specific generation logic to them, but in general</span>
-<span class="doccomment">//! it is recommended to work with the [`DungeonFloorGeneration`] and related traits instead of</span>
-<span class="doccomment">//! implementation-specific code.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The dungeon generation as a collection of traits with two implementations.
+//!
+//! - The game&#39;s implementation ([`game_builtin`]). Limited in flexibility. Works on the current
+//!   global dungeon struct directly.
+//!   Some parameters do not work as advertised since the game is hardcoded to expect some values
+//!   (probably compiler / linker optimizations).
+//!
+//!   To get an instance of the game&#39;s implementation, use
+//!   [`super::GlobalDungeonData::get_builtin_dungeon_generator`].
+//!
+//! - A reimplementation ([`reimplementation`]). Incomplete but hopefully more flexible and
+//!   expandable/modular in the long term.
+//!
+//! The generator modules may expose some more specific generation logic to them, but in general
+//! it is recommended to work with the [`DungeonFloorGeneration`] and related traits instead of
+//! implementation-specific code.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode::GlobalDungeonData</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::GlobalDungeonData;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">game_builtin</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reimplementation</span>;
+<span class="kw">pub mod </span>game_builtin;
+<span class="kw">pub mod </span>reimplementation;
 
-<span class="doccomment">/// A generation cell in the dungeon grid. This is a temporary artifact used during generation,</span>
-<span class="doccomment">/// it clusters the grid of dungeon tiles into multiple areas.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonGridCell</span> = <span class="ident">ffi::dungeon_grid_cell</span>;
+<span class="doccomment">/// A generation cell in the dungeon grid. This is a temporary artifact used during generation,
+/// it clusters the grid of dungeon tiles into multiple areas.
+</span><span class="kw">pub type </span>DungeonGridCell = ffi::dungeon_grid_cell;
 
-<span class="doccomment">/// High-level trait for generating new dungeons and replacing the current global dungeon.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonFloorGeneration</span> {
-    <span class="kw">type</span> <span class="ident">EntityGenerator</span>: <span class="ident">DungeonEntityGeneration</span>;
-    <span class="kw">type</span> <span class="ident">LayoutGenerator</span>: <span class="question-mark">?</span><span class="ident">Sized</span>;
+<span class="doccomment">/// High-level trait for generating new dungeons and replacing the current global dungeon.
+</span><span class="kw">pub trait </span>DungeonFloorGeneration {
+    <span class="kw">type </span>EntityGenerator: DungeonEntityGeneration;
+    <span class="kw">type </span>LayoutGenerator: <span class="question-mark">?</span>Sized;
 
-    <span class="doccomment">/// Generates a floor using the specified floor properties. This will create a fully working</span>
-    <span class="doccomment">/// layout, including entities.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Whether a fixed floor or a floor using a layout is generated is taken from the properties.</span>
-    <span class="kw">fn</span> <span class="ident">generate_floor</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">width</span>: <span class="ident">usize</span>,
-        <span class="ident">height</span>: <span class="ident">usize</span>,
-        <span class="ident">properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
+    <span class="doccomment">/// Generates a floor using the specified floor properties. This will create a fully working
+    /// layout, including entities.
+    ///
+    /// Whether a fixed floor or a floor using a layout is generated is taken from the properties.
+    </span><span class="kw">fn </span>generate_floor(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        width: usize,
+        height: usize,
+        properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>;
 
-    <span class="doccomment">/// Generates a floor using the specified layout. This will create a fully working layout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Entities are not spawned.</span>
-    <span class="kw">fn</span> <span class="ident">generate_layout</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">layout</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::LayoutGenerator</span>,
-        <span class="ident">properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
+    <span class="doccomment">/// Generates a floor using the specified layout. This will create a fully working layout.
+    ///
+    /// Entities are not spawned.
+    </span><span class="kw">fn </span>generate_layout(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        layout: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::LayoutGenerator,
+        properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>;
 
-    <span class="doccomment">/// Generate entities, the callback will receive [`Self::EntityGenerator`] to generate them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Implementors</span>
-    <span class="doccomment">/// Implementations must call `cb`.</span>
-    <span class="kw">fn</span> <span class="ident">entities</span>&lt;<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EntityGenerator</span>)&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cb</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
+    <span class="doccomment">/// Generate entities, the callback will receive [`Self::EntityGenerator`] to generate them.
+    ///
+    /// # Implementors
+    /// Implementations must call `cb`.
+    </span><span class="kw">fn </span>entities&lt;F: FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::EntityGenerator)&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cb: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>;
 
-    <span class="doccomment">/// Write the finished generated dungeon to the global dungeon struct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Important:** For the builtin generator, see the note at</span>
-    <span class="doccomment">/// [`game_builtin::GlobalDungeonStructureGenerator::generate`].</span>
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="self">self</span>, <span class="ident">global_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>);
+    <span class="doccomment">/// Write the finished generated dungeon to the global dungeon struct.
+    ///
+    /// **Important:** For the builtin generator, see the note at
+    /// [`game_builtin::GlobalDungeonStructureGenerator::generate`].
+    </span><span class="kw">fn </span>generate(<span class="self">self</span>, global_dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData);
 }
 
-<span class="doccomment">/// Generator for entities on a dungeon floor.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonEntityGeneration</span> {
-    <span class="doccomment">/// Spawn all non-enemy entities, which includes stairs, items, traps, and the player.</span>
-    <span class="kw">fn</span> <span class="ident">spawn_non_enemies</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-        <span class="ident">empty_monster_house</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Generator for entities on a dungeon floor.
+</span><span class="kw">pub trait </span>DungeonEntityGeneration {
+    <span class="doccomment">/// Spawn all non-enemy entities, which includes stairs, items, traps, and the player.
+    </span><span class="kw">fn </span>spawn_non_enemies(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        floor_properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+        empty_monster_house: bool,
     );
 
-    <span class="doccomment">/// Spawn all enemies, which includes normal enemies and those in Monster Houses.</span>
-    <span class="kw">fn</span> <span class="ident">spawn_enemies</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-        <span class="ident">empty_monster_house</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Spawn all enemies, which includes normal enemies and those in Monster Houses.
+    </span><span class="kw">fn </span>spawn_enemies(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        floor_properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+        empty_monster_house: bool,
     );
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

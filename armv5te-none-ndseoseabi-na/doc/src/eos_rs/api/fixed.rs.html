@@ -92,99 +92,99 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Dealing with [fixed-point numbers](https://en.wikipedia.org/wiki/Fixed-point_arithmetic)</span>
-<span class="doccomment">//! used in the game.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that this module currently only deals with binary fixed-point representations.</span>
-<span class="doccomment">//! The game also sometimes uses decimal representations of fixed-point numbers</span>
-<span class="doccomment">//! (eg. 0x64 -&gt; 100 -&gt; &#39;01.00&#39;).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This pulls in parts of the [`fixed`](https://docs.rs/fixed/latest/fixed/index.html) crate,</span>
-<span class="doccomment">//! which describes these numbers as follows:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &gt; An &lt;i&gt;n&lt;/i&gt;-bit fixed-point number has &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;`Frac` fractional</span>
-<span class="doccomment">//! &gt; bits where 0&amp;nbsp;≤&amp;nbsp;&lt;i&gt;f&lt;/i&gt;&amp;nbsp;≤&amp;nbsp;&lt;i&gt;n&lt;/i&gt;, and</span>
-<span class="doccomment">//! &gt; &lt;i&gt;n&lt;/i&gt;&amp;nbsp;&amp;minus;&amp;nbsp;&lt;i&gt;f&lt;/i&gt; integer bits. For example,</span>
-<span class="doccomment">//! &gt; &lt;code&gt;[FixedI32]\&lt;[U24]&gt;&lt;/code&gt; is a 32-bit signed fixed-point number with</span>
-<span class="doccomment">//! &gt; &lt;i&gt;n&lt;/i&gt;&amp;nbsp;=&amp;nbsp;32 total bits, &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;24 fractional bits, and</span>
-<span class="doccomment">//! &gt; &lt;i&gt;n&lt;/i&gt;&amp;nbsp;&amp;minus;&amp;nbsp;&lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;8 integer bits.</span>
-<span class="doccomment">//! &gt; &lt;code&gt;[FixedI32]\&lt;[U0]&gt;&lt;/code&gt; behaves like [`i32`], and</span>
-<span class="doccomment">//! &gt; &lt;code&gt;[FixedU32]\&lt;[U0]&gt;&lt;/code&gt; behaves like [`u32`].</span>
-<span class="doccomment">//! &gt;</span>
-<span class="doccomment">//! &gt; The difference between any two successive representable numbers is constant</span>
-<span class="doccomment">//! &gt; throughout the possible range for a fixed-point number:</span>
-<span class="doccomment">//! &gt; &lt;i&gt;Δ&lt;/i&gt;&amp;nbsp;=&amp;nbsp;1/2&lt;sup&gt;&lt;i&gt;f&lt;/i&gt;&lt;/sup&gt;. When &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;0, like</span>
-<span class="doccomment">//! &gt; in &lt;code&gt;[FixedI32]\&lt;[U0]&gt;&lt;/code&gt;, &lt;i&gt;Δ&lt;/i&gt;&amp;nbsp;=&amp;nbsp;1 because representable</span>
-<span class="doccomment">//! &gt; numbers are integers, and the difference between two successive integers is 1.</span>
-<span class="doccomment">//! &gt; When &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;&lt;i&gt;n&lt;/i&gt;, &lt;i&gt;Δ&lt;/i&gt;&amp;nbsp;=&amp;nbsp;1/2&lt;sup&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;</span>
-<span class="doccomment">//! &gt; and the value lies in the range &amp;minus;0.5&amp;nbsp;≤&amp;nbsp;&lt;i&gt;x&lt;/i&gt;&amp;nbsp;&lt;&amp;nbsp;0.5</span>
-<span class="doccomment">//! &gt; for signed numbers like &lt;code&gt;[FixedI32]\&lt;[U32]&gt;&lt;/code&gt;, and in the range</span>
-<span class="doccomment">//! &gt; 0&amp;nbsp;≤&amp;nbsp;&lt;i&gt;x&lt;/i&gt;&amp;nbsp;&lt;&amp;nbsp;1 for unsigned numbers like</span>
-<span class="doccomment">//! &gt; &lt;code&gt;[FixedU32]\&lt;[U32]&gt;&lt;/code&gt;.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Think of these similar to floats, but instead of having an arbitrary amount of</span>
-<span class="doccomment">//! fractional digits/bits and arbitrary precision, fixed-point numbers have a set</span>
-<span class="doccomment">//! amount of fractional digits/bits that are fully accurate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Commonly used fixed numbers:</span>
-<span class="doccomment">//! - [`I24F8`]: 32-bit number that has 24 integer bits and eight fractional bits.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You have several options to create a fixed-point number:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! let n1 = I24F8::from_num(10);</span>
-<span class="doccomment">//! assert_eq!(n1, 10.0);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // This will round to the nearest possible fixed representation. In this case,</span>
-<span class="doccomment">//! // this value will fit, since 2 fits in a 24-bit integer and 75 fits in an</span>
-<span class="doccomment">//! // 8-bit integer.</span>
-<span class="doccomment">//! let n2 = I24F8::from_num(2.75);</span>
-<span class="doccomment">//! // Note that due to precision differences this assertion can fail with some values.</span>
-<span class="doccomment">//! assert_eq!(n2, 2.75);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // It&#39;s also possible (and probably faster) to directly use a number already encoded</span>
-<span class="doccomment">//! // as a fixed number. This has the lower byte set to 0, which means the fractional</span>
-<span class="doccomment">//! // bit will be 0, and the upper byte to 1, which means this is &quot;1.0&quot;.</span>
-<span class="doccomment">//! let n3 = I24F8::from_bits(0x01_00);</span>
-<span class="doccomment">//! assert_eq!(n3, 1.0);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let n4 = I24F8::from_bits(0x01_AB);</span>
-<span class="doccomment">//! // Using strings here to compare, due to the before mentioned accuracy issues.</span>
-<span class="doccomment">//! assert_eq!(format!(&quot;{}&quot;, n4), &quot;1.668&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let n5 = I24F8::from_bits(0x01_FF);</span>
-<span class="doccomment">//! assert_eq!(format!(&quot;{}&quot;, n5), &quot;1.996&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [U0]: fixed::types::extra::U0</span>
-<span class="doccomment">//! [U24]: fixed::types::extra::U24</span>
-<span class="doccomment">//! [U32]: fixed::types::extra::U32</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fixed::types</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fixed</span>::{<span class="ident">FixedI16</span>, <span class="ident">FixedI32</span>, <span class="ident">FixedI8</span>, <span class="ident">FixedU16</span>, <span class="ident">FixedU32</span>, <span class="ident">FixedU8</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! Dealing with [fixed-point numbers](https://en.wikipedia.org/wiki/Fixed-point_arithmetic)
+//! used in the game.
+//!
+//! Note that this module currently only deals with binary fixed-point representations.
+//! The game also sometimes uses decimal representations of fixed-point numbers
+//! (eg. 0x64 -&gt; 100 -&gt; &#39;01.00&#39;).
+//!
+//! This pulls in parts of the [`fixed`](https://docs.rs/fixed/latest/fixed/index.html) crate,
+//! which describes these numbers as follows:
+//!
+//! &gt; An &lt;i&gt;n&lt;/i&gt;-bit fixed-point number has &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;`Frac` fractional
+//! &gt; bits where 0&amp;nbsp;≤&amp;nbsp;&lt;i&gt;f&lt;/i&gt;&amp;nbsp;≤&amp;nbsp;&lt;i&gt;n&lt;/i&gt;, and
+//! &gt; &lt;i&gt;n&lt;/i&gt;&amp;nbsp;&amp;minus;&amp;nbsp;&lt;i&gt;f&lt;/i&gt; integer bits. For example,
+//! &gt; &lt;code&gt;[FixedI32]\&lt;[U24]&gt;&lt;/code&gt; is a 32-bit signed fixed-point number with
+//! &gt; &lt;i&gt;n&lt;/i&gt;&amp;nbsp;=&amp;nbsp;32 total bits, &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;24 fractional bits, and
+//! &gt; &lt;i&gt;n&lt;/i&gt;&amp;nbsp;&amp;minus;&amp;nbsp;&lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;8 integer bits.
+//! &gt; &lt;code&gt;[FixedI32]\&lt;[U0]&gt;&lt;/code&gt; behaves like [`i32`], and
+//! &gt; &lt;code&gt;[FixedU32]\&lt;[U0]&gt;&lt;/code&gt; behaves like [`u32`].
+//! &gt;
+//! &gt; The difference between any two successive representable numbers is constant
+//! &gt; throughout the possible range for a fixed-point number:
+//! &gt; &lt;i&gt;Δ&lt;/i&gt;&amp;nbsp;=&amp;nbsp;1/2&lt;sup&gt;&lt;i&gt;f&lt;/i&gt;&lt;/sup&gt;. When &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;0, like
+//! &gt; in &lt;code&gt;[FixedI32]\&lt;[U0]&gt;&lt;/code&gt;, &lt;i&gt;Δ&lt;/i&gt;&amp;nbsp;=&amp;nbsp;1 because representable
+//! &gt; numbers are integers, and the difference between two successive integers is 1.
+//! &gt; When &lt;i&gt;f&lt;/i&gt;&amp;nbsp;=&amp;nbsp;&lt;i&gt;n&lt;/i&gt;, &lt;i&gt;Δ&lt;/i&gt;&amp;nbsp;=&amp;nbsp;1/2&lt;sup&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;
+//! &gt; and the value lies in the range &amp;minus;0.5&amp;nbsp;≤&amp;nbsp;&lt;i&gt;x&lt;/i&gt;&amp;nbsp;&lt;&amp;nbsp;0.5
+//! &gt; for signed numbers like &lt;code&gt;[FixedI32]\&lt;[U32]&gt;&lt;/code&gt;, and in the range
+//! &gt; 0&amp;nbsp;≤&amp;nbsp;&lt;i&gt;x&lt;/i&gt;&amp;nbsp;&lt;&amp;nbsp;1 for unsigned numbers like
+//! &gt; &lt;code&gt;[FixedU32]\&lt;[U32]&gt;&lt;/code&gt;.
+//!
+//! Think of these similar to floats, but instead of having an arbitrary amount of
+//! fractional digits/bits and arbitrary precision, fixed-point numbers have a set
+//! amount of fractional digits/bits that are fully accurate.
+//!
+//! Commonly used fixed numbers:
+//! - [`I24F8`]: 32-bit number that has 24 integer bits and eight fractional bits.
+//!
+//! You have several options to create a fixed-point number:
+//!
+//! ```
+//! let n1 = I24F8::from_num(10);
+//! assert_eq!(n1, 10.0);
+//!
+//! // This will round to the nearest possible fixed representation. In this case,
+//! // this value will fit, since 2 fits in a 24-bit integer and 75 fits in an
+//! // 8-bit integer.
+//! let n2 = I24F8::from_num(2.75);
+//! // Note that due to precision differences this assertion can fail with some values.
+//! assert_eq!(n2, 2.75);
+//!
+//! // It&#39;s also possible (and probably faster) to directly use a number already encoded
+//! // as a fixed number. This has the lower byte set to 0, which means the fractional
+//! // bit will be 0, and the upper byte to 1, which means this is &quot;1.0&quot;.
+//! let n3 = I24F8::from_bits(0x01_00);
+//! assert_eq!(n3, 1.0);
+//!
+//! let n4 = I24F8::from_bits(0x01_AB);
+//! // Using strings here to compare, due to the before mentioned accuracy issues.
+//! assert_eq!(format!(&quot;{}&quot;, n4), &quot;1.668&quot;);
+//!
+//! let n5 = I24F8::from_bits(0x01_FF);
+//! assert_eq!(format!(&quot;{}&quot;, n5), &quot;1.996&quot;);
+//! ```
+//!
+//! [U0]: fixed::types::extra::U0
+//! [U24]: fixed::types::extra::U24
+//! [U32]: fixed::types::extra::U32
+</span><span class="kw">pub use </span>fixed::types::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>fixed::{FixedI16, FixedI32, FixedI8, FixedU16, FixedU32, FixedU8};
 
-<span class="comment">// Since doctests don&#39;t work, we turn the doctest into a normal unit test here.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::I24F8</span>;
-    <span class="kw">use</span> <span class="ident">alloc::format</span>;
+<span class="comment">// Since doctests don&#39;t work, we turn the doctest into a normal unit test here.
+</span><span class="attribute">#[cfg(test)]</span>
+<span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::I24F8;
+    <span class="kw">use </span>alloc::format;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_documentation</span>() {
-        <span class="kw">let</span> <span class="ident">n1</span> = <span class="ident">I24F8::from_num</span>(<span class="number">10</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">n1</span>, <span class="number">10.0</span>);
+    <span class="attribute">#[test]</span>
+    <span class="kw">pub fn </span>test_documentation() {
+        <span class="kw">let </span>n1 = I24F8::from_num(<span class="number">10</span>);
+        <span class="macro">assert_eq!</span>(n1, <span class="number">10.0</span>);
 
-        <span class="kw">let</span> <span class="ident">n2</span> = <span class="ident">I24F8::from_num</span>(<span class="number">2.75</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">n2</span>, <span class="number">2.75</span>);
+        <span class="kw">let </span>n2 = I24F8::from_num(<span class="number">2.75</span>);
+        <span class="macro">assert_eq!</span>(n2, <span class="number">2.75</span>);
 
-        <span class="kw">let</span> <span class="ident">n3</span> = <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_00</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">n3</span>, <span class="number">1.0</span>);
+        <span class="kw">let </span>n3 = I24F8::from_bits(<span class="number">0x01_00</span>);
+        <span class="macro">assert_eq!</span>(n3, <span class="number">1.0</span>);
 
-        <span class="kw">let</span> <span class="ident">n4</span> = <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_AB</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">n4</span>), <span class="string">&quot;1.668&quot;</span>);
+        <span class="kw">let </span>n4 = I24F8::from_bits(<span class="number">0x01_AB</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, n4), <span class="string">&quot;1.668&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">n5</span> = <span class="ident">I24F8::from_bits</span>(<span class="number">0x01_FF</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">n5</span>), <span class="string">&quot;1.996&quot;</span>);
+        <span class="kw">let </span>n5 = I24F8::from_bits(<span class="number">0x01_FF</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, n5), <span class="string">&quot;1.996&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

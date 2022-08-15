@@ -83,90 +83,90 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Traits, enums, structs and functions related to dungeon mode.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Traits, enums, structs and functions related to dungeon mode.
 
-<span class="kw">mod</span> <span class="ident">dungeon_struct</span>;
-<span class="kw">mod</span> <span class="ident">effects</span>;
-<span class="kw">mod</span> <span class="ident">entity</span>;
-<span class="kw">mod</span> <span class="ident">enums</span>;
-<span class="kw">mod</span> <span class="ident">message_log</span>;
-<span class="kw">mod</span> <span class="ident">monster</span>;
-<span class="kw">mod</span> <span class="ident">moves</span>;
-<span class="kw">mod</span> <span class="ident">random</span>;
-<span class="kw">mod</span> <span class="ident">tile</span>;
+</span><span class="kw">mod </span>dungeon_struct;
+<span class="kw">mod </span>effects;
+<span class="kw">mod </span>entity;
+<span class="kw">mod </span>enums;
+<span class="kw">mod </span>message_log;
+<span class="kw">mod </span>monster;
+<span class="kw">mod </span>moves;
+<span class="kw">mod </span>random;
+<span class="kw">mod </span>tile;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dungeon_generator</span>;
+<span class="kw">pub mod </span>dungeon_generator;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::DungeonEntity</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dungeon_struct</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">effects</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">entity</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">enums</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">message_log</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">monster</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">moves</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">random</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tile</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::objects::DungeonEntity;
+<span class="kw">use </span>core::ptr;
+<span class="kw">pub use </span>dungeon_struct::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>effects::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>entity::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>enums::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>message_log::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>monster::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>moves::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>random::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>tile::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay::OverlayLoadLease</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
+<span class="kw">use </span><span class="kw">crate</span>::ctypes::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="comment">// Misc dungeon functions.</span>
+<span class="comment">// Misc dungeon functions.
 
-<span class="doccomment">/// Seems to zero some damage description struct, which is output by the damage</span>
-<span class="doccomment">/// calculation function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This resets some global data. The caller needs to make sure pointers to this space</span>
-<span class="doccomment">/// are set up correctly and no references to the area exist.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">reset_damage_desc</span>(<span class="ident">damage_desc</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>, <span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
-    <span class="ident">ffi::ResetDamageDesc</span>(<span class="ident">damage_desc</span>);
+</span><span class="doccomment">/// Seems to zero some damage description struct, which is output by the damage
+/// calculation function.
+///
+/// # Safety
+/// This resets some global data. The caller needs to make sure pointers to this space
+/// are set up correctly and no references to the area exist.
+///
+/// The caller must make sure the undefined params are valid for this function.
+</span><span class="kw">pub unsafe fn </span>reset_damage_desc(damage_desc: <span class="kw-2">*mut </span>ffi::undefined4, _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) {
+    ffi::ResetDamageDesc(damage_desc);
 }
 
-<span class="doccomment">/// [`crate::api::objects::DungeonMonsterRef::calc_damage`] seems to use scratch space of</span>
-<span class="doccomment">/// some kind, which this function zeroes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This resets some global data. The caller needs to make sure pointers to this space</span>
-<span class="doccomment">/// are set up correctly and no references to the area exist.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">reset_damage_calc_scratch_space</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
-    <span class="ident">ffi::ResetDamageCalcScratchSpace</span>();
+<span class="doccomment">/// [`crate::api::objects::DungeonMonsterRef::calc_damage`] seems to use scratch space of
+/// some kind, which this function zeroes.
+///
+/// # Safety
+/// This resets some global data. The caller needs to make sure pointers to this space
+/// are set up correctly and no references to the area exist.
+</span><span class="kw">pub unsafe fn </span>reset_damage_calc_scratch_space(_ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) {
+    ffi::ResetDamageCalcScratchSpace();
 }
 
-<span class="doccomment">/// This changes the palettes of windows in both screens to an appropriate value depending on</span>
-<span class="doccomment">/// the playthrough.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you&#39;re in a special episode, they turn green , otherwise, they turn blue or pink depending</span>
-<span class="doccomment">/// on your character&#39;s sex</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_both_screens_window_color_to_default</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetBothScreensWindowColorToDefault</span>() }
+<span class="doccomment">/// This changes the palettes of windows in both screens to an appropriate value depending on
+/// the playthrough.
+///
+/// If you&#39;re in a special episode, they turn green , otherwise, they turn blue or pink depending
+/// on your character&#39;s sex
+///
+</span><span class="kw">pub fn </span>set_both_screens_window_color_to_default(_ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) {
+    <span class="kw">unsafe </span>{ ffi::SetBothScreensWindowColorToDefault() }
 }
 
-<span class="doccomment">/// Fades the screen to black across several frames.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fade_to_black</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::FadeToBlack</span>() }
+<span class="doccomment">/// Fades the screen to black across several frames.
+</span><span class="kw">pub fn </span>fade_to_black(_ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) {
+    <span class="kw">unsafe </span>{ ffi::FadeToBlack() }
 }
 
-<span class="doccomment">/// Advances one frame. Does not return until the next frame starts.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_frame</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::AdvanceFrame</span>(<span class="number">0</span> <span class="kw">as</span> <span class="ident">ffi::undefined</span>) }
+<span class="doccomment">/// Advances one frame. Does not return until the next frame starts.
+</span><span class="kw">pub fn </span>advance_frame(_ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) {
+    <span class="kw">unsafe </span>{ ffi::AdvanceFrame(<span class="number">0 </span><span class="kw">as </span>ffi::undefined) }
 }
 
-<span class="doccomment">/// Graphically displays any pending actions that have happened but haven&#39;t been shown on screen</span>
-<span class="doccomment">/// yet.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All actions are displayed at the same time. For example, this delayed display system is used</span>
-<span class="doccomment">/// to display multiple monsters moving at once even though they take turns sequentially.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Seems to return true if there were any pending actions to display.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_actions</span>(<span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;, <span class="ident">entity</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>&gt;) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">ptr</span> = <span class="ident">entity</span>.<span class="ident">map</span>(|<span class="ident">e</span>| <span class="macro">force_mut_ptr!</span>(<span class="ident">e</span>)).<span class="ident">unwrap_or</span>(<span class="ident">ptr::null_mut</span>());
-    <span class="kw">unsafe</span> { <span class="ident">ffi::DisplayActions</span>(<span class="ident">ptr</span>) &gt; <span class="number">0</span> }
+<span class="doccomment">/// Graphically displays any pending actions that have happened but haven&#39;t been shown on screen
+/// yet.
+///
+/// All actions are displayed at the same time. For example, this delayed display system is used
+/// to display multiple monsters moving at once even though they take turns sequentially.
+///
+/// Seems to return true if there were any pending actions to display.
+</span><span class="kw">pub fn </span>display_actions(_ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;, entity: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonEntity&gt;) -&gt; bool {
+    <span class="kw">let </span>ptr = entity.map(|e| <span class="macro">force_mut_ptr!</span>(e)).unwrap_or(ptr::null_mut());
+    <span class="kw">unsafe </span>{ ffi::DisplayActions(ptr) &gt; <span class="number">0 </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

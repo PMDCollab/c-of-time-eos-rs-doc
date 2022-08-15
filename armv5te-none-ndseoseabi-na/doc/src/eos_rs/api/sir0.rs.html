@@ -14,21 +14,21 @@
 <span id="14">14</span>
 <span id="15">15</span>
 <span id="16">16</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Handling of SIR0-wrapped files.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Handling of SIR0-wrapped files.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>core::ptr;
 
-<span class="doccomment">/// Translates the offsets in a SIR0 file into NDS memory addresses, changes the magic number to</span>
-<span class="doccomment">/// SirO (opened), and returns a pointer to the first pointer specified in the SIR0 header</span>
-<span class="doccomment">/// (beginning of the data).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// The caller needs to make sure `src` points to a valid SIR0 file buffer.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">translate_sir0</span>(<span class="ident">src</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> = <span class="ident">ptr::null_mut</span>();
-    <span class="ident">ffi::HandleSir0Translation</span>((<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">src</span>);
-    <span class="ident">dst</span>
+<span class="doccomment">/// Translates the offsets in a SIR0 file into NDS memory addresses, changes the magic number to
+/// SirO (opened), and returns a pointer to the first pointer specified in the SIR0 header
+/// (beginning of the data).
+///
+/// # Safety
+/// The caller needs to make sure `src` points to a valid SIR0 file buffer.
+</span><span class="kw">pub unsafe fn </span>translate_sir0(src: <span class="kw-2">*mut </span>u8) -&gt; <span class="kw-2">*mut </span>u8 {
+    <span class="kw">let </span><span class="kw-2">mut </span>dst = ptr::null_mut();
+    ffi::HandleSir0Translation((<span class="kw-2">&amp;mut </span>dst) <span class="kw">as </span><span class="kw-2">*mut *mut </span>u8, src);
+    dst
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

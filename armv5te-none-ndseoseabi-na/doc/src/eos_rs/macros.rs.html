@@ -9,16 +9,16 @@
 <span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
-</pre><pre class="rust"><code><span class="doccomment">/// This forces a normal reference (&amp;) to be converted to a mutable pointer (*mut).</span>
-<span class="doccomment">/// This is extremely unsafe, the caller promises that this is OK to do in this context.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro mostly exists because we make some optimistic assumptions about the ffi</span>
-<span class="doccomment">/// functions actually only requiring const pointers in some instances, even if the C</span>
-<span class="doccomment">/// headers don&#39;t declare them as const.</span>
-<span class="macro">macro_rules!</span> <span class="ident">force_mut_ptr</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>
-    };
+</pre><pre class="rust"><code><span class="doccomment">/// This forces a normal reference (&amp;) to be converted to a mutable pointer (*mut).
+/// This is extremely unsafe, the caller promises that this is OK to do in this context.
+///
+/// This macro mostly exists because we make some optimistic assumptions about the ffi
+/// functions actually only requiring const pointers in some instances, even if the C
+/// headers don&#39;t declare them as const.
+</span><span class="macro">macro_rules!</span> force_mut_ptr {
+    (<span class="macro-nonterminal">$x</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$x </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*mut </span><span class="kw">_
+    </span>};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

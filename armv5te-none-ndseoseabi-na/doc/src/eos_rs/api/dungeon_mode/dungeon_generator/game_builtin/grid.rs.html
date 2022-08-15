@@ -592,599 +592,599 @@
 <span id="592">592</span>
 <span id="593">593</span>
 <span id="594">594</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Temporary grid cells used as building-blocks for dungeon generation.</span>
-<span class="doccomment">//! These building blocks are generated and then piece-by-piece used to fill</span>
-<span class="doccomment">//! the global tile data.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Temporary grid cells used as building-blocks for dungeon generation.
+//! These building blocks are generated and then piece-by-piece used to fill
+//! the global tile data.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode::dungeon_generator::DungeonGridCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode::GlobalDungeonData</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay::OverlayLoadLease</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes::c_int</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::iter::repeat_with</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::dungeon_generator::DungeonGridCell;
+<span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::GlobalDungeonData;
+<span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
+<span class="kw">use </span><span class="kw">crate</span>::ctypes::c_int;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>alloc::vec;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::iter::repeat_with;
 
-<span class="doccomment">/// The capacity of the dungeon grid in both X and Y directions.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GRID_CAPACITY_DIM</span>: <span class="ident">usize</span> = <span class="number">15</span>;
+<span class="doccomment">/// The capacity of the dungeon grid in both X and Y directions.
+</span><span class="kw">pub const </span>GRID_CAPACITY_DIM: usize = <span class="number">15</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::derivable_impls</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ffi::dungeon_grid_cell</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">start_x</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">start_y</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">end_x</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">end_y</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_invalid</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">field_0x9</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_room</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_connected</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">field_0xc</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">field_0xd</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_monster_house</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">field_0xf</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_maze_room</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">was_merged_into_other_room</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_merged_room</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_connected_to_top</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_connected_to_bottom</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_connected_to_left</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">is_connected_to_right</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">should_connect_to_top</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">should_connect_to_bottom</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">should_connect_to_left</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">should_connect_to_right</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">field_0x1b</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">flag_imperfect</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">flag_secondary_structure</span>: <span class="ident">Default::default</span>(),
+<span class="attribute">#[allow(clippy::derivable_impls)]</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>ffi::dungeon_grid_cell {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            start_x: Default::default(),
+            start_y: Default::default(),
+            end_x: Default::default(),
+            end_y: Default::default(),
+            is_invalid: Default::default(),
+            field_0x9: Default::default(),
+            is_room: Default::default(),
+            is_connected: Default::default(),
+            field_0xc: Default::default(),
+            field_0xd: Default::default(),
+            is_monster_house: Default::default(),
+            field_0xf: Default::default(),
+            is_maze_room: Default::default(),
+            was_merged_into_other_room: Default::default(),
+            is_merged_room: Default::default(),
+            is_connected_to_top: Default::default(),
+            is_connected_to_bottom: Default::default(),
+            is_connected_to_left: Default::default(),
+            is_connected_to_right: Default::default(),
+            should_connect_to_top: Default::default(),
+            should_connect_to_bottom: Default::default(),
+            should_connect_to_left: Default::default(),
+            should_connect_to_right: Default::default(),
+            field_0x1b: Default::default(),
+            flag_imperfect: Default::default(),
+            flag_secondary_structure: Default::default(),
         }
     }
 }
 
-<span class="doccomment">/// This helper struct can be used to create a grid of cells ([`DungeonGridCell`]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All coordinates that this struct uses are &quot;ingame&quot; coordinates (so (x, y)), unless</span>
-<span class="doccomment">/// otherwise noted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It can also take ownership of existing `Vec&lt;DungeonGridCell&gt;` and manipulate them.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Finally you can convert this struct into its inner `Vec&lt;DungeonGridCell&gt;` using</span>
-<span class="doccomment">/// [`Self::into_inner()`]. See the notes on [`Self::new()`] for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The cell grid is used in one phase of the dungeon generation. Note that most</span>
-<span class="doccomment">/// of the generation functions here will generate tiles in the global dungeon struct.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonGridMutator</span> {
-    <span class="ident">cells</span>: <span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;,
-    <span class="ident">width</span>: <span class="ident">usize</span>,
-    <span class="ident">height</span>: <span class="ident">usize</span>,
-    <span class="ident">_lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
+<span class="doccomment">/// This helper struct can be used to create a grid of cells ([`DungeonGridCell`]).
+///
+/// All coordinates that this struct uses are &quot;ingame&quot; coordinates (so (x, y)), unless
+/// otherwise noted.
+///
+/// It can also take ownership of existing `Vec&lt;DungeonGridCell&gt;` and manipulate them.
+///
+/// Finally you can convert this struct into its inner `Vec&lt;DungeonGridCell&gt;` using
+/// [`Self::into_inner()`]. See the notes on [`Self::new()`] for more information.
+///
+/// The cell grid is used in one phase of the dungeon generation. Note that most
+/// of the generation functions here will generate tiles in the global dungeon struct.
+</span><span class="kw">pub struct </span>DungeonGridMutator {
+    cells: Vec&lt;DungeonGridCell&gt;,
+    width: usize,
+    height: usize,
+    _lease: OverlayLoadLease&lt;<span class="number">29</span>&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DungeonGridMutator</span> {
-    <span class="doccomment">/// Takes ownership of the given `in_cells` and returns a new `DungeonGridMutator`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The grid is a vector of grid cells stored in column-major order (!) (such that grid cells</span>
-    <span class="doccomment">/// with the same x value are stored contiguously (y, x))</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The dimensions passed in must match the dimensions of the `Vec&lt;DungeonGridCell&gt;`,</span>
-    <span class="doccomment">/// otherwise this will panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Internally the grid has a fixed buffer size / capacity of 15 x 15. If the grid size in the</span>
-    <span class="doccomment">/// X or Y direction is less than this, so when working with the (raw) grid buffer,</span>
-    <span class="doccomment">/// you will need to take into account that each column will have 15 rows, where the last</span>
-    <span class="doccomment">/// (`15-height`) in each column will be uninitialised and that after `width` rows</span>
-    <span class="doccomment">/// the rest of the array will be uninitialised as well.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This helper will abstract for you over this, if you query a cell via eg. [`Self::get`],</span>
-    <span class="doccomment">/// however [`Self::into_inner()`] will still return a vector with 15 x 15 cells, with all</span>
-    <span class="doccomment">/// missing values initialized with defaults.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the game usually works with the assumption that there are exactly 15 rows.</span>
-    <span class="doccomment">/// Using other row sizes may or may not lead to UB with some methods.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The maximum values for `width` and `height` are [`GRID_CAPACITY_DIM`],</span>
-    <span class="doccomment">/// otherwise this function will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_vec</span>(
-        <span class="ident">in_cells</span>: <span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;,
-        <span class="ident">width</span>: <span class="ident">usize</span>,
-        <span class="ident">height</span>: <span class="ident">usize</span>,
-        <span class="ident">ov29</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">width</span> &lt;= <span class="ident">GRID_CAPACITY_DIM</span> &amp;&amp; <span class="ident">height</span> &lt;= <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="macro">assert!</span>(<span class="ident">in_cells</span>.<span class="ident">len</span>() &gt;= <span class="ident">width</span> <span class="kw">as</span> <span class="ident">usize</span> * <span class="ident">height</span> <span class="kw">as</span> <span class="ident">usize</span>);
+<span class="kw">impl </span>DungeonGridMutator {
+    <span class="doccomment">/// Takes ownership of the given `in_cells` and returns a new `DungeonGridMutator`.
+    ///
+    /// The grid is a vector of grid cells stored in column-major order (!) (such that grid cells
+    /// with the same x value are stored contiguously (y, x))
+    ///
+    /// The dimensions passed in must match the dimensions of the `Vec&lt;DungeonGridCell&gt;`,
+    /// otherwise this will panic.
+    ///
+    /// Internally the grid has a fixed buffer size / capacity of 15 x 15. If the grid size in the
+    /// X or Y direction is less than this, so when working with the (raw) grid buffer,
+    /// you will need to take into account that each column will have 15 rows, where the last
+    /// (`15-height`) in each column will be uninitialised and that after `width` rows
+    /// the rest of the array will be uninitialised as well.
+    ///
+    /// This helper will abstract for you over this, if you query a cell via eg. [`Self::get`],
+    /// however [`Self::into_inner()`] will still return a vector with 15 x 15 cells, with all
+    /// missing values initialized with defaults.
+    ///
+    /// Note that the game usually works with the assumption that there are exactly 15 rows.
+    /// Using other row sizes may or may not lead to UB with some methods.
+    ///
+    /// The maximum values for `width` and `height` are [`GRID_CAPACITY_DIM`],
+    /// otherwise this function will panic.
+    </span><span class="kw">pub fn </span>new_from_vec(
+        in_cells: Vec&lt;DungeonGridCell&gt;,
+        width: usize,
+        height: usize,
+        ov29: OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(width &lt;= GRID_CAPACITY_DIM &amp;&amp; height &lt;= GRID_CAPACITY_DIM);
+        <span class="macro">assert!</span>(in_cells.len() &gt;= width <span class="kw">as </span>usize * height <span class="kw">as </span>usize);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells_iter</span> = <span class="ident">in_cells</span>.<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>cells_iter = in_cells.into_iter().peekable();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells</span> = <span class="ident">Vec::with_capacity</span>(<span class="ident">GRID_CAPACITY_DIM</span> * (<span class="ident">width</span> - <span class="number">1</span>) + <span class="ident">height</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>cells = Vec::with_capacity(GRID_CAPACITY_DIM * (width - <span class="number">1</span>) + height);
 
-        <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">GRID_CAPACITY_DIM</span> {
-            <span class="kw">if</span> <span class="ident">x</span> &lt; <span class="ident">width</span> {
-                <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">GRID_CAPACITY_DIM</span> {
-                    <span class="ident">cells</span>.<span class="ident">push</span>(<span class="kw">if</span> <span class="ident">y</span> &lt; <span class="ident">height</span> {
-                        <span class="ident">cells_iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">Default::default</span>()
+        <span class="kw">for </span>x <span class="kw">in </span><span class="number">0</span>..GRID_CAPACITY_DIM {
+            <span class="kw">if </span>x &lt; width {
+                <span class="kw">for </span>y <span class="kw">in </span><span class="number">0</span>..GRID_CAPACITY_DIM {
+                    cells.push(<span class="kw">if </span>y &lt; height {
+                        cells_iter.next().unwrap()
+                    } <span class="kw">else </span>{
+                        Default::default()
                     });
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">GRID_CAPACITY_DIM</span> {
-                    <span class="ident">cells</span>.<span class="ident">push</span>(<span class="ident">Default::default</span>())
+            } <span class="kw">else </span>{
+                <span class="kw">for _ in </span><span class="number">0</span>..GRID_CAPACITY_DIM {
+                    cells.push(Default::default())
                 }
             }
-            <span class="kw">if</span> <span class="ident">cells_iter</span>.<span class="ident">peek</span>().<span class="ident">is_none</span>() {
+            <span class="kw">if </span>cells_iter.peek().is_none() {
                 <span class="kw">break</span>;
             }
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">cells</span>,
-            <span class="ident">width</span>,
-            <span class="ident">height</span>,
-            <span class="ident">_lease</span>: <span class="ident">ov29</span>,
+        <span class="self">Self </span>{
+            cells,
+            width,
+            height,
+            _lease: ov29,
         }
     }
 
-    <span class="doccomment">/// Initialize a dungeon grid with defaults.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The grid is an array of grid cells stored in column-major order (!) (such that grid cells</span>
-    <span class="doccomment">/// with the same x value are stored contiguously (y, x)).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Internally the grid has a fixed buffer size / capacity of 15 x 15. If the grid size in the</span>
-    <span class="doccomment">/// X or Y direction is less than this, so when working with the (raw) grid buffer,</span>
-    <span class="doccomment">/// you will need to take into account that each column will have 15 rows, where the last</span>
-    <span class="doccomment">/// (`15-height`) in each column will be uninitialised and that after `width` rows</span>
-    <span class="doccomment">/// the rest of the array will be uninitialised as well.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This helper will abstract for you over this, if you query a cell via eg. [`Self::get`],</span>
-    <span class="doccomment">/// however [`Self::into_inner()`] ill still return a vector with 15 x 15 cells, with all</span>
-    <span class="doccomment">/// missing values initialized with defaults.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `width` must be less than or equal to 15, otherwise this function will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">width</span>: <span class="ident">usize</span>, <span class="ident">ov29</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">height</span> = <span class="ident">GRID_CAPACITY_DIM</span>;
-        <span class="macro">assert!</span>(<span class="ident">width</span> &lt;= <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="comment">// The game stops after the last column that had cells, so this is the actual capacity:</span>
-        <span class="kw">let</span> <span class="ident">min_grid_size</span> = (<span class="ident">GRID_CAPACITY_DIM</span> * (<span class="ident">width</span> - <span class="number">1</span>) + <span class="ident">height</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cells</span>;
-        <span class="comment">// SAFETY: We know the grid vector will be big enough.</span>
-        <span class="comment">//         We also know the height is at least 15, so all cells will be initialized.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">cells</span> = <span class="ident">repeat_with</span>(<span class="ident">Default::default</span>)
-                .<span class="ident">take</span>(<span class="ident">min_grid_size</span>)
-                .<span class="ident">collect</span>::&lt;<span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;&gt;();
-            <span class="ident">ffi::InitDungeonGrid</span>(<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>);
+    <span class="doccomment">/// Initialize a dungeon grid with defaults.
+    ///
+    /// The grid is an array of grid cells stored in column-major order (!) (such that grid cells
+    /// with the same x value are stored contiguously (y, x)).
+    ///
+    /// Internally the grid has a fixed buffer size / capacity of 15 x 15. If the grid size in the
+    /// X or Y direction is less than this, so when working with the (raw) grid buffer,
+    /// you will need to take into account that each column will have 15 rows, where the last
+    /// (`15-height`) in each column will be uninitialised and that after `width` rows
+    /// the rest of the array will be uninitialised as well.
+    ///
+    /// This helper will abstract for you over this, if you query a cell via eg. [`Self::get`],
+    /// however [`Self::into_inner()`] ill still return a vector with 15 x 15 cells, with all
+    /// missing values initialized with defaults.
+    ///
+    /// `width` must be less than or equal to 15, otherwise this function will panic.
+    </span><span class="kw">pub fn </span>new(<span class="kw-2">&amp;</span><span class="self">self</span>, width: usize, ov29: OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>height = GRID_CAPACITY_DIM;
+        <span class="macro">assert!</span>(width &lt;= GRID_CAPACITY_DIM);
+        <span class="comment">// The game stops after the last column that had cells, so this is the actual capacity:
+        </span><span class="kw">let </span>min_grid_size = (GRID_CAPACITY_DIM * (width - <span class="number">1</span>) + height) <span class="kw">as </span>usize;
+        <span class="kw">let </span><span class="kw-2">mut </span>cells;
+        <span class="comment">// SAFETY: We know the grid vector will be big enough.
+        //         We also know the height is at least 15, so all cells will be initialized.
+        </span><span class="kw">unsafe </span>{
+            cells = repeat_with(Default::default)
+                .take(min_grid_size)
+                .collect::&lt;Vec&lt;DungeonGridCell&gt;&gt;();
+            ffi::InitDungeonGrid(cells.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>, width <span class="kw">as </span>i32, height <span class="kw">as </span>i32);
         }
-        <span class="self">Self</span> {
-            <span class="ident">cells</span>,
-            <span class="ident">width</span>,
-            <span class="ident">height</span>,
-            <span class="ident">_lease</span>: <span class="ident">ov29</span>,
+        <span class="self">Self </span>{
+            cells,
+            width,
+            height,
+            _lease: ov29,
         }
     }
 
-    <span class="doccomment">/// Extract the grid from the mutator, along with its width and height.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The grid will always be a matrix with 15 rows per column and it might contain extra</span>
-    <span class="doccomment">/// dangling rows, you need to ignore cells outside of the grid&#39;s actual width and height,</span>
-    <span class="doccomment">/// see the notes for [`Self::new()`] for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">Vec</span>&lt;<span class="ident">DungeonGridCell</span>&gt;, <span class="ident">usize</span>, <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() &lt;= <span class="ident">GRID_CAPACITY_DIM</span> * <span class="ident">GRID_CAPACITY_DIM</span>);
-        (<span class="self">self</span>.<span class="ident">cells</span>, <span class="self">self</span>.<span class="ident">width</span>, <span class="self">self</span>.<span class="ident">height</span>)
+    <span class="doccomment">/// Extract the grid from the mutator, along with its width and height.
+    ///
+    /// The grid will always be a matrix with 15 rows per column and it might contain extra
+    /// dangling rows, you need to ignore cells outside of the grid&#39;s actual width and height,
+    /// see the notes for [`Self::new()`] for more information.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; (Vec&lt;DungeonGridCell&gt;, usize, usize) {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.cells.len() &lt;= GRID_CAPACITY_DIM * GRID_CAPACITY_DIM);
+        (<span class="self">self</span>.cells, <span class="self">self</span>.width, <span class="self">self</span>.height)
     }
 
-    <span class="doccomment">/// Get the cell at the given coordinates.</span>
-    <span class="doccomment">/// Panics if the coordinates are out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DungeonGridCell</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() &lt;= <span class="ident">GRID_CAPACITY_DIM</span> * <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="kw">let</span> <span class="ident">coords</span> = <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
-        <span class="kw">if</span> <span class="ident">coords</span> &gt;= <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;Grid cell at ({}, {}) is out of bounds&quot;</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="doccomment">/// Get the cell at the given coordinates.
+    /// Panics if the coordinates are out of bounds.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="kw-2">&amp;</span>DungeonGridCell {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.cells.len() &lt;= GRID_CAPACITY_DIM * GRID_CAPACITY_DIM);
+        <span class="kw">let </span>coords = <span class="self">self</span>.get_coords(x, y);
+        <span class="kw">if </span>coords &gt;= <span class="self">self</span>.cells.len() {
+            <span class="macro">panic!</span>(<span class="string">&quot;Grid cell at ({}, {}) is out of bounds&quot;</span>, x, y);
         }
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cells</span>[<span class="ident">coords</span>]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cells[coords]
     }
 
-    <span class="doccomment">/// Get the cell at the given coordinates, no extra checking is done, just normal slice</span>
-    <span class="doccomment">/// indexing is done. This is UB if overflow checks are disabled and the coordinates are oob.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller needs to make sure `x` and `y` are in bounds.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DungeonGridCell</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cells</span>[<span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>)]
+    <span class="doccomment">/// Get the cell at the given coordinates, no extra checking is done, just normal slice
+    /// indexing is done. This is UB if overflow checks are disabled and the coordinates are oob.
+    ///
+    /// # Safety
+    /// The caller needs to make sure `x` and `y` are in bounds.
+    </span><span class="kw">pub unsafe fn </span>get_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="kw-2">&amp;</span>DungeonGridCell {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cells[<span class="self">self</span>.get_coords(x, y)]
     }
 
-    <span class="doccomment">/// Get the cell at the given coordinates, mutably.</span>
-    <span class="doccomment">/// Panics if the coordinates are out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">DungeonGridCell</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() &lt;= <span class="ident">GRID_CAPACITY_DIM</span> * <span class="ident">GRID_CAPACITY_DIM</span>);
-        <span class="kw">let</span> <span class="ident">coords</span> = <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
-        <span class="kw">if</span> <span class="ident">coords</span> &gt;= <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">len</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;Grid cell at ({}, {}) is out of bounds&quot;</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="doccomment">/// Get the cell at the given coordinates, mutably.
+    /// Panics if the coordinates are out of bounds.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="kw-2">&amp;mut </span>DungeonGridCell {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.cells.len() &lt;= GRID_CAPACITY_DIM * GRID_CAPACITY_DIM);
+        <span class="kw">let </span>coords = <span class="self">self</span>.get_coords(x, y);
+        <span class="kw">if </span>coords &gt;= <span class="self">self</span>.cells.len() {
+            <span class="macro">panic!</span>(<span class="string">&quot;Grid cell at ({}, {}) is out of bounds&quot;</span>, x, y);
         }
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cells</span>[<span class="ident">coords</span>]
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.cells[coords]
     }
 
-    <span class="doccomment">/// Get the cell at the given coordinates, mutable, no extra checking is done, just normal</span>
-    <span class="doccomment">/// slice indexing is done. This is UB if overflow checks are disabled and the coordinates are</span>
-    <span class="doccomment">/// oob.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller needs to make sure `x` and `y` are in bounds.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mut_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">DungeonGridCell</span> {
-        <span class="kw">let</span> <span class="ident">coords</span> = <span class="self">self</span>.<span class="ident">get_coords</span>(<span class="ident">x</span>, <span class="ident">y</span>);
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cells</span>[<span class="ident">coords</span>]
+    <span class="doccomment">/// Get the cell at the given coordinates, mutable, no extra checking is done, just normal
+    /// slice indexing is done. This is UB if overflow checks are disabled and the coordinates are
+    /// oob.
+    ///
+    /// # Safety
+    /// The caller needs to make sure `x` and `y` are in bounds.
+    </span><span class="kw">pub unsafe fn </span>get_mut_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="kw-2">&amp;mut </span>DungeonGridCell {
+        <span class="kw">let </span>coords = <span class="self">self</span>.get_coords(x, y);
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.cells[coords]
     }
 
-    <span class="doccomment">/// Merges two vertically stacked rooms into one larger room.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `_dungeon` - Reference to global dungeon struct.</span>
-    <span class="doccomment">/// * `x` - x grid coordinate of the rooms to merge</span>
-    <span class="doccomment">/// * `y` - y grid coordinate of the rooms to merge</span>
-    <span class="doccomment">/// * `dy` - dy, where the lower room has a y grid coordinate of y+dy</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_rooms_vertically</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">x</span>: <span class="ident">i32</span>,
-        <span class="ident">y</span>: <span class="ident">i32</span>,
-        <span class="ident">dy</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// Merges two vertically stacked rooms into one larger room.
+    ///
+    /// # Arguments
+    /// * `_dungeon` - Reference to global dungeon struct.
+    /// * `x` - x grid coordinate of the rooms to merge
+    /// * `y` - y grid coordinate of the rooms to merge
+    /// * `dy` - dy, where the lower room has a y grid coordinate of y+dy
+    </span><span class="kw">pub fn </span>merge_rooms_vertically(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        x: i32,
+        y: i32,
+        dy: i32,
     ) {
-        <span class="macro">assert!</span>(<span class="ident">x</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="ident">y</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="ident">dy</span> &gt;= <span class="number">0</span>);
+        <span class="macro">assert!</span>(x &gt;= <span class="number">0 </span>&amp;&amp; y &gt;= <span class="number">0 </span>&amp;&amp; dy &gt;= <span class="number">0</span>);
         <span class="macro">assert!</span>(
-            <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span> &lt;= <span class="self">self</span>.<span class="ident">width</span>
-                &amp;&amp; <span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> &lt;= <span class="self">self</span>.<span class="ident">height</span>
-                &amp;&amp; (<span class="ident">y</span> + <span class="ident">dy</span>) <span class="kw">as</span> <span class="ident">usize</span> &lt;= <span class="self">self</span>.<span class="ident">height</span>
+            x <span class="kw">as </span>usize &lt;= <span class="self">self</span>.width
+                &amp;&amp; y <span class="kw">as </span>usize &lt;= <span class="self">self</span>.height
+                &amp;&amp; (y + dy) <span class="kw">as </span>usize &lt;= <span class="self">self</span>.height
         );
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::MergeRoomsVertically</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">dy</span>, <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>()) }
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{ ffi::MergeRoomsVertically(x, y, dy, <span class="self">self</span>.cells.as_mut_ptr()) }
     }
 
-    <span class="doccomment">/// Generate extra hallways on the floor via a series of random walks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each random walk starts from a random tile in a random room, leaves the room in a</span>
-    <span class="doccomment">/// random cardinal direction, and from there tunnels through obstacles through a series of</span>
-    <span class="doccomment">/// random turns, leaving open terrain in its wake. The random walk stops when it reaches open</span>
-    <span class="doccomment">/// terrain, goes out of bounds, or reaches an impassable obstruction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_extra_hallways</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">number_extra_hallways</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// Generate extra hallways on the floor via a series of random walks.
+    ///
+    /// Each random walk starts from a random tile in a random room, leaves the room in a
+    /// random cardinal direction, and from there tunnels through obstacles through a series of
+    /// random turns, leaving open terrain in its wake. The random walk stops when it reaches open
+    /// terrain, goes out of bounds, or reaches an impassable obstruction.
+    </span><span class="kw">pub fn </span>generate_extra_hallways(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        number_extra_hallways: i32,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateExtraHallways</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">number_extra_hallways</span>,
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::GenerateExtraHallways(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                number_extra_hallways,
             )
         }
     }
 
-    <span class="doccomment">/// Get the grid cell positions for a given set of floor grid dimensions. Width and height</span>
-    <span class="doccomment">/// must be positive.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_grid_positions</span>(
-        <span class="ident">width</span>: <span class="ident">i32</span>,
-        <span class="ident">height</span>: <span class="ident">i32</span>,
-        <span class="ident">_ov29</span>: <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
-    ) -&gt; (<span class="ident">Vec</span>&lt;<span class="ident">i32</span>&gt;, <span class="ident">Vec</span>&lt;<span class="ident">i32</span>&gt;) {
-        <span class="macro">assert!</span>(<span class="ident">width</span> &gt; <span class="number">0</span> &amp;&amp; <span class="ident">height</span> &gt; <span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x_positions</span> = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">width</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y_positions</span> = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">height</span> <span class="kw">as</span> <span class="ident">usize</span>];
+    <span class="doccomment">/// Get the grid cell positions for a given set of floor grid dimensions. Width and height
+    /// must be positive.
+    </span><span class="kw">pub fn </span>get_grid_positions(
+        width: i32,
+        height: i32,
+        _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    ) -&gt; (Vec&lt;i32&gt;, Vec&lt;i32&gt;) {
+        <span class="macro">assert!</span>(width &gt; <span class="number">0 </span>&amp;&amp; height &gt; <span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>x_positions = <span class="macro">vec!</span>[<span class="number">0</span>; width <span class="kw">as </span>usize];
+        <span class="kw">let </span><span class="kw-2">mut </span>y_positions = <span class="macro">vec!</span>[<span class="number">0</span>; height <span class="kw">as </span>usize];
 
-        <span class="comment">// SAFETY: We have a lease.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GetGridPositions</span>(
-                <span class="ident">x_positions</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">y_positions</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">width</span>,
-                <span class="ident">height</span>,
+        <span class="comment">// SAFETY: We have a lease.
+        </span><span class="kw">unsafe </span>{
+            ffi::GetGridPositions(
+                x_positions.as_mut_ptr(),
+                y_positions.as_mut_ptr(),
+                width,
+                height,
             )
         };
 
-        (<span class="ident">x_positions</span>, <span class="ident">y_positions</span>)
+        (x_positions, y_positions)
     }
 
-    <span class="doccomment">/// Randomly selects a subset of grid cells to become rooms.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The given number of grid cells will become rooms. If any of the selected grid cells are</span>
-    <span class="doccomment">/// invalid, fewer rooms will be generated. The number of rooms assigned will always be at</span>
-    <span class="doccomment">/// least 2 and never exceed 36.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Cells not marked as rooms will become hallway anchors. A hallway anchor is a single tile</span>
-    <span class="doccomment">/// in a non-room grid cell to which hallways will be connected later, thus &quot;anchoring&quot;</span>
-    <span class="doccomment">/// hallway generation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `number_rooms` is the number of rooms; if positive, a random value between</span>
-    <span class="doccomment">/// \[n_rooms, n_rooms+2\] will be used. If negative, |n_rooms| will be used exactly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assign_rooms</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">number_rooms</span>: <span class="ident">i32</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::AssignRooms</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">number_rooms</span>,
+    <span class="doccomment">/// Randomly selects a subset of grid cells to become rooms.
+    ///
+    /// The given number of grid cells will become rooms. If any of the selected grid cells are
+    /// invalid, fewer rooms will be generated. The number of rooms assigned will always be at
+    /// least 2 and never exceed 36.
+    ///
+    /// Cells not marked as rooms will become hallway anchors. A hallway anchor is a single tile
+    /// in a non-room grid cell to which hallways will be connected later, thus &quot;anchoring&quot;
+    /// hallway generation.
+    ///
+    /// `number_rooms` is the number of rooms; if positive, a random value between
+    /// \[n_rooms, n_rooms+2\] will be used. If negative, |n_rooms| will be used exactly.
+    </span><span class="kw">pub fn </span>assign_rooms(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData, number_rooms: i32) {
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::AssignRooms(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                number_rooms,
             )
         }
     }
 
-    <span class="doccomment">/// Creates rooms and hallway anchors in each grid cell as designated by [`Self::assign_rooms`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function creates a rectangle of open terrain for each room (with some margin relative</span>
-    <span class="doccomment">/// to the grid cell border). A single open tile is created in hallway anchor cells, and a</span>
-    <span class="doccomment">/// hallway anchor indicator is set for later reference.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if any start position is invalid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `starts_x` - Array of the starting x coordinates of each grid column</span>
-    <span class="doccomment">/// * `starts_y` - Array of the starting y coordinates of each grid row</span>
-    <span class="doccomment">/// * `room_flags` - Only uses bit 2 (mask: 0b100), which enables room imperfections</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_rooms_and_anchors</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">starts_x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>],
-        <span class="ident">starts_y</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>],
-        <span class="ident">room_flags</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Creates rooms and hallway anchors in each grid cell as designated by [`Self::assign_rooms`].
+    ///
+    /// This function creates a rectangle of open terrain for each room (with some margin relative
+    /// to the grid cell border). A single open tile is created in hallway anchor cells, and a
+    /// hallway anchor indicator is set for later reference.
+    ///
+    /// Panics if any start position is invalid.
+    ///
+    /// # Arguments
+    /// * `starts_x` - Array of the starting x coordinates of each grid column
+    /// * `starts_y` - Array of the starting y coordinates of each grid row
+    /// * `room_flags` - Only uses bit 2 (mask: 0b100), which enables room imperfections
+    </span><span class="kw">pub fn </span>create_rooms_and_anchors(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        starts_x: <span class="kw-2">&amp;mut </span>[i32],
+        starts_y: <span class="kw-2">&amp;mut </span>[i32],
+        room_flags: u32,
     ) {
-        <span class="self">self</span>.<span class="ident">assert_start_positions_valid</span>(<span class="ident">starts_x</span>, <span class="ident">starts_y</span>);
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::CreateRoomsAndAnchors</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">starts_x</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">starts_y</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">room_flags</span>,
+        <span class="self">self</span>.assert_start_positions_valid(starts_x, starts_y);
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::CreateRoomsAndAnchors(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                starts_x.as_mut_ptr(),
+                starts_y.as_mut_ptr(),
+                room_flags,
             )
         }
     }
-    <span class="doccomment">/// Try to generate secondary structures in flagged rooms.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a valid room with no special features is flagged to have a secondary structure, try to</span>
-    <span class="doccomment">/// generate a random one in the room, based on the result of a dice roll:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   0: no secondary structure</span>
-    <span class="doccomment">///   1: maze, or a central water/lava &quot;plus sign&quot; as fallback, or a single water/lava tile in</span>
-    <span class="doccomment">///      the center as a second fallback</span>
-    <span class="doccomment">///   2: checkerboard pattern of water/lava</span>
-    <span class="doccomment">///   3: central pool of water/lava</span>
-    <span class="doccomment">///   4: central &quot;island&quot; with items and a Warp Tile, surrounded by a &quot;moat&quot; of water/lava</span>
-    <span class="doccomment">///   5: horizontal or vertical divider of water/lava splitting the room in two</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the room isn&#39;t the right shape, dimension, or otherwise doesn&#39;t support the selected</span>
-    <span class="doccomment">/// secondary structure, it is left untouched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_secondary_structures</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">_number_rooms</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// Try to generate secondary structures in flagged rooms.
+    ///
+    /// If a valid room with no special features is flagged to have a secondary structure, try to
+    /// generate a random one in the room, based on the result of a dice roll:
+    ///
+    /// ```text
+    ///   0: no secondary structure
+    ///   1: maze, or a central water/lava &quot;plus sign&quot; as fallback, or a single water/lava tile in
+    ///      the center as a second fallback
+    ///   2: checkerboard pattern of water/lava
+    ///   3: central pool of water/lava
+    ///   4: central &quot;island&quot; with items and a Warp Tile, surrounded by a &quot;moat&quot; of water/lava
+    ///   5: horizontal or vertical divider of water/lava splitting the room in two
+    /// ```
+    ///
+    /// If the room isn&#39;t the right shape, dimension, or otherwise doesn&#39;t support the selected
+    /// secondary structure, it is left untouched.
+    </span><span class="kw">pub fn </span>generate_secondary_structures(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        _number_rooms: i32,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateSecondaryStructures</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::GenerateSecondaryStructures(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
             )
         }
     }
 
-    <span class="doccomment">/// Randomly assigns connections between adjacent grid cells.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Connections are created via a random walk with momentum, starting from the grid cell at</span>
-    <span class="doccomment">/// (cursor x, cursor y). A connection is drawn in a random direction from the current cursor,</span>
-    <span class="doccomment">/// and this process is repeated a certain number of times (the &quot;floor connectivity&quot; specified</span>
-    <span class="doccomment">/// in the floor properties). The direction of the random walk has &quot;momentum&quot;; there&#39;s a 50%</span>
-    <span class="doccomment">/// chance it will be the same as the previous step (or rotated counterclockwise if on the</span>
-    <span class="doccomment">/// boundary).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This helps to reduce the number of dead ends and forks in the road caused by the random</span>
-    <span class="doccomment">/// walk &quot;doubling back&quot; on itself.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If dead ends are disabled in the floor properties, there is an additional phase to remove</span>
-    <span class="doccomment">/// dead end hallway anchors (only hallway anchors, not rooms) by drawing additional</span>
-    <span class="doccomment">/// connections. Note that the actual implementation contains a bug: the grid cell validity</span>
-    <span class="doccomment">/// checks use the wrong index, so connections may be drawn to invalid cells.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the cursor positions are out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assign_grid_cell_connections</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">cursor_x</span>: <span class="ident">i32</span>,
-        <span class="ident">cursor_y</span>: <span class="ident">i32</span>,
-        <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
+    <span class="doccomment">/// Randomly assigns connections between adjacent grid cells.
+    ///
+    /// Connections are created via a random walk with momentum, starting from the grid cell at
+    /// (cursor x, cursor y). A connection is drawn in a random direction from the current cursor,
+    /// and this process is repeated a certain number of times (the &quot;floor connectivity&quot; specified
+    /// in the floor properties). The direction of the random walk has &quot;momentum&quot;; there&#39;s a 50%
+    /// chance it will be the same as the previous step (or rotated counterclockwise if on the
+    /// boundary).
+    ///
+    /// This helps to reduce the number of dead ends and forks in the road caused by the random
+    /// walk &quot;doubling back&quot; on itself.
+    ///
+    /// If dead ends are disabled in the floor properties, there is an additional phase to remove
+    /// dead end hallway anchors (only hallway anchors, not rooms) by drawing additional
+    /// connections. Note that the actual implementation contains a bug: the grid cell validity
+    /// checks use the wrong index, so connections may be drawn to invalid cells.
+    ///
+    /// Panics if the cursor positions are out of bounds.
+    </span><span class="kw">pub fn </span>assign_grid_cell_connections(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        cursor_x: i32,
+        cursor_y: i32,
+        floor_properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
     ) {
         <span class="macro">assert!</span>(
-            <span class="ident">cursor_x</span> &gt;= <span class="number">0</span>
-                &amp;&amp; (<span class="ident">cursor_x</span> <span class="kw">as</span> <span class="ident">usize</span>) &lt; <span class="self">self</span>.<span class="ident">width</span>
-                &amp;&amp; <span class="ident">cursor_y</span> &gt;= <span class="number">0</span>
-                &amp;&amp; (<span class="ident">cursor_y</span> <span class="kw">as</span> <span class="ident">usize</span>) &lt; <span class="self">self</span>.<span class="ident">height</span>
+            cursor_x &gt;= <span class="number">0
+                </span>&amp;&amp; (cursor_x <span class="kw">as </span>usize) &lt; <span class="self">self</span>.width
+                &amp;&amp; cursor_y &gt;= <span class="number">0
+                </span>&amp;&amp; (cursor_y <span class="kw">as </span>usize) &lt; <span class="self">self</span>.height
         );
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::AssignGridCellConnections</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">cursor_x</span>,
-                <span class="ident">cursor_y</span>,
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">floor_properties</span>),
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::AssignGridCellConnections(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                cursor_x,
+                cursor_y,
+                <span class="macro">force_mut_ptr!</span>(floor_properties),
             )
         }
     }
 
-    <span class="doccomment">/// Create grid cell connections either by creating hallways or merging rooms.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When creating a hallway connecting a hallway anchor, the exact anchor coordinates are used</span>
-    <span class="doccomment">/// as the endpoint. When creating a hallway connecting a room, a random point on the room edge</span>
-    <span class="doccomment">/// facing the hallway is used as the endpoint. The grid cell boundaries are used as the middle</span>
-    <span class="doccomment">/// coordinates for kinks (see [`super::GlobalDungeonStructureGenerator::create_hallway`]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If room merging is enabled, there is a 9.75% chance that two connected rooms will be merged</span>
-    <span class="doccomment">/// into a single larger room (9.75% comes from two 5% rolls, one for each of the two rooms</span>
-    <span class="doccomment">/// being merged). A room can only participate in a merge once.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_grid_cell_connections</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">starts_x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>],
-        <span class="ident">starts_y</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>],
-        <span class="ident">enable_room_merging</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Create grid cell connections either by creating hallways or merging rooms.
+    ///
+    /// When creating a hallway connecting a hallway anchor, the exact anchor coordinates are used
+    /// as the endpoint. When creating a hallway connecting a room, a random point on the room edge
+    /// facing the hallway is used as the endpoint. The grid cell boundaries are used as the middle
+    /// coordinates for kinks (see [`super::GlobalDungeonStructureGenerator::create_hallway`]).
+    ///
+    /// If room merging is enabled, there is a 9.75% chance that two connected rooms will be merged
+    /// into a single larger room (9.75% comes from two 5% rolls, one for each of the two rooms
+    /// being merged). A room can only participate in a merge once.
+    </span><span class="kw">pub fn </span>create_grid_cell_connections(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        starts_x: <span class="kw-2">&amp;mut </span>[i32],
+        starts_y: <span class="kw-2">&amp;mut </span>[i32],
+        enable_room_merging: bool,
     ) {
-        <span class="self">self</span>.<span class="ident">assert_start_positions_valid</span>(<span class="ident">starts_x</span>, <span class="ident">starts_y</span>);
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::CreateGridCellConnections</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">starts_x</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">starts_y</span>.<span class="ident">as_mut_ptr</span>(),
-                (!<span class="ident">enable_room_merging</span>) <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+        <span class="self">self</span>.assert_start_positions_valid(starts_x, starts_y);
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::CreateGridCellConnections(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                starts_x.as_mut_ptr(),
+                starts_y.as_mut_ptr(),
+                (!enable_room_merging) <span class="kw">as </span>ffi::bool_,
             )
         }
     }
 
-    <span class="doccomment">/// Attempt to generate room imperfections for each room in the floor layout, if enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each room has a 40% chance of having imperfections if its grid cell is flagged to allow</span>
-    <span class="doccomment">/// room imperfections. Imperfections are generated by randomly growing the walls of the room</span>
-    <span class="doccomment">/// inwards for a certain number of iterations, starting from the corners.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_room_imperfections</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateRoomImperfections</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
+    <span class="doccomment">/// Attempt to generate room imperfections for each room in the floor layout, if enabled.
+    ///
+    /// Each room has a 40% chance of having imperfections if its grid cell is flagged to allow
+    /// room imperfections. Imperfections are generated by randomly growing the walls of the room
+    /// inwards for a certain number of iterations, starting from the corners.
+    </span><span class="kw">pub fn </span>generate_room_imperfections(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData) {
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::GenerateRoomImperfections(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
             )
         }
     }
 
-    <span class="doccomment">/// Ensure the grid forms a connected graph (all valid cells are reachable) by adding hallways</span>
-    <span class="doccomment">/// to unreachable grid cells.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a grid cell cannot be connected for some reason, remove it entirely.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_connected_grid</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-        <span class="ident">starts_x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>],
-        <span class="ident">starts_y</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>],
+    <span class="doccomment">/// Ensure the grid forms a connected graph (all valid cells are reachable) by adding hallways
+    /// to unreachable grid cells.
+    ///
+    /// If a grid cell cannot be connected for some reason, remove it entirely.
+    </span><span class="kw">pub fn </span>ensure_connected_grid(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+        starts_x: <span class="kw-2">&amp;mut </span>[i32],
+        starts_y: <span class="kw-2">&amp;mut </span>[i32],
     ) {
-        <span class="self">self</span>.<span class="ident">assert_start_positions_valid</span>(<span class="ident">starts_x</span>, <span class="ident">starts_y</span>);
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::EnsureConnectedGrid</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">starts_x</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">starts_y</span>.<span class="ident">as_mut_ptr</span>(),
+        <span class="self">self</span>.assert_start_positions_valid(starts_x, starts_y);
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::EnsureConnectedGrid(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                starts_x.as_mut_ptr(),
+                starts_y.as_mut_ptr(),
             )
         }
     }
 
-    <span class="doccomment">/// A Kecleon shop will be generated with a probability determined by the Kecleon shop spawn</span>
-    <span class="doccomment">/// chance parameter (percentage from 0 to 100).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A Kecleon shop will be generated in a random room that is valid, connected, has no other</span>
-    <span class="doccomment">/// special features, and has dimensions of at least 5x4. Kecleon shops will occupy the entire</span>
-    <span class="doccomment">/// room interior, leaving a one tile margin from the room walls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_kecleon_shop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">spawn_chance</span>: <span class="ident">u8</span>) {
-        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> &lt;= <span class="number">100</span>);
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateKecleonShop</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">spawn_chance</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="doccomment">/// A Kecleon shop will be generated with a probability determined by the Kecleon shop spawn
+    /// chance parameter (percentage from 0 to 100).
+    ///
+    /// A Kecleon shop will be generated in a random room that is valid, connected, has no other
+    /// special features, and has dimensions of at least 5x4. Kecleon shops will occupy the entire
+    /// room interior, leaving a one tile margin from the room walls.
+    </span><span class="kw">pub fn </span>generate_kecleon_shop(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData, spawn_chance: u8) {
+        <span class="macro">assert!</span>(spawn_chance &lt;= <span class="number">100</span>);
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::GenerateKecleonShop(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                spawn_chance <span class="kw">as </span>c_int,
             )
         }
     }
 
-    <span class="comment">//// Possibly generate a Monster House on the floor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A Monster House will be generated with a probability determined by the Monster House</span>
-    <span class="doccomment">/// spawn chance parameter, and only if the current floor can support one (no non-Monster-House</span>
-    <span class="doccomment">/// outlaw missions or special floor types). A Monster House will be generated in a random room</span>
-    <span class="doccomment">/// that is valid, connected, and is not a merged or maze room.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `spawn_chance` is the percentage chance that a Monster House will be generated (0-100).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_monster_house</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">spawn_chance</span>: <span class="ident">u8</span>) {
-        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> &lt;= <span class="number">100</span>);
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateMonsterHouse</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">spawn_chance</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="comment">//// Possibly generate a Monster House on the floor.
+    </span><span class="doccomment">///
+    /// A Monster House will be generated with a probability determined by the Monster House
+    /// spawn chance parameter, and only if the current floor can support one (no non-Monster-House
+    /// outlaw missions or special floor types). A Monster House will be generated in a random room
+    /// that is valid, connected, and is not a merged or maze room.
+    ///
+    /// `spawn_chance` is the percentage chance that a Monster House will be generated (0-100).
+    </span><span class="kw">pub fn </span>generate_monster_house(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData, spawn_chance: u8) {
+        <span class="macro">assert!</span>(spawn_chance &lt;= <span class="number">100</span>);
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::GenerateMonsterHouse(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                spawn_chance <span class="kw">as </span>c_int,
             )
         }
     }
 
-    <span class="doccomment">/// Possibly generate a maze room on the floor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A maze room will be generated with a probability determined by the maze room chance</span>
-    <span class="doccomment">/// parameter. A maze will be generated in a random room that is valid, connected, has odd</span>
-    <span class="doccomment">/// dimensions, and has no other features.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `spawn_chance` is the percentage chance that a Monster House will be generated (0-100).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_maze_room</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_dungeon</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>, <span class="ident">spawn_chance</span>: <span class="ident">u8</span>) {
-        <span class="macro">assert!</span>(<span class="ident">spawn_chance</span> &lt;= <span class="number">100</span>);
-        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateMazeRoom</span>(
-                <span class="self">self</span>.<span class="ident">cells</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="ident">spawn_chance</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="doccomment">/// Possibly generate a maze room on the floor.
+    ///
+    /// A maze room will be generated with a probability determined by the maze room chance
+    /// parameter. A maze will be generated in a random room that is valid, connected, has odd
+    /// dimensions, and has no other features.
+    ///
+    /// `spawn_chance` is the percentage chance that a Monster House will be generated (0-100).
+    </span><span class="kw">pub fn </span>generate_maze_room(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _dungeon: <span class="kw-2">&amp;mut </span>GlobalDungeonData, spawn_chance: u8) {
+        <span class="macro">assert!</span>(spawn_chance &lt;= <span class="number">100</span>);
+        <span class="comment">// SAFETY: We have a mutable reference to the global dungeon data.
+        </span><span class="kw">unsafe </span>{
+            ffi::GenerateMazeRoom(
+                <span class="self">self</span>.cells.as_mut_ptr(),
+                <span class="self">self</span>.width <span class="kw">as </span>i32,
+                <span class="self">self</span>.height <span class="kw">as </span>i32,
+                spawn_chance <span class="kw">as </span>c_int,
             )
         }
     }
 
-    <span class="doccomment">/// Generate a maze room within a given grid cell.</span>
-    <span class="doccomment">/// A &quot;maze&quot; is generated within the room using a series of random walks to place obstacle</span>
-    <span class="doccomment">/// terrain (walls or secondary terrain) in a maze-like arrangement. &quot;Maze lines&quot;</span>
-    <span class="doccomment">/// (see [`super::GlobalDungeonStructureGenerator::generate_maze_line`]) are</span>
-    <span class="doccomment">/// generated using every other tile around the room&#39;s border, as well as every other interior</span>
-    <span class="doccomment">/// tile, as a starting point.</span>
-    <span class="doccomment">/// This ensures that there are stripes of walkable open terrain surrounded by stripes of</span>
-    <span class="doccomment">/// obstacles (the maze walls).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_maze</span>&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::dungeon_grid_cell</span>,
-        <span class="ident">secondary_terrain_instead_of_walls</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Generate a maze room within a given grid cell.
+    /// A &quot;maze&quot; is generated within the room using a series of random walks to place obstacle
+    /// terrain (walls or secondary terrain) in a maze-like arrangement. &quot;Maze lines&quot;
+    /// (see [`super::GlobalDungeonStructureGenerator::generate_maze_line`]) are
+    /// generated using every other tile around the room&#39;s border, as well as every other interior
+    /// tile, as a starting point.
+    /// This ensures that there are stripes of walkable open terrain surrounded by stripes of
+    /// obstacles (the maze walls).
+    </span><span class="kw">pub fn </span>generate_maze&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        cell: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::dungeon_grid_cell,
+        secondary_terrain_instead_of_walls: bool,
     ) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateMaze</span>(
-                <span class="ident">cell</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
-                <span class="ident">secondary_terrain_instead_of_walls</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+        <span class="kw">unsafe </span>{
+            ffi::GenerateMaze(
+                cell <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
+                secondary_terrain_instead_of_walls <span class="kw">as </span>ffi::bool_,
             )
         }
     }
 
-    <span class="doccomment">/// Set spawn flag 5 (0b100000 or 0x20) on all tiles in a room.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_spawn_flag_5</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::dungeon_grid_cell</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetSpawnFlag5</span>(<span class="ident">cell</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+    <span class="doccomment">/// Set spawn flag 5 (0b100000 or 0x20) on all tiles in a room.
+    </span><span class="kw">pub fn </span>set_spawn_flag_5&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, cell: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::dungeon_grid_cell) {
+        <span class="kw">unsafe </span>{ ffi::SetSpawnFlag5(cell <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_coords</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">x</span> * <span class="ident">GRID_CAPACITY_DIM</span> + <span class="ident">y</span>
+    <span class="kw">fn </span>get_coords(<span class="kw-2">&amp;</span><span class="self">self</span>, x: usize, y: usize) -&gt; usize {
+        x * GRID_CAPACITY_DIM + y
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_start_positions_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starts_x</span>: <span class="kw-2">&amp;</span>[<span class="ident">i32</span>], <span class="ident">starts_y</span>: <span class="kw-2">&amp;</span>[<span class="ident">i32</span>]) {
-        <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">starts_x</span> {
-            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">x</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="kw-2">*</span><span class="ident">x</span> &lt; <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="ident">i32</span>);
+    <span class="kw">fn </span>assert_start_positions_valid(<span class="kw-2">&amp;</span><span class="self">self</span>, starts_x: <span class="kw-2">&amp;</span>[i32], starts_y: <span class="kw-2">&amp;</span>[i32]) {
+        <span class="kw">for </span>x <span class="kw">in </span>starts_x {
+            <span class="macro">assert!</span>(<span class="kw-2">*</span>x &gt;= <span class="number">0 </span>&amp;&amp; <span class="kw-2">*</span>x &lt; <span class="self">self</span>.width <span class="kw">as </span>i32);
         }
-        <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="ident">starts_y</span> {
-            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">y</span> &gt;= <span class="number">0</span> &amp;&amp; <span class="kw-2">*</span><span class="ident">y</span> &lt; <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="ident">i32</span>);
+        <span class="kw">for </span>y <span class="kw">in </span>starts_y {
+            <span class="macro">assert!</span>(<span class="kw-2">*</span>y &gt;= <span class="number">0 </span>&amp;&amp; <span class="kw-2">*</span>y &lt; <span class="self">self</span>.height <span class="kw">as </span>i32);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -13,20 +13,20 @@
 <span id="13">13</span>
 <span id="14">14</span>
 <span id="15">15</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::panic::PanicInfo</span>;
-<span class="kw">use</span> <span class="ident">log::error</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::panic::PanicInfo;
+<span class="kw">use </span>log::error;
 
-<span class="attribute">#[<span class="ident">panic_handler</span>]</span>
-<span class="doccomment">/// Panic by logging the panic and then calling the game&#39;s</span>
-<span class="doccomment">/// built-in function for hanging it.</span>
-<span class="kw">fn</span> <span class="ident">panic</span>(<span class="ident">panic</span>: <span class="kw-2">&amp;</span><span class="ident">PanicInfo</span>&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ! {
-    <span class="macro">error!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">panic</span>);
-    <span class="kw">unsafe</span> { <span class="ident">WaitForever</span>() }
+<span class="attribute">#[panic_handler]</span>
+<span class="doccomment">/// Panic by logging the panic and then calling the game&#39;s
+/// built-in function for hanging it.
+</span><span class="kw">fn </span>panic(panic: <span class="kw-2">&amp;</span>PanicInfo&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ! {
+    <span class="macro">error!</span>(<span class="string">&quot;{}&quot;</span>, panic);
+    <span class="kw">unsafe </span>{ WaitForever() }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clashing_extern_declarations</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">WaitForever</span>() -&gt; !;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[allow(clashing_extern_declarations)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>WaitForever() -&gt; !;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

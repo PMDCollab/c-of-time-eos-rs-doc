@@ -3,48 +3,48 @@
 }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A trait providing a subset of <a href="https://doc.rust-lang.org/stable/std/io/struct.Error.html"><code>std::error::Error</code></a>’s functionality.</p>
 </div></details><h2 id="provided-methods" class="small-section-header">Provided Methods<a href="#provided-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="method.source" class="method has-srclink"><div class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#89">source</a></div><h4 class="code-header">fn <a href="#method.source" class="fnname">source</a>(&amp;self) -&gt; Option&lt;&amp;(dyn <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a> + 'static)&gt;</h4></div></summary><div class="docblock"><p>The lower-level source of this error, if any.</p>
 <h5 id="examples"><a href="#examples">Examples</a></h5>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">acid_io::ErrorTrait</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>acid_io::ErrorTrait;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SuperError</span> {
-    <span class="ident">side</span>: <span class="ident">SuperErrorSideKick</span>,
+<span class="attribute">#[derive(Debug)]</span>
+<span class="kw">struct </span>SuperError {
+    side: SuperErrorSideKick,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SuperError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SuperError is here!&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SuperError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;SuperError is here!&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ErrorTrait</span> <span class="kw">for</span> <span class="ident">SuperError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ErrorTrait</span> + <span class="lifetime">&#39;static</span>)&gt; {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">side</span>)
+<span class="kw">impl </span>ErrorTrait <span class="kw">for </span>SuperError {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ErrorTrait + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.side)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SuperErrorSideKick</span>;
+<span class="attribute">#[derive(Debug)]</span>
+<span class="kw">struct </span>SuperErrorSideKick;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SuperErrorSideKick</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SuperErrorSideKick is here!&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SuperErrorSideKick {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;SuperErrorSideKick is here!&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ErrorTrait</span> <span class="kw">for</span> <span class="ident">SuperErrorSideKick</span> {}
+<span class="kw">impl </span>ErrorTrait <span class="kw">for </span>SuperErrorSideKick {}
 
-<span class="kw">fn</span> <span class="ident">get_super_error</span>() -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="ident">SuperError</span>&gt; {
-    <span class="prelude-val">Err</span>(<span class="ident">SuperError</span> { <span class="ident">side</span>: <span class="ident">SuperErrorSideKick</span> })
+<span class="kw">fn </span>get_super_error() -&gt; <span class="prelude-ty">Result</span>&lt;(), SuperError&gt; {
+    <span class="prelude-val">Err</span>(SuperError { side: SuperErrorSideKick })
 }
 
-<span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">match</span> <span class="ident">get_super_error</span>() {
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-            <span class="macro">println!</span>(<span class="string">&quot;Error: {}&quot;</span>, <span class="ident">e</span>);
-            <span class="macro">println!</span>(<span class="string">&quot;Caused by: {}&quot;</span>, <span class="ident">e</span>.<span class="ident">source</span>().<span class="ident">unwrap</span>());
+<span class="kw">fn </span>main() {
+    <span class="kw">match </span>get_super_error() {
+        <span class="prelude-val">Err</span>(e) =&gt; {
+            <span class="macro">println!</span>(<span class="string">&quot;Error: {}&quot;</span>, e);
+            <span class="macro">println!</span>(<span class="string">&quot;Caused by: {}&quot;</span>, e.source().unwrap());
         }
-        <span class="kw">_</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;No error&quot;</span>),
+        <span class="kw">_ </span>=&gt; <span class="macro">println!</span>(<span class="string">&quot;No error&quot;</span>),
     }
 }</code></pre></div>
 </div></details></div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><div id="implementations-list"><details class="rustdoc-toggle implementors-toggle" open><summary><section id="impl-dyn%20ErrorTrait%20+%20%27static" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#108">source</a></span><a href="#impl-dyn%20ErrorTrait%20+%20%27static" class="anchor"></a><h3 class="code-header in-band">impl dyn <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a> + 'static</h3></section></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><section id="method.is" class="method has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#111">source</a></span><h4 class="code-header">pub fn <a href="#method.is" class="fnname">is</a>&lt;T&gt;(&amp;self) -&gt; bool <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: 'static + <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Returns <code>true</code> if the boxed type is the same as <code>T</code></p>
@@ -58,4 +58,4 @@
 </div></details></div></details><details class="rustdoc-toggle implementors-toggle" open><summary><section id="impl-dyn%20ErrorTrait%20+%20Send%20+%20Sync%20+%20%27static" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#165">source</a></span><a href="#impl-dyn%20ErrorTrait%20+%20Send%20+%20Sync%20+%20%27static" class="anchor"></a><h3 class="code-header in-band">impl dyn <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a> + Send + Sync + 'static</h3></section></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><section id="method.is-2" class="method has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#168">source</a></span><h4 class="code-header">pub fn <a href="#method.is-2" class="fnname">is</a>&lt;T&gt;(&amp;self) -&gt; bool <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: 'static + <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Forwards to the method defined on the type <code>dyn ErrorTrait</code>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.downcast_ref-2" class="method has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#174">source</a></span><h4 class="code-header">pub fn <a href="#method.downcast_ref-2" class="fnname">downcast_ref</a>&lt;T&gt;(&amp;self) -&gt; Option&lt;&amp;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: 'static + <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Forwards to the method defined on the type <code>dyn ErrorTrait</code>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.downcast_mut-2" class="method has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#180">source</a></span><h4 class="code-header">pub fn <a href="#method.downcast_mut-2" class="fnname">downcast_mut</a>&lt;T&gt;(&amp;mut self) -&gt; Option&lt;&amp;mut T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: 'static + <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Forwards to the method defined on the type <code>dyn ErrorTrait</code>.</p>
-</div></details></div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><section id="impl-ErrorTrait-for-Error" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#499">source</a></span><a href="#impl-ErrorTrait-for-Error" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a> for <a class="struct" href="struct.Error.html" title="struct eos_rs::api::io::Error">Error</a></h3></section></div><script type="text/javascript" src="../../../implementors/acid_io/error/trait.ErrorTrait.js" data-ignore-extern-crates="acid_io" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</div></details></div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><section id="impl-ErrorTrait-for-Error" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/acid_io/0.1.0/src/acid_io/error.rs.html#499">source</a></span><a href="#impl-ErrorTrait-for-Error" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="trait.ErrorTrait.html" title="trait eos_rs::api::io::ErrorTrait">ErrorTrait</a> for <a class="struct" href="struct.Error.html" title="struct eos_rs::api::io::Error">Error</a></h3></section></div><script type="text/javascript" src="../../../implementors/acid_io/error/trait.ErrorTrait.js" data-ignore-extern-crates="acid_io" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

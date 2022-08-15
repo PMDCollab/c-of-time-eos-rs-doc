@@ -499,506 +499,506 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The game&#39;s built-in dungeon generator.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **IMPORTANT to know** for this implementation: A lot of functions will not work as expected,</span>
-<span class="doccomment">//! since some low level functions just ignore some parameters passed in completely.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The generation implementation that is built into the game works directly</span>
-<span class="doccomment">//! with the global tile data based on temporary grid cells.</span>
-<span class="doccomment">//! This module contains functions that either are high level wrappers or little pieces</span>
-<span class="doccomment">//! of the algorithm that don&#39;t need dungeon grid cells.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To get an instance of the generator, use</span>
-<span class="doccomment">//! [`crate::api::dungeon_mode::GlobalDungeonData::get_builtin_dungeon_generator`].</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The game&#39;s built-in dungeon generator.
+//!
+//! **IMPORTANT to know** for this implementation: A lot of functions will not work as expected,
+//! since some low level functions just ignore some parameters passed in completely.
+//!
+//! The generation implementation that is built into the game works directly
+//! with the global tile data based on temporary grid cells.
+//! This module contains functions that either are high level wrappers or little pieces
+//! of the algorithm that don&#39;t need dungeon grid cells.
+//!
+//! To get an instance of the generator, use
+//! [`crate::api::dungeon_mode::GlobalDungeonData::get_builtin_dungeon_generator`].
 
-<span class="kw">mod</span> <span class="ident">grid</span>;
+</span><span class="kw">mod </span>grid;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::grid</span>::{<span class="ident">DungeonGridMutator</span>, <span class="ident">GRID_CAPACITY_DIM</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode::GlobalDungeonData</span>;
+<span class="kw">pub use </span><span class="self">self</span>::grid::{DungeonGridMutator, GRID_CAPACITY_DIM};
+<span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::GlobalDungeonData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode::dungeon_generator</span>::{
-    <span class="ident">DungeonEntityGeneration</span>, <span class="ident">DungeonFloorGeneration</span>,
+<span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::dungeon_generator::{
+    DungeonEntityGeneration, DungeonFloorGeneration,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::fixed_room_catalog</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay::OverlayLoadLease</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes::c_int</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::objects::fixed_room_catalog;
+<span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
+<span class="kw">use </span><span class="kw">crate</span>::ctypes::c_int;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="comment">//-----------------------------------------------------------------------------------------------//</span>
+<span class="comment">//-----------------------------------------------------------------------------------------------//
 
-<span class="doccomment">/// The structure and layout generator for the global dungeon.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To create instances of this struct use</span>
-<span class="doccomment">/// [`crate::api::dungeon_mode::GlobalDungeonData::get_builtin_dungeon_generator`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalDungeonStructureGenerator</span>&lt;<span class="lifetime">&#39;a</span>&gt;(
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">GlobalDungeonData</span>&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="doccomment">/// The structure and layout generator for the global dungeon.
+///
+/// To create instances of this struct use
+/// [`crate::api::dungeon_mode::GlobalDungeonData::get_builtin_dungeon_generator`].
+</span><span class="kw">pub struct </span>GlobalDungeonStructureGenerator&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>GlobalDungeonData&lt;<span class="lifetime">&#39;a</span>&gt;,
 );
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">GlobalDungeonStructureGenerator</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generate_floor_internal</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GenerateFloor</span>() }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GlobalDungeonStructureGenerator&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[doc(hidden)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>generate_floor_internal(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::GenerateFloor() }
     }
 
-    <span class="doccomment">/// Handles fixed room generation if the floor contains a fixed room.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_fixed_room</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">fixed_room_id</span>: <span class="ident">fixed_room_catalog::Type</span>,
-        <span class="ident">properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GenerateFixedRoom</span>(<span class="ident">fixed_room_id</span>, <span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>)) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Handles fixed room generation if the floor contains a fixed room.
+    </span><span class="kw">pub fn </span>generate_fixed_room(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        fixed_room_id: fixed_room_catalog::Type,
+        properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::GenerateFixedRoom(fixed_room_id, <span class="macro">force_mut_ptr!</span>(properties)) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Sets the junction flag (bit 3 of the terrain flags) on any hallway junction tiles in</span>
-    <span class="doccomment">/// some range [x0, x1), [y0, y1). This leaves tiles within rooms untouched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flag_hallway_junctions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x0</span>: <span class="ident">i32</span>, <span class="ident">y0</span>: <span class="ident">i32</span>, <span class="ident">x1</span>: <span class="ident">i32</span>, <span class="ident">y1</span>: <span class="ident">i32</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::FlagHallwayJunctions</span>(<span class="ident">x0</span>, <span class="ident">y0</span>, <span class="ident">x1</span>, <span class="ident">y1</span>) }
+    <span class="doccomment">/// Sets the junction flag (bit 3 of the terrain flags) on any hallway junction tiles in
+    /// some range [x0, x1), [y0, y1). This leaves tiles within rooms untouched.
+    </span><span class="kw">pub fn </span>flag_hallway_junctions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x0: i32, y0: i32, x1: i32, y1: i32) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::FlagHallwayJunctions(x0, y0, x1, y1) }
     }
 
-    <span class="doccomment">/// Create a hallway between two points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the two points share no coordinates in common (meaning the line connecting them is</span>
-    <span class="doccomment">/// diagonal), a &quot;kinked&quot; hallway is created, with the kink at a specified &quot;middle&quot;</span>
-    <span class="doccomment">/// coordinate (in practice the grid cell boundary). For example, with a kinked horizontal</span>
-    <span class="doccomment">/// hallway, there are two horizontal lines extending out from the endpoints, connected by a</span>
-    <span class="doccomment">/// vertical line on the middle x coordinate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a hallway would intersect with an existing open tile (like an existing hallway), the</span>
-    <span class="doccomment">/// hallway will only be created up to the point where it intersects with the open tile.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `start_x` - The x coordinate of the start of the hallway.</span>
-    <span class="doccomment">/// * `start_y` - The y coordinate of the start of the hallway.</span>
-    <span class="doccomment">/// * `end_x` - The x coordinate of the end of the hallway.</span>
-    <span class="doccomment">/// * `end_y` - The y coordinate of the end of the hallway.</span>
-    <span class="doccomment">/// * `is_vertical` - vertical flag (true for vertical hallway, false for horizontal).</span>
-    <span class="doccomment">/// * `middle_x` - Middle x coordinate for kinked horizontal hallways.</span>
-    <span class="doccomment">/// * `middle_y` - Middle y coordinate for kinked vertical hallways.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_hallway</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">start_x</span>: <span class="ident">i32</span>,
-        <span class="ident">start_y</span>: <span class="ident">i32</span>,
-        <span class="ident">end_x</span>: <span class="ident">i32</span>,
-        <span class="ident">end_y</span>: <span class="ident">i32</span>,
-        <span class="ident">is_vertical</span>: <span class="ident">bool</span>,
-        <span class="ident">middle_x</span>: <span class="ident">i32</span>,
-        <span class="ident">middle_y</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// Create a hallway between two points.
+    ///
+    /// If the two points share no coordinates in common (meaning the line connecting them is
+    /// diagonal), a &quot;kinked&quot; hallway is created, with the kink at a specified &quot;middle&quot;
+    /// coordinate (in practice the grid cell boundary). For example, with a kinked horizontal
+    /// hallway, there are two horizontal lines extending out from the endpoints, connected by a
+    /// vertical line on the middle x coordinate.
+    ///
+    /// If a hallway would intersect with an existing open tile (like an existing hallway), the
+    /// hallway will only be created up to the point where it intersects with the open tile.
+    ///
+    /// # Arguments
+    ///
+    /// * `start_x` - The x coordinate of the start of the hallway.
+    /// * `start_y` - The y coordinate of the start of the hallway.
+    /// * `end_x` - The x coordinate of the end of the hallway.
+    /// * `end_y` - The y coordinate of the end of the hallway.
+    /// * `is_vertical` - vertical flag (true for vertical hallway, false for horizontal).
+    /// * `middle_x` - Middle x coordinate for kinked horizontal hallways.
+    /// * `middle_y` - Middle y coordinate for kinked vertical hallways.
+    </span><span class="kw">pub fn </span>create_hallway(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        start_x: i32,
+        start_y: i32,
+        end_x: i32,
+        end_y: i32,
+        is_vertical: bool,
+        middle_x: i32,
+        middle_y: i32,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::CreateHallway</span>(
-                <span class="ident">start_x</span>,
-                <span class="ident">start_y</span>,
-                <span class="ident">end_x</span>,
-                <span class="ident">end_y</span>,
-                <span class="ident">is_vertical</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">middle_x</span>,
-                <span class="ident">middle_y</span>,
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{
+            ffi::CreateHallway(
+                start_x,
+                start_y,
+                end_x,
+                end_y,
+                is_vertical <span class="kw">as </span>ffi::bool_,
+                middle_x,
+                middle_y,
             )
         }
     }
 
-    <span class="doccomment">/// Finalizes junction tiles by setting the junction flag (bit 3 of the terrain flags) and</span>
-    <span class="doccomment">/// ensuring open terrain.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this implementation is slightly buggy. This function scans tiles left-to-right,</span>
-    <span class="doccomment">/// top-to-bottom, and identifies junctions as any open, non-hallway tile (room_index != 0xFF)</span>
-    <span class="doccomment">/// adjacent to an open, hallway tile (room_index == 0xFF). This interacts poorly with hallway</span>
-    <span class="doccomment">/// anchors (room_index == 0xFE). This function sets the room index of any hallway anchors to</span>
-    <span class="doccomment">/// 0xFF within the same loop, so a hallway anchor may or may not be identified as a junction</span>
-    <span class="doccomment">/// depending on the orientation of connected hallways.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, in the following configuration, the &quot;o&quot; tile would be marked as a junction</span>
-    <span class="doccomment">/// because the neighboring hallway tile to its left comes earlier in iteration, while the &quot;o&quot;</span>
-    <span class="doccomment">/// tile still has the room index 0xFE, causing the algorithm to mistake it for a room tile:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// xxxxx</span>
-    <span class="doccomment">/// ---ox</span>
-    <span class="doccomment">/// xxx|x</span>
-    <span class="doccomment">/// xxx|x</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// However, in the following configuration, the &quot;o&quot; tile would NOT be marked as a junction</span>
-    <span class="doccomment">/// because it comes earlier in iteration than any of its neighboring hallway tiles, so its</span>
-    <span class="doccomment">/// room index is set to 0xFF before it can be marked as a junction. This is actually the ONLY</span>
-    <span class="doccomment">/// possible configuration where a hallway anchor will not be marked as a junction.</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// xxxxx</span>
-    <span class="doccomment">/// xo---</span>
-    <span class="doccomment">/// x|xxx</span>
-    <span class="doccomment">/// x|xxx</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize_junctions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::FinalizeJunctions</span>() }
+    <span class="doccomment">/// Finalizes junction tiles by setting the junction flag (bit 3 of the terrain flags) and
+    /// ensuring open terrain.
+    ///
+    /// Note that this implementation is slightly buggy. This function scans tiles left-to-right,
+    /// top-to-bottom, and identifies junctions as any open, non-hallway tile (room_index != 0xFF)
+    /// adjacent to an open, hallway tile (room_index == 0xFF). This interacts poorly with hallway
+    /// anchors (room_index == 0xFE). This function sets the room index of any hallway anchors to
+    /// 0xFF within the same loop, so a hallway anchor may or may not be identified as a junction
+    /// depending on the orientation of connected hallways.
+    ///
+    /// For example, in the following configuration, the &quot;o&quot; tile would be marked as a junction
+    /// because the neighboring hallway tile to its left comes earlier in iteration, while the &quot;o&quot;
+    /// tile still has the room index 0xFE, causing the algorithm to mistake it for a room tile:
+    /// ```text
+    /// xxxxx
+    /// ---ox
+    /// xxx|x
+    /// xxx|x
+    /// ```
+    ///
+    /// However, in the following configuration, the &quot;o&quot; tile would NOT be marked as a junction
+    /// because it comes earlier in iteration than any of its neighboring hallway tiles, so its
+    /// room index is set to 0xFF before it can be marked as a junction. This is actually the ONLY
+    /// possible configuration where a hallway anchor will not be marked as a junction.
+    /// ```text
+    /// xxxxx
+    /// xo---
+    /// x|xxx
+    /// x|xxx
+    /// ```
+    </span><span class="kw">pub fn </span>finalize_junctions(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::FinalizeJunctions() }
     }
 
-    <span class="doccomment">/// Generate a &quot;maze line&quot; from a given starting point, within the given bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A &quot;maze line&quot; is a random walk starting from (x0, y0). The random walk proceeds with a</span>
-    <span class="doccomment">/// stride of 2 in a random direction, laying down obstacles as it goes. The random walk</span>
-    <span class="doccomment">/// terminates when it gets trapped and there are no more neighboring tiles that are open and</span>
-    <span class="doccomment">/// in-bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_maze_line</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">x0</span>: <span class="ident">i32</span>,
-        <span class="ident">y0</span>: <span class="ident">i32</span>,
-        <span class="ident">x_min</span>: <span class="ident">i32</span>,
-        <span class="ident">y_min</span>: <span class="ident">i32</span>,
-        <span class="ident">x_max</span>: <span class="ident">i32</span>,
-        <span class="ident">y_max</span>: <span class="ident">i32</span>,
-        <span class="ident">use_secondary_terrain</span>: <span class="ident">bool</span>,
-        <span class="ident">room</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// Generate a &quot;maze line&quot; from a given starting point, within the given bounds.
+    ///
+    /// A &quot;maze line&quot; is a random walk starting from (x0, y0). The random walk proceeds with a
+    /// stride of 2 in a random direction, laying down obstacles as it goes. The random walk
+    /// terminates when it gets trapped and there are no more neighboring tiles that are open and
+    /// in-bounds.
+    </span><span class="kw">pub fn </span>generate_maze_line(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        x0: i32,
+        y0: i32,
+        x_min: i32,
+        y_min: i32,
+        x_max: i32,
+        y_max: i32,
+        use_secondary_terrain: bool,
+        room: u8,
     ) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GenerateMazeLine</span>(
-                <span class="ident">x0</span>,
-                <span class="ident">y0</span>,
-                <span class="ident">x_min</span>,
-                <span class="ident">y_min</span>,
-                <span class="ident">x_max</span>,
-                <span class="ident">y_max</span>,
-                <span class="ident">use_secondary_terrain</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">room</span>,
+        <span class="kw">unsafe </span>{
+            ffi::GenerateMazeLine(
+                x0,
+                y0,
+                x_min,
+                y_min,
+                x_max,
+                y_max,
+                use_secondary_terrain <span class="kw">as </span>ffi::bool_,
+                room,
             )
         }
     }
 
-    <span class="doccomment">/// Checks if a tile position is either in a hallway or next to one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_next_to_hallway</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::IsNextToHallway</span>(<span class="ident">x</span>, <span class="ident">y</span>) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Checks if a tile position is either in a hallway or next to one.
+    </span><span class="kw">pub fn </span>is_next_to_hallway(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsNextToHallway(x, y) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Resolve invalid spawn flags on tiles.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Spawn flags can be invalid due to terrain. For example, traps can&#39;t spawn on obstacles.</span>
-    <span class="doccomment">/// Spawn flags can also be invalid due to multiple being set on a single tile, in which case</span>
-    <span class="doccomment">/// one will take precedence. For example, stair spawns trump trap spawns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_invalid_spawns</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ResolveInvalidSpawns</span>() }
+    <span class="doccomment">/// Resolve invalid spawn flags on tiles.
+    ///
+    /// Spawn flags can be invalid due to terrain. For example, traps can&#39;t spawn on obstacles.
+    /// Spawn flags can also be invalid due to multiple being set on a single tile, in which case
+    /// one will take precedence. For example, stair spawns trump trap spawns.
+    </span><span class="kw">pub fn </span>resolve_invalid_spawns(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::ResolveInvalidSpawns() }
     }
 
-    <span class="doccomment">/// Converts all secondary terrain tiles (water/lava) to chasms.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert_secondary_terrain_to_chasms</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ConvertSecondaryTerrainToChasms</span>() }
+    <span class="doccomment">/// Converts all secondary terrain tiles (water/lava) to chasms.
+    </span><span class="kw">pub fn </span>convert_secondary_terrain_to_chasms(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::ConvertSecondaryTerrainToChasms() }
     }
 
-    <span class="doccomment">/// Converts all wall tiles to chasms.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert_walls_to_chasms</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ConvertWallsToChasms</span>() }
+    <span class="doccomment">/// Converts all wall tiles to chasms.
+    </span><span class="kw">pub fn </span>convert_walls_to_chasms(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::ConvertWallsToChasms() }
     }
 
-    <span class="doccomment">/// Ensures all tiles with the impassable flag are walls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_impassable_tiles_are_walls</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EnsureImpassableTilesAreWalls</span>() }
+    <span class="doccomment">/// Ensures all tiles with the impassable flag are walls.
+    </span><span class="kw">pub fn </span>ensure_impassable_tiles_are_walls(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::EnsureImpassableTilesAreWalls() }
     }
 
-    <span class="doccomment">/// Resets the floor in preparation for a floor generation attempt.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Resets all tiles, resets the border to be impassable, and clears entity spawns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_floor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ResetFloor</span>() }
+    <span class="doccomment">/// Resets the floor in preparation for a floor generation attempt.
+    ///
+    /// Resets all tiles, resets the border to be impassable, and clears entity spawns.
+    </span><span class="kw">pub fn </span>reset_floor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::ResetFloor() }
     }
 
-    <span class="doccomment">/// Generate secondary terrain (water/lava) formations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This includes &quot;rivers&quot; that flow from top-to-bottom (or bottom-to-top), as well as &quot;lakes&quot;</span>
-    <span class="doccomment">/// both standalone and after rivers. Water/lava formations will never cut through rooms, but</span>
-    <span class="doccomment">/// they can pass through rooms to the opposite side.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Rivers are generated by a top-down or bottom-up random walk that ends when existing</span>
-    <span class="doccomment">/// secondary terrain is reached or the walk goes out of bounds. Some rivers also end</span>
-    <span class="doccomment">/// prematurely in a lake. Lakes are a large collection of secondary terrain generated around</span>
-    <span class="doccomment">/// a central point.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `test_flag` - bit index to test in the floor properties room flag bitvector</span>
-    <span class="doccomment">///                 (formations are only generated if the bit is set)</span>
-    <span class="doccomment">/// * `floor_props` - floor properties</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_secondary_terrain_formations</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">test_flag</span>: <span class="ident">u8</span>,
-        <span class="ident">floor_props</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
+    <span class="doccomment">/// Generate secondary terrain (water/lava) formations.
+    ///
+    /// This includes &quot;rivers&quot; that flow from top-to-bottom (or bottom-to-top), as well as &quot;lakes&quot;
+    /// both standalone and after rivers. Water/lava formations will never cut through rooms, but
+    /// they can pass through rooms to the opposite side.
+    ///
+    /// Rivers are generated by a top-down or bottom-up random walk that ends when existing
+    /// secondary terrain is reached or the walk goes out of bounds. Some rivers also end
+    /// prematurely in a lake. Lakes are a large collection of secondary terrain generated around
+    /// a central point.
+    ///
+    /// # Arguments
+    /// * `test_flag` - bit index to test in the floor properties room flag bitvector
+    ///                 (formations are only generated if the bit is set)
+    /// * `floor_props` - floor properties
+    </span><span class="kw">pub fn </span>generate_secondary_terrain_formations(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        test_flag: u8,
+        floor_props: <span class="kw-2">&amp;</span>ffi::floor_properties,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GenerateSecondaryTerrainFormations</span>(<span class="ident">test_flag</span>, <span class="macro">force_mut_ptr!</span>(<span class="ident">floor_props</span>)) }
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::GenerateSecondaryTerrainFormations(test_flag, <span class="macro">force_mut_ptr!</span>(floor_props)) }
     }
 
-    <span class="doccomment">/// Checks that the stairs are reachable from every walkable tile on the floor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This runs a graph traversal algorithm that is very similar to breadth-first search</span>
-    <span class="doccomment">/// (the order in which nodes are visited is slightly different), starting from the stairs.</span>
-    <span class="doccomment">/// If any tile is walkable but wasn&#39;t reached by the traversal algorithm, then the stairs</span>
-    <span class="doccomment">/// must not be reachable from that tile.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `mark_unreachable` is true, this function will instead always return true, but set a</span>
-    <span class="doccomment">/// special bit on all walkable tiles that aren&#39;t reachable from the stairs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stairs_are_always_reachable</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">x_stairs</span>: <span class="ident">i32</span>,
-        <span class="ident">y_stairs</span>: <span class="ident">i32</span>,
-        <span class="ident">mark_unreachable</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::StairsAlwaysReachable</span>(<span class="ident">x_stairs</span>, <span class="ident">y_stairs</span>, <span class="ident">mark_unreachable</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) &gt; <span class="number">0</span>
-        }
+    <span class="doccomment">/// Checks that the stairs are reachable from every walkable tile on the floor.
+    ///
+    /// This runs a graph traversal algorithm that is very similar to breadth-first search
+    /// (the order in which nodes are visited is slightly different), starting from the stairs.
+    /// If any tile is walkable but wasn&#39;t reached by the traversal algorithm, then the stairs
+    /// must not be reachable from that tile.
+    ///
+    /// If `mark_unreachable` is true, this function will instead always return true, but set a
+    /// special bit on all walkable tiles that aren&#39;t reachable from the stairs.
+    </span><span class="kw">pub fn </span>stairs_are_always_reachable(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        x_stairs: i32,
+        y_stairs: i32,
+        mark_unreachable: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{
+            ffi::StairsAlwaysReachable(x_stairs, y_stairs, mark_unreachable <span class="kw">as </span>ffi::bool_) &gt; <span class="number">0
+        </span>}
     }
 
-    <span class="doccomment">/// Reset the inner boundary tile rows (y == 1 and y == 30) to their initial state of all wall</span>
-    <span class="doccomment">/// tiles, with impassable walls at the edges (x == 0 and x == 55).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_inner_boundary_tile_rows</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ResetInnerBoundaryTileRows</span>() }
+    <span class="doccomment">/// Reset the inner boundary tile rows (y == 1 and y == 30) to their initial state of all wall
+    /// tiles, with impassable walls at the edges (x == 0 and x == 55).
+    </span><span class="kw">pub fn </span>reset_inner_boundary_tile_rows(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{ ffi::ResetInnerBoundaryTileRows() }
     }
 
-    <span class="doccomment">/// Spawn stairs at the given location.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the hidden stairs flag is set, hidden stairs will be spawned instead of normal stairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If spawning normal stairs and the current floor is a rescue floor, the room containing</span>
-    <span class="doccomment">/// the stairs will be converted into a Monster House.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_stairs</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">x</span>: <span class="ident">u8</span>,
-        <span class="ident">y</span>: <span class="ident">u8</span>,
-        <span class="ident">gen_info</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::dungeon_generation_info</span>,
-        <span class="ident">is_hidden_stairs</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Spawn stairs at the given location.
+    ///
+    /// If the hidden stairs flag is set, hidden stairs will be spawned instead of normal stairs.
+    ///
+    /// If spawning normal stairs and the current floor is a rescue floor, the room containing
+    /// the stairs will be converted into a Monster House.
+    </span><span class="kw">pub fn </span>spawn_stairs(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        x: u8,
+        y: u8,
+        gen_info: <span class="kw-2">&amp;</span>ffi::dungeon_generation_info,
+        is_hidden_stairs: bool,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::SpawnStairs</span>(
-                [<span class="ident">x</span>, <span class="ident">y</span>].<span class="ident">as_mut_ptr</span>(),
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">gen_info</span>),
-                <span class="ident">is_hidden_stairs</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{
+            ffi::SpawnStairs(
+                [x, y].as_mut_ptr(),
+                <span class="macro">force_mut_ptr!</span>(gen_info),
+                is_hidden_stairs <span class="kw">as </span>ffi::bool_,
             )
         }
     }
 }
 
-<span class="comment">//-----------------------------------------------------------------------------------------------//</span>
+<span class="comment">//-----------------------------------------------------------------------------------------------//
 
-<span class="doccomment">/// The entity generator for the global dungeon.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalDungeonEntityGenerator</span>(());
+</span><span class="doccomment">/// The entity generator for the global dungeon.
+</span><span class="kw">pub struct </span>GlobalDungeonEntityGenerator(());
 
-<span class="kw">impl</span> <span class="ident">GlobalDungeonEntityGenerator</span> {
-    <span class="doccomment">/// Creates a new generator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety:</span>
-    <span class="doccomment">/// The caller needs to make sure that overlay 29 is loaded and it&#39;s safe to</span>
-    <span class="doccomment">/// manipulate the global dungeon.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+<span class="kw">impl </span>GlobalDungeonEntityGenerator {
+    <span class="doccomment">/// Creates a new generator.
+    ///
+    /// # Safety:
+    /// The caller needs to make sure that overlay 29 is loaded and it&#39;s safe to
+    /// manipulate the global dungeon.
+    </span><span class="kw">unsafe fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(())
     }
 
-    <span class="doccomment">/// Randomly shuffle an array of spawn positions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shuffle_spawn_positions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">spawn_positions</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">ffi::spawn_position</span>]) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::ShuffleSpawnPositions</span>(<span class="ident">spawn_positions</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">spawn_positions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span>)
+    <span class="doccomment">/// Randomly shuffle an array of spawn positions.
+    </span><span class="kw">pub fn </span>shuffle_spawn_positions(<span class="kw-2">&amp;</span><span class="self">self</span>, spawn_positions: <span class="kw-2">&amp;mut </span>[ffi::spawn_position]) {
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{
+            ffi::ShuffleSpawnPositions(spawn_positions.as_mut_ptr(), spawn_positions.len() <span class="kw">as </span>c_int)
         }
     }
 }
 
-<span class="comment">//-----------------------------------------------------------------------------------------------//</span>
+<span class="comment">//-----------------------------------------------------------------------------------------------//
 
-<span class="doccomment">/// The game&#39;s builtin dungeon generator.</span>
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DungeonFloorGeneration</span> <span class="kw">for</span> <span class="ident">GlobalDungeonStructureGenerator</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type</span> <span class="ident">EntityGenerator</span> = <span class="ident">GlobalDungeonEntityGenerator</span>;
-    <span class="kw">type</span> <span class="ident">LayoutGenerator</span> = <span class="ident">BuiltinDungeonLayoutGenerators</span>;
+</span><span class="doccomment">/// The game&#39;s builtin dungeon generator.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DungeonFloorGeneration <span class="kw">for </span>GlobalDungeonStructureGenerator&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>EntityGenerator = GlobalDungeonEntityGenerator;
+    <span class="kw">type </span>LayoutGenerator = BuiltinDungeonLayoutGenerators;
 
-    <span class="doccomment">/// Generate a dungeon floor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This ignores all parameters at the moment and instead reads from the global dungeon struct</span>
-    <span class="doccomment">/// directly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the master function that generates the dungeon floor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Very loosely speaking, this function first tries to generate a valid floor layout.</span>
-    <span class="doccomment">/// Then it tries to spawn entities in a valid configuration. Finally, it performs cleanup</span>
-    <span class="doccomment">/// and post-processing depending on the dungeon.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a spawn configuration is invalid, the entire floor layout is scrapped and regenerated.</span>
-    <span class="doccomment">/// If the generated floor layout is invalid 10 times in a row, or a valid spawn configuration</span>
-    <span class="doccomment">/// isn&#39;t generated within 10 attempts, the generation algorithm aborts and the default</span>
-    <span class="doccomment">/// one-room Monster House floor is generated as a fallback.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If not changed by a patch, this function will use the game&#39;s default built in generator</span>
-    <span class="doccomment">/// and generate the floor based on the current global configuration for the floor.</span>
-    <span class="comment">// TODO: Set up global struct here to take param into account?</span>
-    <span class="kw">fn</span> <span class="ident">generate_floor</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_width</span>: <span class="ident">usize</span>,
-        <span class="ident">_height</span>: <span class="ident">usize</span>,
-        <span class="ident">_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">generate_floor_internal</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Generate a dungeon floor.
+    ///
+    /// This ignores all parameters at the moment and instead reads from the global dungeon struct
+    /// directly.
+    ///
+    /// This is the master function that generates the dungeon floor.
+    ///
+    /// Very loosely speaking, this function first tries to generate a valid floor layout.
+    /// Then it tries to spawn entities in a valid configuration. Finally, it performs cleanup
+    /// and post-processing depending on the dungeon.
+    ///
+    /// If a spawn configuration is invalid, the entire floor layout is scrapped and regenerated.
+    /// If the generated floor layout is invalid 10 times in a row, or a valid spawn configuration
+    /// isn&#39;t generated within 10 attempts, the generation algorithm aborts and the default
+    /// one-room Monster House floor is generated as a fallback.
+    ///
+    /// If not changed by a patch, this function will use the game&#39;s default built in generator
+    /// and generate the floor based on the current global configuration for the floor.
+    </span><span class="comment">// TODO: Set up global struct here to take param into account?
+    </span><span class="kw">fn </span>generate_floor(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _width: usize,
+        _height: usize,
+        _properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.generate_floor_internal();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Width and height are ignored for most layouts.</span>
-    <span class="kw">fn</span> <span class="ident">generate_layout</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">layout</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::LayoutGenerator</span>,
-        <span class="ident">properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="ident">layout</span> {
-                <span class="ident">BuiltinDungeonLayoutGenerators::Standard</span> { <span class="ident">width</span>, <span class="ident">height</span> } =&gt; {
-                    <span class="ident">ffi::GenerateStandardFloor</span>(<span class="kw-2">*</span><span class="ident">width</span>, <span class="kw-2">*</span><span class="ident">height</span>, <span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+    <span class="doccomment">/// Width and height are ignored for most layouts.
+    </span><span class="kw">fn </span>generate_layout(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        layout: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::LayoutGenerator,
+        properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span>layout {
+                BuiltinDungeonLayoutGenerators::Standard { width, height } =&gt; {
+                    ffi::GenerateStandardFloor(<span class="kw-2">*</span>width, <span class="kw-2">*</span>height, <span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::OuterRing</span> =&gt; {
-                    <span class="ident">ffi::GenerateOuterRingFloor</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+                BuiltinDungeonLayoutGenerators::OuterRing =&gt; {
+                    ffi::GenerateOuterRingFloor(<span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::Crossroads</span> =&gt; {
-                    <span class="ident">ffi::GenerateCrossroadsFloor</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+                BuiltinDungeonLayoutGenerators::Crossroads =&gt; {
+                    ffi::GenerateCrossroadsFloor(<span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::Line</span> =&gt; {
-                    <span class="ident">ffi::GenerateLineFloor</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+                BuiltinDungeonLayoutGenerators::Line =&gt; {
+                    ffi::GenerateLineFloor(<span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::Cross</span> =&gt; {
-                    <span class="ident">ffi::GenerateCrossFloor</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+                BuiltinDungeonLayoutGenerators::Cross =&gt; {
+                    ffi::GenerateCrossFloor(<span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::Beetle</span> =&gt; {
-                    <span class="ident">ffi::GenerateBeetleFloor</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+                BuiltinDungeonLayoutGenerators::Beetle =&gt; {
+                    ffi::GenerateBeetleFloor(<span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::OuterRooms</span> { <span class="ident">width</span>, <span class="ident">height</span> } =&gt; {
-                    <span class="ident">ffi::GenerateOuterRoomsFloor</span>(<span class="kw-2">*</span><span class="ident">width</span>, <span class="kw-2">*</span><span class="ident">height</span>, <span class="macro">force_mut_ptr!</span>(<span class="ident">properties</span>))
+                BuiltinDungeonLayoutGenerators::OuterRooms { width, height } =&gt; {
+                    ffi::GenerateOuterRoomsFloor(<span class="kw-2">*</span>width, <span class="kw-2">*</span>height, <span class="macro">force_mut_ptr!</span>(properties))
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::TwoRoomsMonsterHouse</span> =&gt; {
-                    <span class="ident">ffi::GenerateTwoRoomsWithMonsterHouseFloor</span>()
+                BuiltinDungeonLayoutGenerators::TwoRoomsMonsterHouse =&gt; {
+                    ffi::GenerateTwoRoomsWithMonsterHouseFloor()
                 }
-                <span class="ident">BuiltinDungeonLayoutGenerators::OneRoomMonsterHouse</span> =&gt; {
-                    <span class="ident">ffi::GenerateOneRoomMonsterHouseFloor</span>()
+                BuiltinDungeonLayoutGenerators::OneRoomMonsterHouse =&gt; {
+                    ffi::GenerateOneRoomMonsterHouseFloor()
                 }
             }
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">entities</span>&lt;<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EntityGenerator</span>)&gt;(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cb</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay and a mutable borrow on the global dungeon.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ent</span> = <span class="kw">unsafe</span> { <span class="ident">GlobalDungeonEntityGenerator::new</span>() };
-        <span class="ident">cb</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ent</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>entities&lt;F: FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::EntityGenerator)&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cb: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="comment">// SAFETY: We have a lease on the overlay and a mutable borrow on the global dungeon.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ent = <span class="kw">unsafe </span>{ GlobalDungeonEntityGenerator::new() };
+        cb(<span class="kw-2">&amp;mut </span>ent);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// This does nothing, this implementation will always update the global struct directly.</span>
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>) {}
+    <span class="doccomment">/// This does nothing, this implementation will always update the global struct directly.
+    </span><span class="kw">fn </span>generate(<span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>GlobalDungeonData) {}
 }
 
-<span class="doccomment">/// Builtin generator for entities on a dungeon floor.</span>
-<span class="kw">impl</span> <span class="ident">DungeonEntityGeneration</span> <span class="kw">for</span> <span class="ident">GlobalDungeonEntityGenerator</span> {
-    <span class="doccomment">/// Spawn all non-enemy entities, which includes stairs, items, traps, and the player.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Most entities are spawned randomly on a subset of permissible tiles.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Stairs are spawned if they don&#39;t already exist on the floor, and hidden stairs of the</span>
-    <span class="doccomment">/// specified type are also spawned if configured as long as there are at least 2 floors left</span>
-    <span class="doccomment">/// in the dungeon. Stairs can spawn on any tile that has open terrain, is in a room, isn&#39;t in</span>
-    <span class="doccomment">/// a Kecleon shop, doesn&#39;t already have an enemy spawn, isn&#39;t a hallway junction, and isn&#39;t a</span>
-    <span class="doccomment">/// special tile like a Key door.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Items are spawned both normally in rooms, as well as in walls and Monster Houses. Normal</span>
-    <span class="doccomment">/// items can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon shop</span>
-    <span class="doccomment">/// or Monster House, isn&#39;t a hallway junction, and isn&#39;t a special tile like a Key door.</span>
-    <span class="doccomment">/// Buried items can spawn on any wall tile. Monster House items can spawn on any Monster House</span>
-    <span class="doccomment">/// tile that isn&#39;t in a Kecleon shop and isn&#39;t a hallway junction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Traps are similarly spawned both normally in rooms, as well as in Monster Houses. Normal</span>
-    <span class="doccomment">/// traps can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon shop,</span>
-    <span class="doccomment">/// doesn&#39;t already have an item or enemy spawn, and isn&#39;t a special tile like a Key door.</span>
-    <span class="doccomment">/// Monster House traps follow the same conditions as Monster House items.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The player can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon</span>
-    <span class="doccomment">/// shop, isn&#39;t a hallway junction, doesn&#39;t already have an item, enemy, or trap spawn, and</span>
-    <span class="doccomment">/// isn&#39;t a special tile like a Key door.</span>
-    <span class="kw">fn</span> <span class="ident">spawn_non_enemies</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-        <span class="ident">empty_monster_house</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Builtin generator for entities on a dungeon floor.
+</span><span class="kw">impl </span>DungeonEntityGeneration <span class="kw">for </span>GlobalDungeonEntityGenerator {
+    <span class="doccomment">/// Spawn all non-enemy entities, which includes stairs, items, traps, and the player.
+    ///
+    /// Most entities are spawned randomly on a subset of permissible tiles.
+    ///
+    /// Stairs are spawned if they don&#39;t already exist on the floor, and hidden stairs of the
+    /// specified type are also spawned if configured as long as there are at least 2 floors left
+    /// in the dungeon. Stairs can spawn on any tile that has open terrain, is in a room, isn&#39;t in
+    /// a Kecleon shop, doesn&#39;t already have an enemy spawn, isn&#39;t a hallway junction, and isn&#39;t a
+    /// special tile like a Key door.
+    ///
+    /// Items are spawned both normally in rooms, as well as in walls and Monster Houses. Normal
+    /// items can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon shop
+    /// or Monster House, isn&#39;t a hallway junction, and isn&#39;t a special tile like a Key door.
+    /// Buried items can spawn on any wall tile. Monster House items can spawn on any Monster House
+    /// tile that isn&#39;t in a Kecleon shop and isn&#39;t a hallway junction.
+    ///
+    /// Traps are similarly spawned both normally in rooms, as well as in Monster Houses. Normal
+    /// traps can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon shop,
+    /// doesn&#39;t already have an item or enemy spawn, and isn&#39;t a special tile like a Key door.
+    /// Monster House traps follow the same conditions as Monster House items.
+    ///
+    /// The player can spawn on any tile that has open terrain, is in a room, isn&#39;t in a Kecleon
+    /// shop, isn&#39;t a hallway junction, doesn&#39;t already have an item, enemy, or trap spawn, and
+    /// isn&#39;t a special tile like a Key door.
+    </span><span class="kw">fn </span>spawn_non_enemies(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        floor_properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+        empty_monster_house: bool,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::SpawnNonEnemies</span>(
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">floor_properties</span>),
-                <span class="ident">empty_monster_house</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{
+            ffi::SpawnNonEnemies(
+                <span class="macro">force_mut_ptr!</span>(floor_properties),
+                empty_monster_house <span class="kw">as </span>ffi::bool_,
             )
         }
     }
 
-    <span class="doccomment">/// Spawn all enemies, which includes normal enemies and those in Monster Houses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Normal enemies can spawn on any tile that has open terrain, isn&#39;t in a Kecleon shop,</span>
-    <span class="doccomment">/// doesn&#39;t already have another entity spawn, and isn&#39;t a special tile like a Key door.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Monster House enemies can spawn on any Monster House tile that isn&#39;t in a Kecleon shop,</span>
-    <span class="doccomment">/// isn&#39;t where the player spawns, and isn&#39;t a special tile like a Key door.</span>
-    <span class="kw">fn</span> <span class="ident">spawn_enemies</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">floor_properties</span>: <span class="kw-2">&amp;</span><span class="ident">ffi::floor_properties</span>,
-        <span class="ident">empty_monster_house</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Spawn all enemies, which includes normal enemies and those in Monster Houses.
+    ///
+    /// Normal enemies can spawn on any tile that has open terrain, isn&#39;t in a Kecleon shop,
+    /// doesn&#39;t already have another entity spawn, and isn&#39;t a special tile like a Key door.
+    ///
+    /// Monster House enemies can spawn on any Monster House tile that isn&#39;t in a Kecleon shop,
+    /// isn&#39;t where the player spawns, and isn&#39;t a special tile like a Key door.
+    </span><span class="kw">fn </span>spawn_enemies(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        floor_properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
+        empty_monster_house: bool,
     ) {
-        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::SpawnEnemies</span>(
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">floor_properties</span>),
-                <span class="ident">empty_monster_house</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+        <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
+        </span><span class="kw">unsafe </span>{
+            ffi::SpawnEnemies(
+                <span class="macro">force_mut_ptr!</span>(floor_properties),
+                empty_monster_house <span class="kw">as </span>ffi::bool_,
             )
         }
     }
 }
 
-<span class="comment">//-----------------------------------------------------------------------------------------------//</span>
+<span class="comment">//-----------------------------------------------------------------------------------------------//
 
-<span class="doccomment">/// Builtin layout generators.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BuiltinDungeonLayoutGenerators</span> {
-    <span class="doccomment">/// Broadly speaking, a standard floor is generated as follows:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 1. Generating the grid</span>
-    <span class="doccomment">/// 2. Creating a room or hallway anchor in each grid cell</span>
-    <span class="doccomment">/// 3. Creating hallways between grid cells</span>
-    <span class="doccomment">/// 4. Generating special features (maze room, Kecleon shop, Monster House, extra hallways,</span>
-    <span class="doccomment">///    room imperfections, secondary structures)</span>
-    <span class="ident">Standard</span> { <span class="ident">width</span>: <span class="ident">i32</span>, <span class="ident">height</span>: <span class="ident">i32</span> },
-    <span class="doccomment">/// Floor layout with a 4x2 grid of rooms, surrounded by an outer ring of hallways.</span>
-    <span class="ident">OuterRing</span>,
-    <span class="doccomment">/// Floor layout with a mesh of hallways on the interior 3x2 grid, surrounded by a</span>
-    <span class="doccomment">/// boundary of rooms protruding from the interior like spikes, excluding the corner cells.</span>
-    <span class="ident">Crossroads</span>,
-    <span class="doccomment">/// Floor layout with 5 grid cells in a horizontal line.</span>
-    <span class="ident">Line</span>,
-    <span class="doccomment">/// Floor layout with 5 rooms arranged in a cross (&quot;plus sign&quot;) formation.</span>
-    <span class="ident">Cross</span>,
-    <span class="doccomment">/// Floor layout in a &quot;beetle&quot; formation, which is created by taking a 3x3 grid</span>
-    <span class="doccomment">/// of rooms, connecting the rooms within each row, and merging the central column</span>
-    <span class="doccomment">/// into one big room.</span>
-    <span class="ident">Beetle</span>,
-    <span class="doccomment">/// Floor layout with a ring of rooms on the grid boundary and nothing in the</span>
-    <span class="doccomment">/// interior.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this is bugged, and won&#39;t properly connect all the rooms together for</span>
-    <span class="doccomment">/// `width &lt; 4`.</span>
-    <span class="ident">OuterRooms</span> { <span class="ident">width</span>: <span class="ident">i32</span>, <span class="ident">height</span>: <span class="ident">i32</span> },
-    <span class="doccomment">/// Floor layout with two rooms (left and right), one of which is a Monster House.</span>
-    <span class="ident">TwoRoomsMonsterHouse</span>,
-    <span class="doccomment">/// Floor layout with just a large, one-room Monster House.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the default layout if dungeon generation fails.</span>
-    <span class="attribute">#[<span class="ident">default</span>]</span>
-    <span class="ident">OneRoomMonsterHouse</span>,
+</span><span class="doccomment">/// Builtin layout generators.
+</span><span class="attribute">#[derive(Copy, Clone, Default)]</span>
+<span class="kw">pub enum </span>BuiltinDungeonLayoutGenerators {
+    <span class="doccomment">/// Broadly speaking, a standard floor is generated as follows:
+    ///
+    /// 1. Generating the grid
+    /// 2. Creating a room or hallway anchor in each grid cell
+    /// 3. Creating hallways between grid cells
+    /// 4. Generating special features (maze room, Kecleon shop, Monster House, extra hallways,
+    ///    room imperfections, secondary structures)
+    </span>Standard { width: i32, height: i32 },
+    <span class="doccomment">/// Floor layout with a 4x2 grid of rooms, surrounded by an outer ring of hallways.
+    </span>OuterRing,
+    <span class="doccomment">/// Floor layout with a mesh of hallways on the interior 3x2 grid, surrounded by a
+    /// boundary of rooms protruding from the interior like spikes, excluding the corner cells.
+    </span>Crossroads,
+    <span class="doccomment">/// Floor layout with 5 grid cells in a horizontal line.
+    </span>Line,
+    <span class="doccomment">/// Floor layout with 5 rooms arranged in a cross (&quot;plus sign&quot;) formation.
+    </span>Cross,
+    <span class="doccomment">/// Floor layout in a &quot;beetle&quot; formation, which is created by taking a 3x3 grid
+    /// of rooms, connecting the rooms within each row, and merging the central column
+    /// into one big room.
+    </span>Beetle,
+    <span class="doccomment">/// Floor layout with a ring of rooms on the grid boundary and nothing in the
+    /// interior.
+    ///
+    /// Note that this is bugged, and won&#39;t properly connect all the rooms together for
+    /// `width &lt; 4`.
+    </span>OuterRooms { width: i32, height: i32 },
+    <span class="doccomment">/// Floor layout with two rooms (left and right), one of which is a Monster House.
+    </span>TwoRoomsMonsterHouse,
+    <span class="doccomment">/// Floor layout with just a large, one-room Monster House.
+    ///
+    /// This is the default layout if dungeon generation fails.
+    </span><span class="attribute">#[default]</span>
+    OneRoomMonsterHouse,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

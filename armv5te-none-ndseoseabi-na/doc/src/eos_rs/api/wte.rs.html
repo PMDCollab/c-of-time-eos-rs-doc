@@ -45,52 +45,52 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Handling of WTE files.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Handling of WTE files.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">core::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>core::ffi::CStr;
+<span class="kw">use </span>core::mem::MaybeUninit;
 
-<span class="doccomment">/// A Rust-owned WTE file.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OwnedWte</span>(<span class="ident">ffi::wte_handle</span>);
+<span class="doccomment">/// A Rust-owned WTE file.
+</span><span class="kw">pub struct </span>OwnedWte(ffi::wte_handle);
 
-<span class="kw">impl</span> <span class="ident">OwnedWte</span> {
-    <span class="doccomment">/// Take ownership of an WTE handle.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The handle must be valid.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_handle</span>(<span class="ident">handle</span>: <span class="ident">ffi::wte_handle</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">handle</span>)
+<span class="kw">impl </span>OwnedWte {
+    <span class="doccomment">/// Take ownership of an WTE handle.
+    ///
+    /// # Safety
+    /// The handle must be valid.
+    </span><span class="kw">pub unsafe fn </span>from_handle(handle: ffi::wte_handle) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(handle)
     }
 
-    <span class="doccomment">/// Loads a SIR0-wrapped WTE file from ROM.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The path must point to a valid WTE file.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_from_rom</span>&lt;<span class="ident">C</span>: <span class="ident">AsRef</span>&lt;<span class="ident">CStr</span>&gt;&gt;(<span class="ident">path</span>: <span class="ident">C</span>, <span class="ident">malloc_flags</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> = <span class="ident">MaybeUninit::uninit</span>();
-        <span class="ident">ffi::LoadWteFromRom</span>(<span class="ident">handle</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>(), <span class="ident">malloc_flags</span>);
-        <span class="self">Self</span>(<span class="ident">handle</span>.<span class="ident">assume_init</span>())
+    <span class="doccomment">/// Loads a SIR0-wrapped WTE file from ROM.
+    ///
+    /// # Safety
+    /// The path must point to a valid WTE file.
+    </span><span class="kw">pub unsafe fn </span>load_from_rom&lt;C: AsRef&lt;CStr&gt;&gt;(path: C, malloc_flags: u32) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>handle = MaybeUninit::uninit();
+        ffi::LoadWteFromRom(handle.as_mut_ptr(), path.as_ref().as_ptr(), malloc_flags);
+        <span class="self">Self</span>(handle.assume_init())
     }
 
-    <span class="doccomment">/// Loads a SIR0-wrapped WTE file from a file directory.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The path must point to a valid WTE file.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_from_dir</span>(<span class="ident">pack_file_id</span>: <span class="ident">u16</span>, <span class="ident">file_index</span>: <span class="ident">u16</span>, <span class="ident">malloc_flags</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> = <span class="ident">MaybeUninit::uninit</span>();
-        <span class="ident">ffi::LoadWteFromFileDirectory</span>(<span class="ident">handle</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">pack_file_id</span>, <span class="ident">file_index</span>, <span class="ident">malloc_flags</span>);
-        <span class="self">Self</span>(<span class="ident">handle</span>.<span class="ident">assume_init</span>())
+    <span class="doccomment">/// Loads a SIR0-wrapped WTE file from a file directory.
+    ///
+    /// # Safety
+    /// The path must point to a valid WTE file.
+    </span><span class="kw">pub unsafe fn </span>load_from_dir(pack_file_id: u16, file_index: u16, malloc_flags: u32) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>handle = MaybeUninit::uninit();
+        ffi::LoadWteFromFileDirectory(handle.as_mut_ptr(), pack_file_id, file_index, malloc_flags);
+        <span class="self">Self</span>(handle.assume_init())
     }
 }
 
-<span class="doccomment">/// Unloads the WTE file.</span>
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">OwnedWte</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::UnloadWte</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>);
+<span class="doccomment">/// Unloads the WTE file.
+</span><span class="kw">impl </span>Drop <span class="kw">for </span>OwnedWte {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            ffi::UnloadWte(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

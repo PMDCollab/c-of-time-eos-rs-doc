@@ -775,782 +775,782 @@
 <span id="775">775</span>
 <span id="776">776</span>
 <span id="777">777</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Code for handling script variables.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Code for handling script variables.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::script_var_catalog</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes::c_void</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::script_var_id::Type</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::script_var_type</span>;
-<span class="kw">use</span> <span class="ident">alloc::ffi::CString</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::objects::script_var_catalog;
+<span class="kw">use </span><span class="kw">crate</span>::ctypes::c_void;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span><span class="kw">crate</span>::ffi::script_var_id::Type;
+<span class="kw">use </span><span class="kw">crate</span>::ffi::script_var_type;
+<span class="kw">use </span>alloc::ffi::CString;
+<span class="kw">use </span>alloc::vec;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::ffi::CStr;
+<span class="kw">use </span>core::marker::PhantomData;
+<span class="kw">use </span>core::ptr;
 
-<span class="doccomment">/// Value types of script variables.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can convert into this from [`script_var_type::Type`] with</span>
-<span class="doccomment">/// [`TryInto::try_into`] / [`TryFrom::try_from`].</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScriptVariableValueType</span> {
-    <span class="prelude-val">None</span> = <span class="ident">script_var_type::VARTYPE_NONE</span>,
-    <span class="ident">Bit</span> = <span class="ident">script_var_type::VARTYPE_BIT</span>,
-    <span class="ident">String</span> = <span class="ident">script_var_type::VARTYPE_STRING</span>,
-    <span class="ident">U8</span> = <span class="ident">script_var_type::VARTYPE_UINT8</span>,
-    <span class="ident">U16</span> = <span class="ident">script_var_type::VARTYPE_UINT16</span>,
-    <span class="ident">U32</span> = <span class="ident">script_var_type::VARTYPE_UINT32</span>,
-    <span class="ident">I8</span> = <span class="ident">script_var_type::VARTYPE_INT8</span>,
-    <span class="ident">I16</span> = <span class="ident">script_var_type::VARTYPE_INT16</span>,
-    <span class="ident">I32</span> = <span class="ident">script_var_type::VARTYPE_INT32</span>,
-    <span class="ident">Special</span> = <span class="ident">script_var_type::VARTYPE_SPECIAL</span>,
+<span class="doccomment">/// Value types of script variables.
+///
+/// You can convert into this from [`script_var_type::Type`] with
+/// [`TryInto::try_into`] / [`TryFrom::try_from`].
+</span><span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, Debug)]</span>
+<span class="kw">pub enum </span>ScriptVariableValueType {
+    <span class="prelude-val">None </span>= script_var_type::VARTYPE_NONE,
+    Bit = script_var_type::VARTYPE_BIT,
+    String = script_var_type::VARTYPE_STRING,
+    U8 = script_var_type::VARTYPE_UINT8,
+    U16 = script_var_type::VARTYPE_UINT16,
+    U32 = script_var_type::VARTYPE_UINT32,
+    I8 = script_var_type::VARTYPE_INT8,
+    I16 = script_var_type::VARTYPE_INT16,
+    I32 = script_var_type::VARTYPE_INT32,
+    Special = script_var_type::VARTYPE_SPECIAL,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">script_var_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValueType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;script_var_type::Type&gt; <span class="kw">for </span>ScriptVariableValueType {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">script_var_type::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">script_var_type::VARTYPE_NONE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::None</span>),
-            <span class="ident">script_var_type::VARTYPE_BIT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::Bit</span>),
-            <span class="ident">script_var_type::VARTYPE_STRING</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::String</span>),
-            <span class="ident">script_var_type::VARTYPE_UINT8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::U8</span>),
-            <span class="ident">script_var_type::VARTYPE_UINT16</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::U16</span>),
-            <span class="ident">script_var_type::VARTYPE_UINT32</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::U32</span>),
-            <span class="ident">script_var_type::VARTYPE_INT8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::I8</span>),
-            <span class="ident">script_var_type::VARTYPE_INT16</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::I16</span>),
-            <span class="ident">script_var_type::VARTYPE_INT32</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::I32</span>),
-            <span class="ident">script_var_type::VARTYPE_SPECIAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScriptVariableValueType::Special</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: script_var_type::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            script_var_type::VARTYPE_NONE =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::None),
+            script_var_type::VARTYPE_BIT =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::Bit),
+            script_var_type::VARTYPE_STRING =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::String),
+            script_var_type::VARTYPE_UINT8 =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::U8),
+            script_var_type::VARTYPE_UINT16 =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::U16),
+            script_var_type::VARTYPE_UINT32 =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::U32),
+            script_var_type::VARTYPE_INT8 =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::I8),
+            script_var_type::VARTYPE_INT16 =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::I16),
+            script_var_type::VARTYPE_INT32 =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::I32),
+            script_var_type::VARTYPE_SPECIAL =&gt; <span class="prelude-val">Ok</span>(ScriptVariableValueType::Special),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="doccomment">/// Value of a script variable.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScriptVariableValue</span> {
+<span class="doccomment">/// Value of a script variable.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq)]</span>
+<span class="kw">pub enum </span>ScriptVariableValue {
     <span class="prelude-val">None</span>,
-    <span class="ident">Bit</span>(<span class="ident">bool</span>),
-    <span class="ident">String</span>(<span class="ident">CString</span>),
-    <span class="ident">U8</span>(<span class="ident">u8</span>),
-    <span class="ident">U16</span>(<span class="ident">u16</span>),
-    <span class="ident">U32</span>(<span class="ident">u32</span>),
-    <span class="ident">I8</span>(<span class="ident">i8</span>),
-    <span class="ident">I16</span>(<span class="ident">i16</span>),
-    <span class="ident">I32</span>(<span class="ident">i32</span>),
-    <span class="ident">Special</span>(<span class="ident">i32</span>),
+    Bit(bool),
+    String(CString),
+    U8(u8),
+    U16(u16),
+    U32(u32),
+    I8(i8),
+    I16(i16),
+    I32(i32),
+    Special(i32),
 }
 
-<span class="kw">impl</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="doccomment">/// Type of this value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">var_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScriptVariableValueType</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::None</span> =&gt; <span class="ident">ScriptVariableValueType::None</span>,
-            <span class="ident">ScriptVariableValue::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::Bit</span>,
-            <span class="ident">ScriptVariableValue::String</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::String</span>,
-            <span class="ident">ScriptVariableValue::U8</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::U8</span>,
-            <span class="ident">ScriptVariableValue::U16</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::U16</span>,
-            <span class="ident">ScriptVariableValue::U32</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::U32</span>,
-            <span class="ident">ScriptVariableValue::I8</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::I8</span>,
-            <span class="ident">ScriptVariableValue::I16</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::I16</span>,
-            <span class="ident">ScriptVariableValue::I32</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::I32</span>,
-            <span class="ident">ScriptVariableValue::Special</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScriptVariableValueType::Special</span>,
+<span class="kw">impl </span>ScriptVariableValue {
+    <span class="doccomment">/// Type of this value.
+    </span><span class="kw">pub fn </span>var_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableValueType {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::None =&gt; ScriptVariableValueType::None,
+            ScriptVariableValue::Bit(<span class="kw">_</span>) =&gt; ScriptVariableValueType::Bit,
+            ScriptVariableValue::String(<span class="kw">_</span>) =&gt; ScriptVariableValueType::String,
+            ScriptVariableValue::U8(<span class="kw">_</span>) =&gt; ScriptVariableValueType::U8,
+            ScriptVariableValue::U16(<span class="kw">_</span>) =&gt; ScriptVariableValueType::U16,
+            ScriptVariableValue::U32(<span class="kw">_</span>) =&gt; ScriptVariableValueType::U32,
+            ScriptVariableValue::I8(<span class="kw">_</span>) =&gt; ScriptVariableValueType::I8,
+            ScriptVariableValue::I16(<span class="kw">_</span>) =&gt; ScriptVariableValueType::I16,
+            ScriptVariableValue::I32(<span class="kw">_</span>) =&gt; ScriptVariableValueType::I32,
+            ScriptVariableValue::Special(<span class="kw">_</span>) =&gt; ScriptVariableValueType::Special,
         }
     }
 
-    <span class="doccomment">/// Returns the value as raw i32. For String, only the first character&#39;s value is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::None</span> =&gt; <span class="number">0</span>,
-            <span class="ident">ScriptVariableValue::Bit</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">ScriptVariableValue::String</span>(<span class="ident">value</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">as_bytes</span>().<span class="ident">is_empty</span>() {
-                    <span class="number">0</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">value</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">i32</span>
+    <span class="doccomment">/// Returns the value as raw i32. For String, only the first character&#39;s value is returned.
+    </span><span class="kw">pub fn </span>as_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::None =&gt; <span class="number">0</span>,
+            ScriptVariableValue::Bit(value) =&gt; <span class="kw-2">*</span>value <span class="kw">as </span>i32,
+            ScriptVariableValue::String(value) =&gt; {
+                <span class="kw">if </span>value.as_bytes().is_empty() {
+                    <span class="number">0
+                </span>} <span class="kw">else </span>{
+                    value.as_bytes()[<span class="number">0</span>] <span class="kw">as </span>i32
                 }
             }
-            <span class="ident">ScriptVariableValue::U8</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">ScriptVariableValue::U16</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">ScriptVariableValue::U32</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">ScriptVariableValue::I8</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">ScriptVariableValue::I16</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">ScriptVariableValue::I32</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span>,
-            <span class="ident">ScriptVariableValue::Special</span>(<span class="ident">value</span>) =&gt; <span class="kw-2">*</span><span class="ident">value</span>,
+            ScriptVariableValue::U8(value) =&gt; <span class="kw-2">*</span>value <span class="kw">as </span>i32,
+            ScriptVariableValue::U16(value) =&gt; <span class="kw-2">*</span>value <span class="kw">as </span>i32,
+            ScriptVariableValue::U32(value) =&gt; <span class="kw-2">*</span>value <span class="kw">as </span>i32,
+            ScriptVariableValue::I8(value) =&gt; <span class="kw-2">*</span>value <span class="kw">as </span>i32,
+            ScriptVariableValue::I16(value) =&gt; <span class="kw-2">*</span>value <span class="kw">as </span>i32,
+            ScriptVariableValue::I32(value) =&gt; <span class="kw-2">*</span>value,
+            ScriptVariableValue::Special(value) =&gt; <span class="kw-2">*</span>value,
         }
     }
 }
 
-<span class="doccomment">/// This trait can be used to simply convert script variable values to their</span>
-<span class="doccomment">/// primitive types. See [`ScriptVariableRead::value`] for an example.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">T</span>&gt; {
-    <span class="doccomment">/// Force cast the variable into the given type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will panic if:</span>
-    <span class="doccomment">/// - The type `T` does not match the type represented by the `as_type`.</span>
-    <span class="doccomment">/// - The `as_type` does not match the type of the value variant.</span>
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">T</span>;
+<span class="doccomment">/// This trait can be used to simply convert script variable values to their
+/// primitive types. See [`ScriptVariableRead::value`] for an example.
+</span><span class="kw">pub trait </span>UnwrapScriptVariableValueAs&lt;T&gt; {
+    <span class="doccomment">/// Force cast the variable into the given type.
+    ///
+    /// This will panic if:
+    /// - The type `T` does not match the type represented by the `as_type`.
+    /// - The `as_type` does not match the type of the value variant.
+    </span><span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; T;
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;()&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;()&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::None</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::None</span> =&gt; (),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::None,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::None =&gt; (),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">bool</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">bool</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;bool&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; bool {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::Bit</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::Bit</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::Bit,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::Bit(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">CString</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">CString</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;CString&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; CString {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::String</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::String</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::String,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::String(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">u8</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">u8</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;u8&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; u8 {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::U8</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::U8</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::U8,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::U8(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">u16</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">u16</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;u16&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; u16 {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::U16</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::U16</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::U16,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::U16(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">u32</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">u32</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;u32&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; u32 {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::U32</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::U32</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::U32,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::U32(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">i8</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">i8</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;i8&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; i8 {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::I8</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::I8</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::I8,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::I8(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">i16</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">i16</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;i16&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; i16 {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::I16</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::I16</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::I16,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::I16(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">UnwrapScriptVariableValueAs</span>&lt;<span class="ident">i32</span>&gt; <span class="kw">for</span> <span class="ident">ScriptVariableValue</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_as</span>(<span class="self">self</span>, <span class="ident">as_type</span>: <span class="ident">ScriptVariableValueType</span>) -&gt; <span class="ident">i32</span> {
+<span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;i32&gt; <span class="kw">for </span>ScriptVariableValue {
+    <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; i32 {
         <span class="macro">assert!</span>(
-            <span class="ident">as_type</span> == <span class="ident">ScriptVariableValueType::I32</span>,
-            <span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>
-        );
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScriptVariableValue::I32</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="ident">ScriptVariableValue::Special</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
+            as_type == ScriptVariableValueType::I32,
+            <span class="string">&quot;Invalid use of `unwrap_as`&quot;
+        </span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            ScriptVariableValue::I32(v) =&gt; v,
+            ScriptVariableValue::Special(v) =&gt; v,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid use of `unwrap_as`&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// Helper struct for manipulating the global and local script variables.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScriptVariables</span>;
+<span class="doccomment">/// Helper struct for manipulating the global and local script variables.
+</span><span class="kw">pub struct </span>ScriptVariables;
 
-<span class="kw">impl</span> <span class="ident">ScriptVariables</span> {
-    <span class="doccomment">/// Initialize the script variable values table (SCRIPT_VARS_VALUES).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The whole table is first zero-initialized. Then, all script variable values are first</span>
-    <span class="doccomment">/// initialized to their defaults, after which some of them are overwritten with other</span>
-    <span class="doccomment">/// hard-coded values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// SAFETY: This modifies global data, but it contains primitive values only.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitScriptVariableValues</span>() }
+<span class="kw">impl </span>ScriptVariables {
+    <span class="doccomment">/// Initialize the script variable values table (SCRIPT_VARS_VALUES).
+    ///
+    /// The whole table is first zero-initialized. Then, all script variable values are first
+    /// initialized to their defaults, after which some of them are overwritten with other
+    /// hard-coded values.
+    </span><span class="kw">pub fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: This modifies global data, but it contains primitive values only.
+        </span><span class="kw">unsafe </span>{ ffi::InitScriptVariableValues() }
     }
 
-    <span class="doccomment">/// Get a reference to the global variable. This must not be used</span>
-    <span class="doccomment">/// for local variables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_variable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">var_id</span>: <span class="ident">script_var_catalog::Type</span>) -&gt; <span class="ident">GlobalScriptVariableRef</span> {
-        <span class="macro">assert!</span>(!<span class="ident">is_local</span>(<span class="ident">var_id</span>));
-        <span class="ident">GlobalScriptVariableRef</span>(<span class="ident">var_id</span>, <span class="ident">PhantomData</span>)
+    <span class="doccomment">/// Get a reference to the global variable. This must not be used
+    /// for local variables.
+    </span><span class="kw">pub fn </span>global_variable(<span class="kw-2">&amp;</span><span class="self">self</span>, var_id: script_var_catalog::Type) -&gt; GlobalScriptVariableRef {
+        <span class="macro">assert!</span>(!is_local(var_id));
+        GlobalScriptVariableRef(var_id, PhantomData)
     }
 
-    <span class="doccomment">/// Get a mutable reference to the global variable. This must not be used</span>
-    <span class="doccomment">/// for local variables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_variable_mut</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">var_id</span>: <span class="ident">script_var_catalog::Type</span>,
-    ) -&gt; <span class="ident">GlobalScriptVariableMut</span> {
-        <span class="macro">assert!</span>(!(<span class="ident">is_local</span>(<span class="ident">var_id</span>)));
-        <span class="ident">GlobalScriptVariableMut</span>(<span class="ident">var_id</span>, <span class="ident">PhantomData</span>)
+    <span class="doccomment">/// Get a mutable reference to the global variable. This must not be used
+    /// for local variables.
+    </span><span class="kw">pub fn </span>global_variable_mut(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        var_id: script_var_catalog::Type,
+    ) -&gt; GlobalScriptVariableMut {
+        <span class="macro">assert!</span>(!(is_local(var_id)));
+        GlobalScriptVariableMut(var_id, PhantomData)
     }
 
-    <span class="doccomment">/// Get a reference to the local variable. This signature</span>
-    <span class="doccomment">/// will probably update when we know the type of that table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The pointer to the local variable table must be valid.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">local_variable</span>(
+    <span class="doccomment">/// Get a reference to the local variable. This signature
+    /// will probably update when we know the type of that table.
+    ///
+    /// # Safety
+    /// The pointer to the local variable table must be valid.
+    </span><span class="kw">pub unsafe fn </span>local_variable(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">local_var_vals</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-        <span class="ident">var_id</span>: <span class="ident">script_var_catalog::Type</span>,
-    ) -&gt; <span class="ident">LocalScriptVariableRef</span> {
-        <span class="macro">assert!</span>(<span class="ident">is_local</span>(<span class="ident">var_id</span>));
-        <span class="ident">LocalScriptVariableRef</span>(<span class="ident">local_var_vals</span>, <span class="ident">var_id</span>, <span class="ident">PhantomData</span>)
+        local_var_vals: <span class="kw-2">*mut </span>c_void,
+        var_id: script_var_catalog::Type,
+    ) -&gt; LocalScriptVariableRef {
+        <span class="macro">assert!</span>(is_local(var_id));
+        LocalScriptVariableRef(local_var_vals, var_id, PhantomData)
     }
 
-    <span class="doccomment">/// Get a mutable reference to the local variable. This signature</span>
-    <span class="doccomment">/// will probably update when we know the type of that table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The pointer to the local variable table must be valid.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">local_variable_mut</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">local_var_vals</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-        <span class="ident">var_id</span>: <span class="ident">script_var_catalog::Type</span>,
-    ) -&gt; <span class="ident">LocalScriptVariableMut</span> {
-        <span class="macro">assert!</span>(<span class="ident">is_local</span>(<span class="ident">var_id</span>));
-        <span class="ident">LocalScriptVariableMut</span>(<span class="ident">local_var_vals</span>, <span class="ident">var_id</span>, <span class="ident">PhantomData</span>)
+    <span class="doccomment">/// Get a mutable reference to the local variable. This signature
+    /// will probably update when we know the type of that table.
+    ///
+    /// # Safety
+    /// The pointer to the local variable table must be valid.
+    </span><span class="kw">pub unsafe fn </span>local_variable_mut(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        local_var_vals: <span class="kw-2">*mut </span>c_void,
+        var_id: script_var_catalog::Type,
+    ) -&gt; LocalScriptVariableMut {
+        <span class="macro">assert!</span>(is_local(var_id));
+        LocalScriptVariableMut(local_var_vals, var_id, PhantomData)
     }
 
-    <span class="doccomment">/// Saves event flag script variables (see the code for an exhaustive list) to their respective</span>
-    <span class="doccomment">/// BACKUP script variables, but only in certain game modes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function prints the debug string &quot;EventFlag BackupGameMode %d&quot; with the game mode.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_flag_backup</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EventFlagBackup</span>() }
+    <span class="doccomment">/// Saves event flag script variables (see the code for an exhaustive list) to their respective
+    /// BACKUP script variables, but only in certain game modes.
+    ///
+    /// This function prints the debug string &quot;EventFlag BackupGameMode %d&quot; with the game mode.
+    </span><span class="kw">pub fn </span>event_flag_backup(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::EventFlagBackup() }
     }
 
-    <span class="doccomment">/// Runs EventFlagBackup, then copies the script variable values table (SCRIPT_VARS_VALUES) to</span>
-    <span class="doccomment">/// the given pointer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Important:** This high-level function assumes that the variable data is 1024 bytes long.</span>
-    <span class="doccomment">/// Should you somehow extend the table, you should use the low-level</span>
-    <span class="doccomment">/// [`ffi::DumpScriptVariableValues`] directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump_script_variable_values</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">1024</span>] {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> = [<span class="number">0</span>; <span class="number">1024</span>];
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::DumpScriptVariableValues</span>(<span class="ident">data</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>);
+    <span class="doccomment">/// Runs EventFlagBackup, then copies the script variable values table (SCRIPT_VARS_VALUES) to
+    /// the given pointer.
+    ///
+    /// **Important:** This high-level function assumes that the variable data is 1024 bytes long.
+    /// Should you somehow extend the table, you should use the low-level
+    /// [`ffi::DumpScriptVariableValues`] directly.
+    </span><span class="kw">pub fn </span>dump_script_variable_values(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; [u8; <span class="number">1024</span>] {
+        <span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0</span>; <span class="number">1024</span>];
+        <span class="kw">unsafe </span>{
+            ffi::DumpScriptVariableValues(data.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>c_void);
         }
-        <span class="ident">data</span>
+        data
     }
 
-    <span class="doccomment">/// Restores the script variable values table (SCRIPT_VARS_VALUES) with the given data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Important:** This high-level function assumes that the variable data is 1024 bytes long.</span>
-    <span class="doccomment">/// Should you somehow extend the table, you should use the low-level</span>
-    <span class="doccomment">/// [`ffi::RestoreScriptVariableValues`] directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restore_script_variable_values</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">1024</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::RestoreScriptVariableValues</span>(<span class="macro">force_mut_ptr!</span>(<span class="ident">src</span>)) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Restores the script variable values table (SCRIPT_VARS_VALUES) with the given data.
+    ///
+    /// **Important:** This high-level function assumes that the variable data is 1024 bytes long.
+    /// Should you somehow extend the table, you should use the low-level
+    /// [`ffi::RestoreScriptVariableValues`] directly.
+    </span><span class="kw">pub fn </span>restore_script_variable_values(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;</span>[u8; <span class="number">1024</span>]) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::RestoreScriptVariableValues(<span class="macro">force_mut_ptr!</span>(src)) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Initializes an assortment of event flag script variables (see the code for an exhaustive</span>
-    <span class="doccomment">/// list).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_event_flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitEventFlagScriptVars</span>() }
+    <span class="doccomment">/// Initializes an assortment of event flag script variables (see the code for an exhaustive
+    /// list).
+    </span><span class="kw">pub fn </span>init_event_flags(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::InitEventFlagScriptVars() }
     }
 
-    <span class="doccomment">/// Initializes most of the SCENARIO_* script variables (except SCENARIO_TALK_BIT_FLAG for some</span>
-    <span class="doccomment">/// reason). Also initializes the PLAY_OLD_GAME variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_scenario_script_vars</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitScenarioScriptVars</span>() }
+    <span class="doccomment">/// Initializes most of the SCENARIO_* script variables (except SCENARIO_TALK_BIT_FLAG for some
+    /// reason). Also initializes the PLAY_OLD_GAME variable.
+    </span><span class="kw">pub fn </span>init_scenario_script_vars(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::InitScenarioScriptVars() }
     }
 
-    <span class="doccomment">/// Initializes the WORLD_MAP_* script variable values (IDs 0x55-0x57).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_world_map_script_vars</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitWorldMapScriptVars</span>() }
+    <span class="doccomment">/// Initializes the WORLD_MAP_* script variable values (IDs 0x55-0x57).
+    </span><span class="kw">pub fn </span>init_world_map_script_vars(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::InitWorldMapScriptVars() }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_dungeon_list_script_vars</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitDungeonListScriptVars</span>() }
+    <span class="kw">pub fn </span>init_dungeon_list_script_vars(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::InitDungeonListScriptVars() }
     }
 
-    <span class="doccomment">/// Saves scenario flag script variables (SCENARIO_SELECT, SCENARIO_MAIN_BIT_FLAG) to their</span>
-    <span class="doccomment">/// respective BACKUP script variables, but only in certain game modes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function prints the debug string &quot;ScenarioFlag BackupGameMode %d&quot; with the game mode.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scenario_flag_backup</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ScenarioFlagBackup</span>() }
+    <span class="doccomment">/// Saves scenario flag script variables (SCENARIO_SELECT, SCENARIO_MAIN_BIT_FLAG) to their
+    /// respective BACKUP script variables, but only in certain game modes.
+    ///
+    /// This function prints the debug string &quot;ScenarioFlag BackupGameMode %d&quot; with the game mode.
+    </span><span class="kw">pub fn </span>scenario_flag_backup(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::ScenarioFlagBackup() }
     }
 
-    <span class="doccomment">/// Gets the language type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the value backing the special LANGUAGE_TYPE script variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_language_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetLanguageType</span>() }
+    <span class="doccomment">/// Gets the language type.
+    ///
+    /// This is the value backing the special LANGUAGE_TYPE script variable.
+    </span><span class="kw">pub fn </span>get_language_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::GetLanguageType() }
     }
 
-    <span class="doccomment">/// Returns the current value of the NOTIFY_NOTE script variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_notify_note</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetNotifyNote</span>() &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Returns the current value of the NOTIFY_NOTE script variable.
+    </span><span class="kw">pub fn </span>get_notify_note(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::GetNotifyNote() &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Sets the current value of the NOTIFY_NOTE script variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_notify_note</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetNotifyNote</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+    <span class="doccomment">/// Sets the current value of the NOTIFY_NOTE script variable.
+    </span><span class="kw">pub fn </span>set_notify_note(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) {
+        <span class="kw">unsafe </span>{ ffi::SetNotifyNote(value <span class="kw">as </span>ffi::bool_) }
     }
 
-    <span class="doccomment">/// Gets the value of the GAME_MODE script variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_game_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetGameMode</span>() }
+    <span class="doccomment">/// Gets the value of the GAME_MODE script variable.
+    </span><span class="kw">pub fn </span>get_game_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::GetGameMode() }
     }
 
-    <span class="doccomment">/// Gets the special episode type from the SPECIAL_EPISODE_TYPE script variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_special_episode_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetSpecialEpisodeType</span>() }
+    <span class="doccomment">/// Gets the special episode type from the SPECIAL_EPISODE_TYPE script variable.
+    </span><span class="kw">pub fn </span>get_special_episode_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::GetSpecialEpisodeType() }
     }
 }
 
-<span class="doccomment">/// Reference to a global script variable, see [`ScriptVariableRead`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">script_var_catalog::Type</span>, <span class="ident">PhantomData</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()&gt;);
+<span class="doccomment">/// Reference to a global script variable, see [`ScriptVariableRead`].
+</span><span class="kw">pub struct </span>GlobalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt;(script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
-<span class="doccomment">/// Mutable reference to a global script variable, see</span>
-<span class="doccomment">/// [`ScriptVariableRead`] and [`ScriptVariableWrite`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="ident">script_var_catalog::Type</span>, <span class="ident">PhantomData</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()&gt;);
+<span class="doccomment">/// Mutable reference to a global script variable, see
+/// [`ScriptVariableRead`] and [`ScriptVariableWrite`].
+</span><span class="kw">pub struct </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
-<span class="doccomment">/// Reference to a local script variable, see [`ScriptVariableRead`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">script_var_catalog::Type</span>, <span class="ident">PhantomData</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()&gt;);
+<span class="doccomment">/// Reference to a local script variable, see [`ScriptVariableRead`].
+</span><span class="kw">pub struct </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
-<span class="doccomment">/// Mutable reference to a local script variable, see</span>
-<span class="doccomment">/// [`ScriptVariableRead`] and [`ScriptVariableWrite`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">script_var_catalog::Type</span>, <span class="ident">PhantomData</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()&gt;);
+<span class="doccomment">/// Mutable reference to a local script variable, see
+/// [`ScriptVariableRead`] and [`ScriptVariableWrite`].
+</span><span class="kw">pub struct </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
-<span class="doccomment">/// Read actions for script variables.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::not_unsafe_ptr_arg_deref</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ScriptVariableRead</span>: <span class="ident">PartialEq</span> + <span class="ident">Eq</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">internal_local_var_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span>;
+<span class="doccomment">/// Read actions for script variables.
+</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
+<span class="kw">pub trait </span>ScriptVariableRead: PartialEq + Eq {
+    <span class="attribute">#[doc(hidden)]</span>
+    <span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void;
 
-    <span class="doccomment">/// Returns the variable ID</span>
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">script_var_catalog::Type</span>;
+    <span class="doccomment">/// Returns the variable ID
+    </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; script_var_catalog::Type;
 
-    <span class="doccomment">/// Loads a script variable descriptor for a given ID.</span>
-    <span class="kw">fn</span> <span class="ident">descriptor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ffi::script_var</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> = <span class="ident">ffi::script_var_desc</span> {
-            <span class="ident">desc</span>: <span class="ident">ptr::null_mut</span>(),
-            <span class="ident">value</span>: <span class="ident">ptr::null_mut</span>(),
+    <span class="doccomment">/// Loads a script variable descriptor for a given ID.
+    </span><span class="kw">fn </span>descriptor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ffi::script_var {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = ffi::script_var_desc {
+            desc: ptr::null_mut(),
+            value: ptr::null_mut(),
         };
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::LoadScriptVariableRaw</span>(<span class="kw-2">&amp;mut</span> <span class="ident">out</span>, <span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>());
-            <span class="kw">let</span> <span class="ident">ffi::script_var_desc</span> { <span class="ident">desc</span>, .. } = <span class="ident">out</span>;
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">desc</span>
+        <span class="kw">unsafe </span>{
+            ffi::LoadScriptVariableRaw(<span class="kw-2">&amp;mut </span>out, <span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id());
+            <span class="kw">let </span>ffi::script_var_desc { desc, .. } = out;
+            <span class="kw-2">&amp;*</span>desc
         }
     }
 
-    <span class="doccomment">/// Returns whether or not this is a local variable</span>
-    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">is_local</span>(<span class="self">self</span>.<span class="ident">id</span>())
+    <span class="doccomment">/// Returns whether or not this is a local variable
+    </span><span class="kw">fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        is_local(<span class="self">self</span>.id())
     }
 
-    <span class="doccomment">/// Returns the type of the variable</span>
-    <span class="kw">fn</span> <span class="ident">var_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScriptVariableValueType</span> {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="ident">desc</span>.<span class="ident">type_</span>
-            .<span class="ident">val</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;The variable has a corrupted type.&quot;</span>)
+    <span class="doccomment">/// Returns the type of the variable
+    </span><span class="kw">fn </span>var_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableValueType {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        desc.type_
+            .val()
+            .try_into()
+            .expect(<span class="string">&quot;The variable has a corrupted type.&quot;</span>)
     }
 
-    <span class="doccomment">/// Returns whether or not the variable is an array.</span>
-    <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">capacity</span>() &gt; <span class="number">1</span>
+    <span class="doccomment">/// Returns whether or not the variable is an array.
+    </span><span class="kw">fn </span>is_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.capacity() &gt; <span class="number">1
+    </span>}
+
+    <span class="doccomment">/// Returns the number of elements in the array or 1 if it&#39;s not an array.
+    </span><span class="kw">fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        desc.n_values <span class="kw">as </span>usize
     }
 
-    <span class="doccomment">/// Returns the number of elements in the array or 1 if it&#39;s not an array.</span>
-    <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="ident">desc</span>.<span class="ident">n_values</span> <span class="kw">as</span> <span class="ident">usize</span>
-    }
-
-    <span class="doccomment">/// Returns the name of the variable.</span>
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">c_str</span> = <span class="ident">CStr::from_ptr</span>(<span class="ident">desc</span>.<span class="ident">name</span>);
-            <span class="ident">c_str</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Returns the name of the variable.
+    </span><span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>c_str = CStr::from_ptr(desc.name);
+            c_str.to_str().unwrap()
         }
     }
 
-    <span class="doccomment">/// Loads the value of a script variable. If this variable is an array, the value at index 0</span>
-    <span class="doccomment">/// is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return the value of the variable as a `i32`, no matter the type of the variable.</span>
-    <span class="kw">fn</span> <span class="ident">value_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::LoadScriptVariableValue</span>(<span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>()) }
+    <span class="doccomment">/// Loads the value of a script variable. If this variable is an array, the value at index 0
+    /// is returned.
+    ///
+    /// This will return the value of the variable as a `i32`, no matter the type of the variable.
+    </span><span class="kw">fn </span>value_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::LoadScriptVariableValue(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id()) }
     }
 
-    <span class="doccomment">/// Loads the value of a script variable at some index (for script variables that are arrays).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return the value of the variable as a `i32`, no matter the type of the variable.</span>
-    <span class="kw">fn</span> <span class="ident">value_raw_indexed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::LoadScriptVariableValueAtIndex</span>(<span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">index</span>)
+    <span class="doccomment">/// Loads the value of a script variable at some index (for script variables that are arrays).
+    ///
+    /// This will return the value of the variable as a `i32`, no matter the type of the variable.
+    </span><span class="kw">fn </span>value_raw_indexed(<span class="kw-2">&amp;</span><span class="self">self</span>, index: i32) -&gt; i32 {
+        <span class="kw">unsafe </span>{
+            ffi::LoadScriptVariableValueAtIndex(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id(), index)
         }
     }
 
-    <span class="doccomment">/// Loads the value of a script variable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this variable is an array, the value at index 0 is returned.</span>
-    <span class="doccomment">/// Special case: If the type is a string, the entire string is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return the value of the variable as an enum variant of [`ScriptVariableValue`],</span>
-    <span class="doccomment">/// the variant will depend on the type of this variable. You can get the type with</span>
-    <span class="doccomment">/// [`Self::var_type`] and force a cast with that:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use eos_rs::api::script_vars::{ScriptVariableRead, UnwrapScriptVariableValueAs};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn demo(script_var: impl ScriptVariableRead) {</span>
-    <span class="doccomment">///     // Assuming that `script_var` is a boolean variable. If it isn&#39;t, this will panic.</span>
-    <span class="doccomment">///     let value: bool = script_var.value().unwrap_as(script_var.var_type());</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScriptVariableValue</span> {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="kw">let</span> <span class="ident">typ</span>: <span class="ident">ScriptVariableValueType</span> = <span class="ident">desc</span>
-            .<span class="ident">type_</span>
-            .<span class="ident">val</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">capacity</span> = <span class="ident">desc</span>.<span class="ident">n_values</span> <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">match</span> <span class="ident">typ</span> {
-            <span class="ident">ScriptVariableValueType::None</span> =&gt; <span class="ident">ScriptVariableValue::None</span>,
-            <span class="ident">ScriptVariableValueType::Bit</span> =&gt; <span class="ident">ScriptVariableValue::Bit</span>(<span class="self">self</span>.<span class="ident">value_raw</span>() &gt; <span class="number">0</span>),
-            <span class="ident">ScriptVariableValueType::String</span> =&gt; <span class="kw">unsafe</span> {
-                <span class="ident">ScriptVariableValue::String</span>(<span class="ident">CString::from_vec_unchecked</span>(
-                    (<span class="number">0</span>..<span class="ident">capacity</span>)
-                        .<span class="ident">map</span>(|<span class="ident">i</span>| <span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">i</span>) <span class="kw">as</span> <span class="ident">u8</span>)
-                        .<span class="ident">collect</span>::&lt;<span class="ident">Vec</span>&lt;<span class="ident">u8</span>&gt;&gt;(),
+    <span class="doccomment">/// Loads the value of a script variable.
+    ///
+    /// If this variable is an array, the value at index 0 is returned.
+    /// Special case: If the type is a string, the entire string is returned.
+    ///
+    /// This will return the value of the variable as an enum variant of [`ScriptVariableValue`],
+    /// the variant will depend on the type of this variable. You can get the type with
+    /// [`Self::var_type`] and force a cast with that:
+    ///
+    /// ```
+    /// use eos_rs::api::script_vars::{ScriptVariableRead, UnwrapScriptVariableValueAs};
+    ///
+    /// fn demo(script_var: impl ScriptVariableRead) {
+    ///     // Assuming that `script_var` is a boolean variable. If it isn&#39;t, this will panic.
+    ///     let value: bool = script_var.value().unwrap_as(script_var.var_type());
+    /// }
+    /// ```
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableValue {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        <span class="kw">let </span>typ: ScriptVariableValueType = desc
+            .type_
+            .val()
+            .try_into()
+            .expect(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
+        <span class="kw">let </span>capacity = desc.n_values <span class="kw">as </span>i32;
+        <span class="kw">match </span>typ {
+            ScriptVariableValueType::None =&gt; ScriptVariableValue::None,
+            ScriptVariableValueType::Bit =&gt; ScriptVariableValue::Bit(<span class="self">self</span>.value_raw() &gt; <span class="number">0</span>),
+            ScriptVariableValueType::String =&gt; <span class="kw">unsafe </span>{
+                ScriptVariableValue::String(CString::from_vec_unchecked(
+                    (<span class="number">0</span>..capacity)
+                        .map(|i| <span class="self">self</span>.value_raw_indexed(i) <span class="kw">as </span>u8)
+                        .collect::&lt;Vec&lt;u8&gt;&gt;(),
                 ))
             },
-            <span class="ident">ScriptVariableValueType::U8</span> =&gt; <span class="ident">ScriptVariableValue::U8</span>(<span class="self">self</span>.<span class="ident">value_raw</span>() <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">ScriptVariableValueType::U16</span> =&gt; <span class="ident">ScriptVariableValue::U16</span>(<span class="self">self</span>.<span class="ident">value_raw</span>() <span class="kw">as</span> <span class="ident">u16</span>),
-            <span class="ident">ScriptVariableValueType::U32</span> =&gt; <span class="ident">ScriptVariableValue::U32</span>(<span class="self">self</span>.<span class="ident">value_raw</span>() <span class="kw">as</span> <span class="ident">u32</span>),
-            <span class="ident">ScriptVariableValueType::I8</span> =&gt; <span class="ident">ScriptVariableValue::I8</span>(<span class="self">self</span>.<span class="ident">value_raw</span>() <span class="kw">as</span> <span class="ident">i8</span>),
-            <span class="ident">ScriptVariableValueType::I16</span> =&gt; <span class="ident">ScriptVariableValue::I16</span>(<span class="self">self</span>.<span class="ident">value_raw</span>() <span class="kw">as</span> <span class="ident">i16</span>),
-            <span class="ident">ScriptVariableValueType::I32</span> =&gt; <span class="ident">ScriptVariableValue::I32</span>(<span class="self">self</span>.<span class="ident">value_raw</span>()),
-            <span class="ident">ScriptVariableValueType::Special</span> =&gt; <span class="ident">ScriptVariableValue::Special</span>(<span class="self">self</span>.<span class="ident">value_raw</span>()),
+            ScriptVariableValueType::U8 =&gt; ScriptVariableValue::U8(<span class="self">self</span>.value_raw() <span class="kw">as </span>u8),
+            ScriptVariableValueType::U16 =&gt; ScriptVariableValue::U16(<span class="self">self</span>.value_raw() <span class="kw">as </span>u16),
+            ScriptVariableValueType::U32 =&gt; ScriptVariableValue::U32(<span class="self">self</span>.value_raw() <span class="kw">as </span>u32),
+            ScriptVariableValueType::I8 =&gt; ScriptVariableValue::I8(<span class="self">self</span>.value_raw() <span class="kw">as </span>i8),
+            ScriptVariableValueType::I16 =&gt; ScriptVariableValue::I16(<span class="self">self</span>.value_raw() <span class="kw">as </span>i16),
+            ScriptVariableValueType::I32 =&gt; ScriptVariableValue::I32(<span class="self">self</span>.value_raw()),
+            ScriptVariableValueType::Special =&gt; ScriptVariableValue::Special(<span class="self">self</span>.value_raw()),
         }
     }
 
-    <span class="doccomment">/// Loads the value of a script variable at some index (for script variables that are arrays).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the read is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Special case: If the type is a string, the character at the given position is returned</span>
-    <span class="doccomment">/// (but still as a valid single-character CString).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return the value of the variable as an enum variant of `ScriptVariableValue`,</span>
-    <span class="doccomment">/// see [`Self::value`] for more information.</span>
-    <span class="kw">fn</span> <span class="ident">value_indexed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>) -&gt; <span class="ident">ScriptVariableValue</span> {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="kw">let</span> <span class="ident">typ</span> = <span class="ident">desc</span>
-            .<span class="ident">type_</span>
-            .<span class="ident">val</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">capacity</span> = <span class="ident">desc</span>.<span class="ident">n_values</span>;
-        <span class="macro">assert!</span>(<span class="ident">index</span> &lt;= <span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="string">&quot;Out-of-bounds.&quot;</span>);
-        <span class="kw">match</span> <span class="ident">typ</span> {
-            <span class="ident">ScriptVariableValueType::None</span> =&gt; <span class="ident">ScriptVariableValue::None</span>,
-            <span class="ident">ScriptVariableValueType::Bit</span> =&gt; {
-                <span class="ident">ScriptVariableValue::Bit</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) &gt; <span class="number">0</span>)
+    <span class="doccomment">/// Loads the value of a script variable at some index (for script variables that are arrays).
+    ///
+    /// Panics if the read is out of bounds.
+    ///
+    /// Special case: If the type is a string, the character at the given position is returned
+    /// (but still as a valid single-character CString).
+    ///
+    /// This will return the value of the variable as an enum variant of `ScriptVariableValue`,
+    /// see [`Self::value`] for more information.
+    </span><span class="kw">fn </span>value_indexed(<span class="kw-2">&amp;</span><span class="self">self</span>, index: i32) -&gt; ScriptVariableValue {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        <span class="kw">let </span>typ = desc
+            .type_
+            .val()
+            .try_into()
+            .expect(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
+        <span class="kw">let </span>capacity = desc.n_values;
+        <span class="macro">assert!</span>(index &lt;= capacity <span class="kw">as </span>i32, <span class="string">&quot;Out-of-bounds.&quot;</span>);
+        <span class="kw">match </span>typ {
+            ScriptVariableValueType::None =&gt; ScriptVariableValue::None,
+            ScriptVariableValueType::Bit =&gt; {
+                ScriptVariableValue::Bit(<span class="self">self</span>.value_raw_indexed(index) &gt; <span class="number">0</span>)
             }
-            <span class="ident">ScriptVariableValueType::String</span> =&gt; <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">val</span> = <span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-                <span class="kw">if</span> <span class="ident">val</span> == <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="ident">ScriptVariableValue::String</span>(<span class="ident">CString::default</span>());
+            ScriptVariableValueType::String =&gt; <span class="kw">unsafe </span>{
+                <span class="kw">let </span>val = <span class="self">self</span>.value_raw_indexed(index) <span class="kw">as </span>u8;
+                <span class="kw">if </span>val == <span class="number">0 </span>{
+                    <span class="kw">return </span>ScriptVariableValue::String(CString::default());
                 }
-                <span class="ident">ScriptVariableValue::String</span>(<span class="ident">CString::from_vec_with_nul_unchecked</span>(<span class="macro">vec!</span>[<span class="ident">val</span>, <span class="number">0</span>]))
+                ScriptVariableValue::String(CString::from_vec_with_nul_unchecked(<span class="macro">vec!</span>[val, <span class="number">0</span>]))
             },
-            <span class="ident">ScriptVariableValueType::U8</span> =&gt; {
-                <span class="ident">ScriptVariableValue::U8</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) <span class="kw">as</span> <span class="ident">u8</span>)
+            ScriptVariableValueType::U8 =&gt; {
+                ScriptVariableValue::U8(<span class="self">self</span>.value_raw_indexed(index) <span class="kw">as </span>u8)
             }
-            <span class="ident">ScriptVariableValueType::U16</span> =&gt; {
-                <span class="ident">ScriptVariableValue::U16</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) <span class="kw">as</span> <span class="ident">u16</span>)
+            ScriptVariableValueType::U16 =&gt; {
+                ScriptVariableValue::U16(<span class="self">self</span>.value_raw_indexed(index) <span class="kw">as </span>u16)
             }
-            <span class="ident">ScriptVariableValueType::U32</span> =&gt; {
-                <span class="ident">ScriptVariableValue::U32</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) <span class="kw">as</span> <span class="ident">u32</span>)
+            ScriptVariableValueType::U32 =&gt; {
+                ScriptVariableValue::U32(<span class="self">self</span>.value_raw_indexed(index) <span class="kw">as </span>u32)
             }
-            <span class="ident">ScriptVariableValueType::I8</span> =&gt; {
-                <span class="ident">ScriptVariableValue::I8</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) <span class="kw">as</span> <span class="ident">i8</span>)
+            ScriptVariableValueType::I8 =&gt; {
+                ScriptVariableValue::I8(<span class="self">self</span>.value_raw_indexed(index) <span class="kw">as </span>i8)
             }
-            <span class="ident">ScriptVariableValueType::I16</span> =&gt; {
-                <span class="ident">ScriptVariableValue::I16</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>) <span class="kw">as</span> <span class="ident">i16</span>)
+            ScriptVariableValueType::I16 =&gt; {
+                ScriptVariableValue::I16(<span class="self">self</span>.value_raw_indexed(index) <span class="kw">as </span>i16)
             }
-            <span class="ident">ScriptVariableValueType::I32</span> =&gt; <span class="ident">ScriptVariableValue::I32</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>)),
-            <span class="ident">ScriptVariableValueType::Special</span> =&gt; {
-                <span class="ident">ScriptVariableValue::Special</span>(<span class="self">self</span>.<span class="ident">value_raw_indexed</span>(<span class="ident">index</span>))
+            ScriptVariableValueType::I32 =&gt; ScriptVariableValue::I32(<span class="self">self</span>.value_raw_indexed(index)),
+            ScriptVariableValueType::Special =&gt; {
+                ScriptVariableValue::Special(<span class="self">self</span>.value_raw_indexed(index))
             }
         }
     }
 
-    <span class="doccomment">/// Loads the sum of all values of the script variable (for script variables that are</span>
-    <span class="doccomment">/// arrays).</span>
-    <span class="kw">fn</span> <span class="ident">sum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::LoadScriptVariableValueSum</span>(<span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>()) }
+    <span class="doccomment">/// Loads the sum of all values of the script variable (for script variables that are
+    /// arrays).
+    </span><span class="kw">fn </span>sum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::LoadScriptVariableValueSum(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id()) }
     }
 
-    <span class="doccomment">/// Checks if two script variables have equal values. For arrays, compares elementwise for the</span>
-    <span class="doccomment">/// length of the first variable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Hint: Implementors of this trait also implement `PartialEq` and `Eq`, so you can use those</span>
-    <span class="doccomment">/// instead if the underlying type is the same.</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other_id</span>: <span class="ident">script_var_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="ident">is_local</span>(<span class="self">self</span>.<span class="ident">id</span>()) != (<span class="ident">is_local</span>(<span class="ident">other_id</span>)) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Checks if two script variables have equal values. For arrays, compares elementwise for the
+    /// length of the first variable.
+    ///
+    /// Hint: Implementors of this trait also implement `PartialEq` and `Eq`, so you can use those
+    /// instead if the underlying type is the same.
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other_id: script_var_catalog::Type) -&gt; bool {
+        <span class="kw">if </span>is_local(<span class="self">self</span>.id()) != (is_local(other_id)) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::ScriptVariablesEqual</span>(<span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">other_id</span>) &gt; <span class="number">0</span>
-        }
+        <span class="kw">unsafe </span>{
+            ffi::ScriptVariablesEqual(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id(), other_id) &gt; <span class="number">0
+        </span>}
     }
 }
 
-<span class="doccomment">/// Write actions for script variables.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::not_unsafe_ptr_arg_deref</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ScriptVariableWrite</span>: <span class="ident">ScriptVariableRead</span> {
-    <span class="doccomment">/// Zero-initialize the values of the given script variable.</span>
-    <span class="kw">fn</span> <span class="ident">zero_init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">var_id</span>: <span class="ident">script_var_catalog::Type</span>) {
-        <span class="macro">assert!</span>(<span class="ident">var_id</span> &lt; <span class="ident">script_var_catalog::VAR_LOCAL0</span>);
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ZinitScriptVariable</span>(<span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>()) }
+<span class="doccomment">/// Write actions for script variables.
+</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
+<span class="kw">pub trait </span>ScriptVariableWrite: ScriptVariableRead {
+    <span class="doccomment">/// Zero-initialize the values of the given script variable.
+    </span><span class="kw">fn </span>zero_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, var_id: script_var_catalog::Type) {
+        <span class="macro">assert!</span>(var_id &lt; script_var_catalog::VAR_LOCAL0);
+        <span class="kw">unsafe </span>{ ffi::ZinitScriptVariable(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id()) }
     }
 
-    <span class="doccomment">/// Writes the given value to a script variable.</span>
-    <span class="kw">fn</span> <span class="ident">write_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i32</span>) {
-        <span class="comment">// SAFETY: The game makes sure the value fits.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SaveScriptVariableValue</span>(<span class="self">self</span>.<span class="ident">internal_local_var_table</span>(), <span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">value</span>) }
+    <span class="doccomment">/// Writes the given value to a script variable.
+    </span><span class="kw">fn </span>write_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i32) {
+        <span class="comment">// SAFETY: The game makes sure the value fits.
+        </span><span class="kw">unsafe </span>{ ffi::SaveScriptVariableValue(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id(), value) }
     }
 
-    <span class="doccomment">/// Writes the given value to a script variable at the given index (if this is an array).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the write is out of bounds.</span>
-    <span class="kw">fn</span> <span class="ident">write_raw_indexed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>, <span class="ident">value</span>: <span class="ident">i32</span>) {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="kw">let</span> <span class="ident">capacity</span> = <span class="ident">desc</span>.<span class="ident">n_values</span>;
-        <span class="macro">assert!</span>(<span class="ident">index</span> &lt;= <span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="string">&quot;Out-of-bounds.&quot;</span>);
-        <span class="comment">// SAFETY: We make sure the variable in an array, the index is in bound &amp; the game makes sure the value fits.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::SaveScriptVariableValueAtIndex</span>(
-                <span class="self">self</span>.<span class="ident">internal_local_var_table</span>(),
-                <span class="self">self</span>.<span class="ident">id</span>(),
-                <span class="ident">index</span>,
-                <span class="ident">value</span>,
+    <span class="doccomment">/// Writes the given value to a script variable at the given index (if this is an array).
+    ///
+    /// Panics if the write is out of bounds.
+    </span><span class="kw">fn </span>write_raw_indexed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: i32, value: i32) {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        <span class="kw">let </span>capacity = desc.n_values;
+        <span class="macro">assert!</span>(index &lt;= capacity <span class="kw">as </span>i32, <span class="string">&quot;Out-of-bounds.&quot;</span>);
+        <span class="comment">// SAFETY: We make sure the variable in an array, the index is in bound &amp; the game makes sure the value fits.
+        </span><span class="kw">unsafe </span>{
+            ffi::SaveScriptVariableValueAtIndex(
+                <span class="self">self</span>.internal_local_var_table(),
+                <span class="self">self</span>.id(),
+                index,
+                value,
             )
         }
     }
 
-    <span class="doccomment">/// Writes the given value to a script variable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this is an array, it&#39;s written to position 0.</span>
-    <span class="doccomment">/// Special case: If the type is a string, the entire string is written. Panics if the string</span>
-    <span class="doccomment">/// would overflow the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the value type doesn&#39;t match, this panics.</span>
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">ScriptVariableValue</span>) {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="kw">let</span> <span class="ident">typ</span> = <span class="ident">desc</span>
-            .<span class="ident">type_</span>
-            .<span class="ident">val</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
+    <span class="doccomment">/// Writes the given value to a script variable.
+    ///
+    /// If this is an array, it&#39;s written to position 0.
+    /// Special case: If the type is a string, the entire string is written. Panics if the string
+    /// would overflow the array.
+    ///
+    /// If the value type doesn&#39;t match, this panics.
+    </span><span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: ScriptVariableValue) {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        <span class="kw">let </span>typ = desc
+            .type_
+            .val()
+            .try_into()
+            .expect(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">value</span>.<span class="ident">var_type</span>(),
-            <span class="ident">typ</span>,
-            <span class="string">&quot;The type of the value to write doesn&#39;t match the variable&#39;s type.&quot;</span>
-        );
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScriptVariableValue::String</span>(<span class="ident">value</span>) = <span class="ident">value</span> {
-            <span class="kw">let</span> <span class="ident">value</span> = <span class="ident">value</span>.<span class="ident">as_bytes</span>();
-            <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">len</span>() &gt; <span class="ident">desc</span>.<span class="ident">n_values</span> <span class="kw">as</span> <span class="ident">usize</span> {
+            value.var_type(),
+            typ,
+            <span class="string">&quot;The type of the value to write doesn&#39;t match the variable&#39;s type.&quot;
+        </span>);
+        <span class="kw">if let </span>ScriptVariableValue::String(value) = value {
+            <span class="kw">let </span>value = value.as_bytes();
+            <span class="kw">if </span>value.len() &gt; desc.n_values <span class="kw">as </span>usize {
                 <span class="macro">panic!</span>(<span class="string">&quot;The string to write to the variable is too long.&quot;</span>);
             }
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                <span class="self">self</span>.<span class="ident">write_raw_indexed</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="kw-2">*</span><span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>)
+            <span class="kw">for </span>(i, b) <span class="kw">in </span>value.iter().enumerate() {
+                <span class="self">self</span>.write_raw_indexed(i <span class="kw">as </span>i32, <span class="kw-2">*</span>b <span class="kw">as </span>i32)
             }
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">write_raw</span>(<span class="ident">value</span>.<span class="ident">as_raw</span>())
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.write_raw(value.as_raw())
         }
     }
 
-    <span class="doccomment">/// Writes to the given variable as if it were a scenario variable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// You must make sure yourself that this variable is a scenario variable. No bounds or type</span>
-    <span class="doccomment">/// checking is done.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_as_scenario</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value1</span>: <span class="ident">u8</span>, <span class="ident">value2</span>: <span class="ident">u8</span>) {
-        <span class="ident">ffi::SetScenarioScriptVar</span>(<span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">value1</span>, <span class="ident">value2</span>)
+    <span class="doccomment">/// Writes to the given variable as if it were a scenario variable.
+    ///
+    /// # Safety
+    /// You must make sure yourself that this variable is a scenario variable. No bounds or type
+    /// checking is done.
+    </span><span class="kw">unsafe fn </span>write_as_scenario(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value1: u8, value2: u8) {
+        ffi::SetScenarioScriptVar(<span class="self">self</span>.id(), value1, value2)
     }
 
-    <span class="doccomment">/// Writes the given value to a script variable (if this is an array).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the write is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the value type doesn&#39;t match, this panics.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For string type variables, the input value must be a valid single-character CString.</span>
-    <span class="doccomment">/// Only the character at the specified index is changed.</span>
-    <span class="kw">fn</span> <span class="ident">write_indexed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>, <span class="ident">value</span>: <span class="ident">ScriptVariableValue</span>) {
-        <span class="kw">let</span> <span class="ident">desc</span> = <span class="self">self</span>.<span class="ident">descriptor</span>();
-        <span class="kw">let</span> <span class="ident">typ</span> = <span class="ident">desc</span>
-            .<span class="ident">type_</span>
-            .<span class="ident">val</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
+    <span class="doccomment">/// Writes the given value to a script variable (if this is an array).
+    ///
+    /// Panics if the write is out of bounds.
+    ///
+    /// If the value type doesn&#39;t match, this panics.
+    ///
+    /// For string type variables, the input value must be a valid single-character CString.
+    /// Only the character at the specified index is changed.
+    </span><span class="kw">fn </span>write_indexed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: i32, value: ScriptVariableValue) {
+        <span class="kw">let </span>desc = <span class="self">self</span>.descriptor();
+        <span class="kw">let </span>typ = desc
+            .type_
+            .val()
+            .try_into()
+            .expect(<span class="string">&quot;The variable has a corrupted type.&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">value</span>.<span class="ident">var_type</span>(),
-            <span class="ident">typ</span>,
-            <span class="string">&quot;The type of the value to write doesn&#39;t match the variable&#39;s type.&quot;</span>
-        );
-        <span class="kw">let</span> <span class="ident">capacity</span> = <span class="ident">desc</span>.<span class="ident">n_values</span>;
-        <span class="macro">assert!</span>(<span class="ident">index</span> &lt;= <span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="string">&quot;Out-of-bounds.&quot;</span>);
-        <span class="self">self</span>.<span class="ident">write_raw_indexed</span>(<span class="ident">index</span>, <span class="ident">value</span>.<span class="ident">as_raw</span>())
+            value.var_type(),
+            typ,
+            <span class="string">&quot;The type of the value to write doesn&#39;t match the variable&#39;s type.&quot;
+        </span>);
+        <span class="kw">let </span>capacity = desc.n_values;
+        <span class="macro">assert!</span>(index &lt;= capacity <span class="kw">as </span>i32, <span class="string">&quot;Out-of-bounds.&quot;</span>);
+        <span class="self">self</span>.write_raw_indexed(index, value.as_raw())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptVariablesEqual</span>(<span class="ident">ptr::null_mut</span>(), <span class="self">self</span>.<span class="number">0</span>, <span class="ident">other</span>.<span class="number">0</span>) &gt; <span class="number">0</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>GlobalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::ScriptVariablesEqual(ptr::null_mut(), <span class="self">self</span>.<span class="number">0</span>, other.<span class="number">0</span>) &gt; <span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Eq <span class="kw">for </span>GlobalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">ScriptVariableRead</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">internal_local_var_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span> {
-        <span class="ident">ptr::null_mut</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableRead <span class="kw">for </span>GlobalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void {
+        ptr::null_mut()
     }
 
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::ScriptVariablesEqual(ptr::null_mut(), <span class="self">self</span>.<span class="number">0</span>, other.<span class="number">0</span>) &gt; <span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptVariablesEqual</span>(<span class="ident">ptr::null_mut</span>(), <span class="self">self</span>.<span class="number">0</span>, <span class="ident">other</span>.<span class="number">0</span>) &gt; <span class="number">0</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Eq <span class="kw">for </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableRead <span class="kw">for </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void {
+        ptr::null_mut()
     }
+
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">ScriptVariableRead</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">internal_local_var_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span> {
-        <span class="ident">ptr::null_mut</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">ScriptVariableWrite</span> <span class="kw">for</span> <span class="ident">GlobalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::not_unsafe_ptr_arg_deref</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> != <span class="ident">other</span>.<span class="number">0</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= other.<span class="number">0 </span>{
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptVariablesEqual</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>, <span class="ident">other</span>.<span class="number">1</span>) &gt; <span class="number">0</span> }
+        <span class="kw">unsafe </span>{ ffi::ScriptVariablesEqual(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>, other.<span class="number">1</span>) &gt; <span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Eq <span class="kw">for </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">ScriptVariableRead</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">internal_local_var_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableRead <span class="kw">for </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span> {
-        <span class="self">self</span>.<span class="number">1</span>
-    }
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+        <span class="self">self</span>.<span class="number">1
+    </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::not_unsafe_ptr_arg_deref</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> != <span class="ident">other</span>.<span class="number">0</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= other.<span class="number">0 </span>{
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptVariablesEqual</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>, <span class="ident">other</span>.<span class="number">1</span>) &gt; <span class="number">0</span> }
+        <span class="kw">unsafe </span>{ ffi::ScriptVariablesEqual(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>, other.<span class="number">1</span>) &gt; <span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Eq <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">ScriptVariableRead</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">internal_local_var_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableRead <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span> {
-        <span class="self">self</span>.<span class="number">1</span>
-    }
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+        <span class="self">self</span>.<span class="number">1
+    </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">ScriptVariableWrite</span> <span class="kw">for</span> <span class="ident">LocalScriptVariableMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">is_local</span>(<span class="ident">var_id</span>: <span class="ident">script_var_catalog::Type</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">var_id</span> &gt;= <span class="ident">script_var_catalog::VAR_LOCAL0</span>
+<span class="attribute">#[inline(always)]</span>
+<span class="kw">fn </span>is_local(var_id: script_var_catalog::Type) -&gt; bool {
+    var_id &gt;= script_var_catalog::VAR_LOCAL0
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

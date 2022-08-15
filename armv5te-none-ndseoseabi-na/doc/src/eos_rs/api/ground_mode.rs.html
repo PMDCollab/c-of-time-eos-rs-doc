@@ -201,208 +201,208 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Traits, structs and functions related to ground mode.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Traits, structs and functions related to ground mode.
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span> <span class="comment">// for easier reference in the docs of script_special_process_call</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::gameplay</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span> <span class="comment">// for easier reference in the docs of script_special_process_call</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::special_process_catalog</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay</span>::{<span class="ident">CreatableWithLease</span>, <span class="ident">OverlayLoadLease</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+</span><span class="attribute">#[allow(unused_imports)]</span> <span class="comment">// for easier reference in the docs of script_special_process_call
+</span><span class="kw">use </span><span class="kw">crate</span>::api::gameplay;
+<span class="attribute">#[allow(unused_imports)]</span> <span class="comment">// for easier reference in the docs of script_special_process_call
+</span><span class="kw">use </span><span class="kw">crate</span>::api::objects::special_process_catalog::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::overlay::{CreatableWithLease, OverlayLoadLease};
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="doccomment">/// Misc. and general ground mode functions, guarded by this struct.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroundModeContext</span>(<span class="ident">OverlayLoadLease</span>&lt;<span class="number">11</span>&gt;);
+<span class="doccomment">/// Misc. and general ground mode functions, guarded by this struct.
+</span><span class="kw">pub struct </span>GroundModeContext(OverlayLoadLease&lt;<span class="number">11</span>&gt;);
 
-<span class="kw">impl</span> <span class="ident">CreatableWithLease</span>&lt;<span class="number">11</span>&gt; <span class="kw">for</span> <span class="ident">GroundModeContext</span> {
-    <span class="kw">fn</span> <span class="ident">_create</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">11</span>&gt;) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">lease</span>)
+<span class="kw">impl </span>CreatableWithLease&lt;<span class="number">11</span>&gt; <span class="kw">for </span>GroundModeContext {
+    <span class="kw">fn </span>_create(lease: OverlayLoadLease&lt;<span class="number">11</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(lease)
     }
 
-    <span class="kw">fn</span> <span class="ident">lease</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">11</span>&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="kw">fn </span>lease(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">11</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">GroundModeContext</span> {
-    <span class="doccomment">/// Processes calls to the [`script_opcode_catalog::OPCODE_PROCESS_SPECIAL`] script opcode.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns result value of the special process if it has one, otherwise 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Some built-in special processes include:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_KEY_WAIT_INIT`] : [`gameplay::key_wait_init`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_IS_BAG_FULL`] : [`gameplay::is_bag_full`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_COUNT_ITEM_TYPE_IN_BAG`] : [`gameplay::count_item_type_in_bag`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_ADD_ITEM_TO_BAG`] : [`gameplay::add_item_to_bag`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x39`] : [`gameplay::is_storage_full`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_COUNT_ITEM_TYPE_IN_STORAGE`] : [`gameplay::count_item_type_in_storage`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x2A`] : [`gameplay::remove_items_type_in_storage`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_ADD_ITEM_TO_STORAGE`] : [`gameplay::add_item_to_storage`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_INIT_MAIN_TEAM_AFTER_QUIZ`] : [`gameplay::init_main_team_after_quiz`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x3`] : [`gameplay::script_special_process_3`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x4`] : [`gameplay::script_special_process_4`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x3A`] : [`gameplay::AdventureLog::increment_number_dungeons_cleared`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x3B`] : [`gameplay::AdventureLog::increment_number_of_big_treasure_wins`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_SEND_SKY_GIFT_TO_GUILDMASTER`] : [`gameplay::AdventureLog::increment_number_of_gifts_sent`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_SET_TEAM_SETUP_HERO_AND_PARTNER_ONLY`] : [`gameplay::set_team_setup`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_SET_TEAM_SETUP_HERO_ONLY`] : [`gameplay::set_team_setup`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_IS_TEAM_SETUP_SOLO`] : [`gameplay::count_party_members`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_GET_SOS_MAIL_COUNT`] : [`gameplay::get_sos_mail_count`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_DUNGEON_HAD_REQUEST_DONE`] : [`gameplay::dungeon_had_request_done`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x3D`] : [`gameplay::script_special_process_x3d`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x3E`] : [`gameplay::script_special_process_x3e`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x17`] : [`gameplay::script_special_process_x17`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_COUNT_TABLE_ITEM_TYPE_IN_BAG`] : [`gameplay::item_at_table_idx`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_PREPARE_MENU_ACCEPT_TEAM_MEMBER`] : [`Self::prepare_menu_accept_team_member`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_INIT_RANDOM_NPC_JOBS`] : [`Self::init_random_npc_jobs`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_GET_RANDOM_NPC_JOB_TYPE`] : [`Self::get_random_npc_job_type`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_GET_RANDOM_NPC_JOB_SUBTYPE`] : [`Self::get_random_npc_job_subtype`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_GET_RANDOM_NPC_JOB_STILL_AVAILABLE`] : [`Self::is_random_npc_job_still_available`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_ACCEPT_RANDOM_NPC_JOB`] : [`Self::accept_random_npc_job`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_RETURN_DUNGEON`] : [`Self::return_dungeon`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_NEXT_DAY`] : [`Self::next_day`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_JUMP_TO_TITLE_SCREEN`] : [`Self::jump_to_title_screen`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x1A`] : [`Self::jump_to_title_screen`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_RETURN_TO_TITLE_SCREEN`] : [`Self::return_to_title_screen`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_0x16`] : [`Self::script_special_process_x16`]</span>
-    <span class="doccomment">/// - [`SPECIAL_PROC_STATUS_UPDATE`] : [`Self::status_update`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `param_1` - some struct containing a callback of some sort, only used for special process ID 18</span>
-    <span class="doccomment">/// * `id`      - special process ID</span>
-    <span class="doccomment">/// * `arg1`    - first argument, if relevant? Probably corresponds to the second parameter of</span>
-    <span class="doccomment">///               [`script_opcode_catalog::OPCODE_PROCESS_SPECIAL`]</span>
-    <span class="doccomment">/// * `arg2`    - second argument, if relevant? Probably corresponds to the third parameter of</span>
-    <span class="doccomment">///               [`script_opcode_catalog::OPCODE_PROCESS_SPECIAL`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">script_special_process_call</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">param_1</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>,
-        <span class="ident">id</span>: <span class="ident">special_process_catalog::Type</span>,
-        <span class="ident">arg1</span>: <span class="ident">i32</span>,
-        <span class="ident">arg2</span>: <span class="ident">i32</span>,
-    ) -&gt; <span class="ident">i32</span> {
-        <span class="ident">ffi::ScriptSpecialProcessCall</span>(<span class="ident">param_1</span>, <span class="ident">id</span>, <span class="ident">arg1</span>, <span class="ident">arg2</span>)
+<span class="kw">impl </span>GroundModeContext {
+    <span class="doccomment">/// Processes calls to the [`script_opcode_catalog::OPCODE_PROCESS_SPECIAL`] script opcode.
+    ///
+    /// Returns result value of the special process if it has one, otherwise 0.
+    ///
+    /// Some built-in special processes include:
+    ///
+    /// - [`SPECIAL_PROC_KEY_WAIT_INIT`] : [`gameplay::key_wait_init`]
+    /// - [`SPECIAL_PROC_IS_BAG_FULL`] : [`gameplay::is_bag_full`]
+    /// - [`SPECIAL_PROC_COUNT_ITEM_TYPE_IN_BAG`] : [`gameplay::count_item_type_in_bag`]
+    /// - [`SPECIAL_PROC_ADD_ITEM_TO_BAG`] : [`gameplay::add_item_to_bag`]
+    /// - [`SPECIAL_PROC_0x39`] : [`gameplay::is_storage_full`]
+    /// - [`SPECIAL_PROC_COUNT_ITEM_TYPE_IN_STORAGE`] : [`gameplay::count_item_type_in_storage`]
+    /// - [`SPECIAL_PROC_0x2A`] : [`gameplay::remove_items_type_in_storage`]
+    /// - [`SPECIAL_PROC_ADD_ITEM_TO_STORAGE`] : [`gameplay::add_item_to_storage`]
+    /// - [`SPECIAL_PROC_INIT_MAIN_TEAM_AFTER_QUIZ`] : [`gameplay::init_main_team_after_quiz`]
+    /// - [`SPECIAL_PROC_0x3`] : [`gameplay::script_special_process_3`]
+    /// - [`SPECIAL_PROC_0x4`] : [`gameplay::script_special_process_4`]
+    /// - [`SPECIAL_PROC_0x3A`] : [`gameplay::AdventureLog::increment_number_dungeons_cleared`]
+    /// - [`SPECIAL_PROC_0x3B`] : [`gameplay::AdventureLog::increment_number_of_big_treasure_wins`]
+    /// - [`SPECIAL_PROC_SEND_SKY_GIFT_TO_GUILDMASTER`] : [`gameplay::AdventureLog::increment_number_of_gifts_sent`]
+    /// - [`SPECIAL_PROC_SET_TEAM_SETUP_HERO_AND_PARTNER_ONLY`] : [`gameplay::set_team_setup`]
+    /// - [`SPECIAL_PROC_SET_TEAM_SETUP_HERO_ONLY`] : [`gameplay::set_team_setup`]
+    /// - [`SPECIAL_PROC_IS_TEAM_SETUP_SOLO`] : [`gameplay::count_party_members`]
+    /// - [`SPECIAL_PROC_GET_SOS_MAIL_COUNT`] : [`gameplay::get_sos_mail_count`]
+    /// - [`SPECIAL_PROC_DUNGEON_HAD_REQUEST_DONE`] : [`gameplay::dungeon_had_request_done`]
+    /// - [`SPECIAL_PROC_0x3D`] : [`gameplay::script_special_process_x3d`]
+    /// - [`SPECIAL_PROC_0x3E`] : [`gameplay::script_special_process_x3e`]
+    /// - [`SPECIAL_PROC_0x17`] : [`gameplay::script_special_process_x17`]
+    /// - [`SPECIAL_PROC_COUNT_TABLE_ITEM_TYPE_IN_BAG`] : [`gameplay::item_at_table_idx`]
+    /// - [`SPECIAL_PROC_PREPARE_MENU_ACCEPT_TEAM_MEMBER`] : [`Self::prepare_menu_accept_team_member`]
+    /// - [`SPECIAL_PROC_INIT_RANDOM_NPC_JOBS`] : [`Self::init_random_npc_jobs`]
+    /// - [`SPECIAL_PROC_GET_RANDOM_NPC_JOB_TYPE`] : [`Self::get_random_npc_job_type`]
+    /// - [`SPECIAL_PROC_GET_RANDOM_NPC_JOB_SUBTYPE`] : [`Self::get_random_npc_job_subtype`]
+    /// - [`SPECIAL_PROC_GET_RANDOM_NPC_JOB_STILL_AVAILABLE`] : [`Self::is_random_npc_job_still_available`]
+    /// - [`SPECIAL_PROC_ACCEPT_RANDOM_NPC_JOB`] : [`Self::accept_random_npc_job`]
+    /// - [`SPECIAL_PROC_RETURN_DUNGEON`] : [`Self::return_dungeon`]
+    /// - [`SPECIAL_PROC_NEXT_DAY`] : [`Self::next_day`]
+    /// - [`SPECIAL_PROC_JUMP_TO_TITLE_SCREEN`] : [`Self::jump_to_title_screen`]
+    /// - [`SPECIAL_PROC_0x1A`] : [`Self::jump_to_title_screen`]
+    /// - [`SPECIAL_PROC_RETURN_TO_TITLE_SCREEN`] : [`Self::return_to_title_screen`]
+    /// - [`SPECIAL_PROC_0x16`] : [`Self::script_special_process_x16`]
+    /// - [`SPECIAL_PROC_STATUS_UPDATE`] : [`Self::status_update`]
+    ///
+    /// # Arguments
+    /// * `param_1` - some struct containing a callback of some sort, only used for special process ID 18
+    /// * `id`      - special process ID
+    /// * `arg1`    - first argument, if relevant? Probably corresponds to the second parameter of
+    ///               [`script_opcode_catalog::OPCODE_PROCESS_SPECIAL`]
+    /// * `arg2`    - second argument, if relevant? Probably corresponds to the third parameter of
+    ///               [`script_opcode_catalog::OPCODE_PROCESS_SPECIAL`]
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>script_special_process_call(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        param_1: <span class="kw-2">*mut </span>ffi::undefined4,
+        id: special_process_catalog::Type,
+        arg1: i32,
+        arg2: i32,
+    ) -&gt; i32 {
+        ffi::ScriptSpecialProcessCall(param_1, id, arg1, arg2)
     }
 
-    <span class="doccomment">/// Returns an entry from RECRUITMENT_TABLE_SPECIES.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// This indexes without doing bounds checking.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_special_recruitment_species</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>) -&gt; <span class="ident">monster_catalog::Type</span> {
-        <span class="ident">ffi::GetSpecialRecruitmentSpecies</span>(<span class="ident">index</span>)
+    <span class="doccomment">/// Returns an entry from RECRUITMENT_TABLE_SPECIES.
+    ///
+    /// # Safety
+    /// This indexes without doing bounds checking.
+    </span><span class="kw">pub unsafe fn </span>get_special_recruitment_species(<span class="kw-2">&amp;</span><span class="self">self</span>, index: i32) -&gt; monster_catalog::Type {
+        ffi::GetSpecialRecruitmentSpecies(index)
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_PREPARE_MENU_ACCEPT_TEAM_MEMBER.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `idx` is an index into the RECRUITMENT_TABLE_SPECIES.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_menu_accept_team_member</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">i32</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::PrepareMenuAcceptTeamMember</span>(<span class="ident">idx</span>) }
+    <span class="doccomment">/// Implements SPECIAL_PROC_PREPARE_MENU_ACCEPT_TEAM_MEMBER.
+    ///
+    /// `idx` is an index into the RECRUITMENT_TABLE_SPECIES.
+    </span><span class="kw">pub fn </span>prepare_menu_accept_team_member(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: i32) {
+        <span class="kw">unsafe </span>{ ffi::PrepareMenuAcceptTeamMember(idx) }
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_INIT_RANDOM_NPC_JOBS.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `job_type` - job type? 0 is a random NPC job, 1 is a bottle mission</span>
-    <span class="doccomment">/// * `param_2`  - ???</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">init_random_npc_jobs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">job_type</span>: <span class="ident">i32</span>, <span class="ident">param_2</span>: <span class="ident">ffi::undefined2</span>) {
-        <span class="ident">ffi::InitRandomNpcJobs</span>(<span class="ident">job_type</span>, <span class="ident">param_2</span>)
+    <span class="doccomment">/// Implements SPECIAL_PROC_INIT_RANDOM_NPC_JOBS.
+    ///
+    /// # Arguments
+    /// * `job_type` - job type? 0 is a random NPC job, 1 is a bottle mission
+    /// * `param_2`  - ???
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>init_random_npc_jobs(<span class="kw-2">&amp;mut </span><span class="self">self</span>, job_type: i32, param_2: ffi::undefined2) {
+        ffi::InitRandomNpcJobs(job_type, param_2)
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_GET_RANDOM_NPC_JOB_TYPE.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_random_npc_job_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetRandomNpcJobType</span>() }
+    <span class="doccomment">/// Implements SPECIAL_PROC_GET_RANDOM_NPC_JOB_TYPE.
+    </span><span class="kw">pub fn </span>get_random_npc_job_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::GetRandomNpcJobType() }
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_GET_RANDOM_NPC_JOB_SUBTYPE.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_random_npc_job_subtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetRandomNpcJobSubtype</span>() }
+    <span class="doccomment">/// Implements SPECIAL_PROC_GET_RANDOM_NPC_JOB_SUBTYPE.
+    </span><span class="kw">pub fn </span>get_random_npc_job_subtype(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::GetRandomNpcJobSubtype() }
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_GET_RANDOM_NPC_JOB_STILL_AVAILABLE.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_random_npc_job_still_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetRandomNpcJobStillAvailable</span>() &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Implements SPECIAL_PROC_GET_RANDOM_NPC_JOB_STILL_AVAILABLE.
+    </span><span class="kw">pub fn </span>is_random_npc_job_still_available(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::GetRandomNpcJobStillAvailable() &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_ACCEPT_RANDOM_NPC_JOB.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_random_npc_job</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::AcceptRandomNpcJob</span>() &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Implements SPECIAL_PROC_ACCEPT_RANDOM_NPC_JOB.
+    </span><span class="kw">pub fn </span>accept_random_npc_job(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::AcceptRandomNpcJob() &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_RETURN_DUNGEON.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">return_dungeon</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GroundMainReturnDungeon</span>() }
+    <span class="doccomment">/// Implements SPECIAL_PROC_RETURN_DUNGEON.
+    </span><span class="kw">pub fn </span>return_dungeon(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::GroundMainReturnDungeon() }
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_NEXT_DAY.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_day</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GroundMainNextDay</span>() }
+    <span class="doccomment">/// Implements SPECIAL_PROC_NEXT_DAY.
+    </span><span class="kw">pub fn </span>next_day(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::GroundMainNextDay() }
     }
 
-    <span class="doccomment">/// Fades the screen out and throws the player to the title screen.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implements SPECIAL_PROC_JUMP_TO_TITLE_SCREEN and SPECIAL_PROC_0x1A.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `arg` is argument value for SPECIAL_PROC_JUMP_TO_TITLE_SCREEN and -1</span>
-    <span class="doccomment">/// for SPECIAL_PROC_0x1A. It is probably the screen fade out time...?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jump_to_title_screen</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::JumpToTitleScreen</span>(<span class="ident">arg</span>) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Fades the screen out and throws the player to the title screen.
+    ///
+    /// Implements SPECIAL_PROC_JUMP_TO_TITLE_SCREEN and SPECIAL_PROC_0x1A.
+    ///
+    /// `arg` is argument value for SPECIAL_PROC_JUMP_TO_TITLE_SCREEN and -1
+    /// for SPECIAL_PROC_0x1A. It is probably the screen fade out time...?
+    </span><span class="kw">pub fn </span>jump_to_title_screen(<span class="kw-2">&amp;mut </span><span class="self">self</span>, arg: i32) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::JumpToTitleScreen(arg) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Fades the screen out and throws the player to the title screen.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implements SPECIAL_PROC_RETURN_TO_TITLE_SCREEN.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">return_to_title_screen</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">fade_duration</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ReturnToTitleScreen</span>(<span class="ident">fade_duration</span>) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Fades the screen out and throws the player to the title screen.
+    ///
+    /// Implements SPECIAL_PROC_RETURN_TO_TITLE_SCREEN.
+    </span><span class="kw">pub fn </span>return_to_title_screen(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fade_duration: u32) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::ReturnToTitleScreen(fade_duration) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_0x16.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_special_process_x16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_1</span>: <span class="ident">bool</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ScriptSpecialProcess0x16</span>(<span class="ident">param_1</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
+    <span class="doccomment">/// Implements SPECIAL_PROC_0x16.
+    </span><span class="kw">pub fn </span>script_special_process_x16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param_1: bool) {
+        <span class="kw">unsafe </span>{ ffi::ScriptSpecialProcess0x16(param_1 <span class="kw">as </span>ffi::bool_) }
     }
 
-    <span class="doccomment">/// Implements SPECIAL_PROC_STATUS_UPDATE.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::StatusUpdate</span>() }
+    <span class="doccomment">/// Implements SPECIAL_PROC_STATUS_UPDATE.
+    </span><span class="kw">pub fn </span>status_update(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::StatusUpdate() }
     }
 
-    <span class="doccomment">/// Returns the memory allocation arena for ground mode.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can use this with [`crate::allocation::EoSCustomAllocator`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Parameters</span>
-    <span class="doccomment">/// * `size` - initial memory arena pointer, or null.</span>
-    <span class="doccomment">/// * `flags` - `MemAlloc` flags.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::not_unsafe_ptr_arg_deref</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_alloc_arena_ground</span>(
+    <span class="doccomment">/// Returns the memory allocation arena for ground mode.
+    ///
+    /// You can use this with [`crate::allocation::EoSCustomAllocator`].
+    ///
+    /// # Parameters
+    /// * `size` - initial memory arena pointer, or null.
+    /// * `flags` - `MemAlloc` flags.
+    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
+    <span class="kw">pub fn </span>get_alloc_arena_ground(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">arena</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span>,
-        <span class="ident">flags</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetAllocArenaGround</span>(<span class="ident">arena</span>, <span class="ident">flags</span>) }
+        arena: <span class="kw-2">*mut </span>ffi::mem_arena,
+        flags: u32,
+    ) -&gt; <span class="kw-2">*mut </span>ffi::mem_arena {
+        <span class="kw">unsafe </span>{ ffi::GetAllocArenaGround(arena, flags) }
     }
 
-    <span class="doccomment">/// Returns the memory freeing arena for ground mode.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can use this with [`crate::allocation::EoSCustomAllocator`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Parameters</span>
-    <span class="doccomment">/// * `size` - initial memory arena pointer, or null.</span>
-    <span class="doccomment">/// * `flags` - `MemAlloc` flags.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::not_unsafe_ptr_arg_deref</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_free_arena_ground</span>(
+    <span class="doccomment">/// Returns the memory freeing arena for ground mode.
+    ///
+    /// You can use this with [`crate::allocation::EoSCustomAllocator`].
+    ///
+    /// # Parameters
+    /// * `size` - initial memory arena pointer, or null.
+    /// * `flags` - `MemAlloc` flags.
+    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
+    <span class="kw">pub fn </span>get_free_arena_ground(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">arena</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span>,
-        <span class="ident">flags</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetFreeArenaGround</span>(<span class="ident">arena</span>, <span class="ident">flags</span>) }
+        arena: <span class="kw-2">*mut </span>ffi::mem_arena,
+        flags: u32,
+    ) -&gt; <span class="kw-2">*mut </span>ffi::mem_arena {
+        <span class="kw">unsafe </span>{ ffi::GetFreeArenaGround(arena, flags) }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -142,149 +142,149 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Nintendo DS system &amp; game bootstrapping related functions.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Nintendo DS system &amp; game bootstrapping related functions.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="doccomment">/// Probably related to booting the game?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug message &quot;task proc boot&quot;.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This function is related to game-boot and will probably modify a lot of global data.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">task_proc_boot</span>() {
-    <span class="ident">ffi::TaskProcBoot</span>();
+<span class="doccomment">/// Probably related to booting the game?
+///
+/// This function prints the debug message &quot;task proc boot&quot;.
+///
+/// # Safety
+/// This function is related to game-boot and will probably modify a lot of global data.
+</span><span class="kw">pub unsafe fn </span>task_proc_boot() {
+    ffi::TaskProcBoot();
 }
 
-<span class="doccomment">/// Presumably blocks until the program receives an interrupt.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This just calls (in Ghidra terminology) coproc_moveto_Wait_for_interrupt(0).</span>
-<span class="doccomment">/// See &lt;https://en.wikipedia.org/wiki/ARM_architecture_family#Coprocessors&gt;.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_for_interrupt</span>() {
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::WaitForInterrupt</span>();
+<span class="doccomment">/// Presumably blocks until the program receives an interrupt.
+///
+/// This just calls (in Ghidra terminology) coproc_moveto_Wait_for_interrupt(0).
+/// See &lt;https://en.wikipedia.org/wiki/ARM_architecture_family#Coprocessors&gt;.
+</span><span class="kw">pub fn </span>wait_for_interrupt() {
+    <span class="kw">unsafe </span>{
+        ffi::WaitForInterrupt();
     }
 }
 
-<span class="doccomment">/// Sets the Interrupt Master Enable (IME) register to 1, which enables all CPU interrupts</span>
-<span class="doccomment">/// (if enabled in the Interrupt Enable (IE) register).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &lt;https://problemkaputt.de/gbatek.htm#dsiomaps&gt;.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the old value in the IME register.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// The caller needs to make sure the system is in a state where it is safe to enable interrupts.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">enable_all_interrupts</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">ffi::EnableAllInterrupts</span>() &gt; <span class="number">0</span>
+<span class="doccomment">/// Sets the Interrupt Master Enable (IME) register to 1, which enables all CPU interrupts
+/// (if enabled in the Interrupt Enable (IE) register).
+///
+/// See &lt;https://problemkaputt.de/gbatek.htm#dsiomaps&gt;.
+///
+/// Returns the old value in the IME register.
+///
+/// # Safety
+/// The caller needs to make sure the system is in a state where it is safe to enable interrupts.
+</span><span class="kw">pub unsafe fn </span>enable_all_interrupts() -&gt; bool {
+    ffi::EnableAllInterrupts() &gt; <span class="number">0
+</span>}
+
+<span class="doccomment">/// Sets the Interrupt Master Enable (IME) register to 0, which disables all CPU interrupts
+/// (even if enabled in the Interrupt Enable (IE) register).
+///
+/// See &lt;https://problemkaputt.de/gbatek.htm#dsiomaps&gt;.
+///
+/// Returns the old value in the IME register.
+///
+/// # Safety
+/// The caller needs to make sure the system is in a state where it is safe to disable interrupts.
+</span><span class="kw">pub unsafe fn </span>disable_all_interrupts() -&gt; bool {
+    ffi::DisableAllInterrupts() &gt; <span class="number">0
+</span>}
+
+<span class="doccomment">/// Get the current (system?) time as an IEEE 754 floating-point number.
+///
+/// Returns the current time (in seconds?).
+</span><span class="kw">pub fn </span>get_time() -&gt; f32 {
+    <span class="kw">unsafe </span>{ ffi::GetTime() }
 }
 
-<span class="doccomment">/// Sets the Interrupt Master Enable (IME) register to 0, which disables all CPU interrupts</span>
-<span class="doccomment">/// (even if enabled in the Interrupt Enable (IE) register).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &lt;https://problemkaputt.de/gbatek.htm#dsiomaps&gt;.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the old value in the IME register.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// The caller needs to make sure the system is in a state where it is safe to disable interrupts.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">disable_all_interrupts</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">ffi::DisableAllInterrupts</span>() &gt; <span class="number">0</span>
+<span class="doccomment">/// Probably resumes the sound player if paused?
+///
+/// # Safety
+/// This function manipulates low-level global state.
+</span><span class="kw">pub unsafe fn </span>sound_resume() -&gt; bool {
+    ffi::SoundResume() &gt; <span class="number">0
+</span>}
+
+<span class="doccomment">/// Probably aborts the program with some status code? It seems to serve a similar purpose to the
+/// exit(3) function.
+///
+/// This function prints the debug string &quot;card pull out %d&quot; with the status code.
+///
+/// # Safety
+/// This function manipulates low-level global state.
+</span><span class="kw">pub unsafe fn </span>card_pull_out_with_status(status: i32) {
+    ffi::CardPullOutWithStatus(status);
 }
 
-<span class="doccomment">/// Get the current (system?) time as an IEEE 754 floating-point number.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the current time (in seconds?).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_time</span>() -&gt; <span class="ident">f32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetTime</span>() }
+<span class="doccomment">/// Sets some global flag that probably triggers system exit?
+///
+/// This function prints the debug string &quot;card pull out&quot;.
+///
+/// # Safety
+/// This function manipulates low-level global state.
+</span><span class="kw">pub unsafe fn </span>card_pull_out() {
+    ffi::CardPullOut();
 }
 
-<span class="doccomment">/// Probably resumes the sound player if paused?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This function manipulates low-level global state.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">sound_resume</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">ffi::SoundResume</span>() &gt; <span class="number">0</span>
+<span class="doccomment">/// Sets some global flag that maybe indicates a save error?
+///
+/// This function prints the debug string &quot;card backup error&quot;.
+///
+/// # Safety
+/// This function manipulates low-level global state.
+</span><span class="kw">pub unsafe fn </span>card_backup_error() {
+    ffi::CardBackupError();
 }
 
-<span class="doccomment">/// Probably aborts the program with some status code? It seems to serve a similar purpose to the</span>
-<span class="doccomment">/// exit(3) function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug string &quot;card pull out %d&quot; with the status code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This function manipulates low-level global state.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">card_pull_out_with_status</span>(<span class="ident">status</span>: <span class="ident">i32</span>) {
-    <span class="ident">ffi::CardPullOutWithStatus</span>(<span class="ident">status</span>);
+<span class="doccomment">/// Maybe halts the process display?
+///
+/// This function prints the debug string &quot;halt process disp %d&quot; with the status code.
+///
+/// # Safety
+/// This function manipulates low-level global state.
+</span><span class="kw">pub unsafe fn </span>halt_process_disp(status_code: i32) {
+    ffi::HaltProcessDisp(status_code);
 }
 
-<span class="doccomment">/// Sets some global flag that probably triggers system exit?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug string &quot;card pull out&quot;.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This function manipulates low-level global state.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">card_pull_out</span>() {
-    <span class="ident">ffi::CardPullOut</span>();
+<span class="doccomment">/// Supposed to return a debug flag. Just returns 0 in the final binary.
+</span><span class="kw">pub fn </span>get_debug_flag1(flag_id: u32) -&gt; u32 {
+    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.
+    </span><span class="kw">unsafe </span>{ ffi::GetDebugFlag1(flag_id) }
 }
 
-<span class="doccomment">/// Sets some global flag that maybe indicates a save error?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug string &quot;card backup error&quot;.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This function manipulates low-level global state.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">card_backup_error</span>() {
-    <span class="ident">ffi::CardBackupError</span>();
+<span class="doccomment">/// Supposed to return a debug flag. Just returns 0 in the final binary.
+</span><span class="kw">pub fn </span>get_debug_flag2(flag_id: u32) -&gt; u32 {
+    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.
+    </span><span class="kw">unsafe </span>{ ffi::GetDebugFlag2(flag_id) }
 }
 
-<span class="doccomment">/// Maybe halts the process display?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the debug string &quot;halt process disp %d&quot; with the status code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// This function manipulates low-level global state.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">halt_process_disp</span>(<span class="ident">status_code</span>: <span class="ident">i32</span>) {
-    <span class="ident">ffi::HaltProcessDisp</span>(<span class="ident">status_code</span>);
+<span class="doccomment">/// Supposed to set a debug flag. No-op in the final binary.
+</span><span class="kw">pub fn </span>set_debug_flag1(flag_id: u32, value: u32) {
+    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.
+    </span><span class="kw">unsafe </span>{ ffi::SetDebugFlag1(flag_id, value) }
 }
 
-<span class="doccomment">/// Supposed to return a debug flag. Just returns 0 in the final binary.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_debug_flag1</span>(<span class="ident">flag_id</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetDebugFlag1</span>(<span class="ident">flag_id</span>) }
+<span class="doccomment">/// Supposed to return a debug flag. No-op in the final binary.
+</span><span class="kw">pub fn </span>set_debug_flag2(flag_id: u32, value: u32) {
+    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.
+    </span><span class="kw">unsafe </span>{ ffi::SetDebugFlag2(flag_id, value) }
 }
 
-<span class="doccomment">/// Supposed to return a debug flag. Just returns 0 in the final binary.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_debug_flag2</span>(<span class="ident">flag_id</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
-    <span class="kw">unsafe</span> { <span class="ident">ffi::GetDebugFlag2</span>(<span class="ident">flag_id</span>) }
-}
-
-<span class="doccomment">/// Supposed to set a debug flag. No-op in the final binary.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_debug_flag1</span>(<span class="ident">flag_id</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="ident">u32</span>) {
-    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetDebugFlag1</span>(<span class="ident">flag_id</span>, <span class="ident">value</span>) }
-}
-
-<span class="doccomment">/// Supposed to return a debug flag. No-op in the final binary.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_debug_flag2</span>(<span class="ident">flag_id</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="ident">u32</span>) {
-    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
-    <span class="kw">unsafe</span> { <span class="ident">ffi::SetDebugFlag2</span>(<span class="ident">flag_id</span>, <span class="ident">value</span>) }
-}
-
-<span class="doccomment">/// Unpatched this function will always returns true.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Background information</span>
-<span class="doccomment">/// This function seems to be a debug switch that the developers may have used to disable the</span>
-<span class="doccomment">/// random enemy spawn.</span>
-<span class="doccomment">/// If it returned false, the call to `[GlobalDungeonData::spawn_monster]` inside</span>
-<span class="doccomment">/// `[GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]` would not be executed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [GlobalDungeonData::spawn_monster]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::spawn_monster</span>
-<span class="doccomment">/// [GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_debug_flag_monster_spawns_enabled</span>() -&gt; <span class="ident">bool</span> {
-    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.</span>
-    <span class="kw">unsafe</span> { <span class="ident">ffi::MonsterSpawnsEnabled</span>() &gt; <span class="number">0</span> }
+<span class="doccomment">/// Unpatched this function will always returns true.
+///
+/// # Background information
+/// This function seems to be a debug switch that the developers may have used to disable the
+/// random enemy spawn.
+/// If it returned false, the call to `[GlobalDungeonData::spawn_monster]` inside
+/// `[GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]` would not be executed.
+///
+/// [GlobalDungeonData::spawn_monster]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::spawn_monster
+/// [GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter]: crate::api::dungeon_mode::dungeon_struct::GlobalDungeonData::try_spawn_monster_and_tick_spawn_counter
+</span><span class="kw">pub fn </span>is_debug_flag_monster_spawns_enabled() -&gt; bool {
+    <span class="comment">// SAFETY: This is more or less an &quot;atomic&quot; operation.
+    </span><span class="kw">unsafe </span>{ ffi::MonsterSpawnsEnabled() &gt; <span class="number">0 </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

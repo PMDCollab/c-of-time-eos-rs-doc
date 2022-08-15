@@ -1184,1191 +1184,1191 @@
 <span id="1184">1184</span>
 <span id="1185">1185</span>
 <span id="1186">1186</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::overlay</span>::{<span class="ident">CreatableWithLease</span>, <span class="ident">OverlayLoadLease</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">fixed::types::I24F8</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::overlay::{CreatableWithLease, OverlayLoadLease};
+<span class="kw">use </span><span class="kw">crate</span>::ctypes::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>fixed::types::I24F8;
 
-<span class="doccomment">/// Helper struct for emitting move and item effects.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You may find more things to do with monsters in the [`DungeonMonsterExtWrite`] trait.</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonEffectsEmitter</span>(<span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;);
+<span class="doccomment">/// Helper struct for emitting move and item effects.
+///
+/// You may find more things to do with monsters in the [`DungeonMonsterExtWrite`] trait.
+///
+</span><span class="kw">pub struct </span>DungeonEffectsEmitter(OverlayLoadLease&lt;<span class="number">29</span>&gt;);
 
-<span class="kw">impl</span> <span class="ident">CreatableWithLease</span>&lt;<span class="number">29</span>&gt; <span class="kw">for</span> <span class="ident">DungeonEffectsEmitter</span> {
-    <span class="kw">fn</span> <span class="ident">_create</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">lease</span>)
+<span class="kw">impl </span>CreatableWithLease&lt;<span class="number">29</span>&gt; <span class="kw">for </span>DungeonEffectsEmitter {
+    <span class="kw">fn </span>_create(lease: OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(lease)
     }
 
-    <span class="kw">fn</span> <span class="ident">lease</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="number">29</span>&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="kw">fn </span>lease(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>DungeonEffectsEmitter {
+    <span class="doccomment">/// Low-level functions internal to the dungeon engine.
+    /// Consider using one of the other functions instead for most cases.
+    </span><span class="kw">pub fn </span>internals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DungeonEffectsInternals {
+        DungeonEffectsInternals(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Returns true if the target is within range of the user&#39;s move, false otherwise.
+    ///
+    /// If the user does not have Course Checker, it simply checks if the distance between user
+    /// and target is less or equal than the move range.
+    ///
+    /// Otherwise, it will iterate through all tiles in the direction specified, checking for
+    /// walls or other monsters in the way, and return false if they are found.
+    ///
+    /// `move_range` is the range in number of tiles.
+    </span><span class="kw">pub fn </span>is_target_in_range(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        user: <span class="kw-2">&amp;</span>DungeonEntity,
+        target: <span class="kw-2">&amp;</span>DungeonEntity,
+        direction: Direction,
+        move_range: i32,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::IsTargetInRange(
+                <span class="macro">force_mut_ptr!</span>(user),
+                <span class="macro">force_mut_ptr!</span>(target),
+                direction <span class="kw">as </span>ffi::direction_id::Type,
+                move_range,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Deals damage from a move or item used by an attacking monster on a defending monster.
+    ///
+    /// Returns the amount of damage dealt.
+    </span><span class="kw">pub fn </span>deal_damage(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        used_move: <span class="kw-2">&amp;</span>Move,
+        damage_multiplier: I24F8,
+        item_id: <span class="prelude-ty">Option</span>&lt;item_catalog::Type&gt;,
+    ) -&gt; i32 {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::DealDamage(
+                attacker,
+                defender,
+                <span class="macro">force_mut_ptr!</span>(used_move),
+                damage_multiplier.to_bits() <span class="kw">as </span>c_int,
+                item_id.unwrap_or(item_catalog::ITEM_NOTHING),
+            )
+        }
+    }
+
+    <span class="doccomment">/// Deals damage from a move or item used by an attacking monster on a defending monster, and
+    /// also deals recoil damage to the attacker.
+    ///
+    /// Returns whether or not damage was dealt.
+    </span><span class="kw">pub fn </span>deal_damage_with_recoil(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        used_move: <span class="kw-2">&amp;</span>Move,
+        item_id: <span class="prelude-ty">Option</span>&lt;item_catalog::Type&gt;,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::DealDamageWithRecoil(
+                attacker,
+                defender,
+                <span class="macro">force_mut_ptr!</span>(used_move),
+                item_id.unwrap_or(item_catalog::ITEM_NOTHING),
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Sleep status condition on a target monster if possible.
+    ///
+    /// No status is returned.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `number_turns` - How many turns the status should be applied for.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    </span><span class="kw">pub fn </span>try_inflict_sleep_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        number_turns: i32,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictSleepStatus(attacker, defender, number_turns, log_failure <span class="kw">as </span>ffi::bool_)
+        }
+    }
+
+    <span class="doccomment">/// Inflicts the Nightmare status condition on a target monster if possible.
+    ///
+    /// No status is returned.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `number_turns` - How many turns the status should be applied for.
+    </span><span class="kw">pub fn </span>try_inflict_nightmare_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        number_turns: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictNightmareStatus(attacker, defender, number_turns) }
+    }
+
+    <span class="doccomment">/// Inflicts the Napping status condition on a target monster if possible.
+    ///
+    /// No status is returned.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `number_turns` - How many turns the status should be applied for.
+    </span><span class="kw">pub fn </span>try_inflict_napping_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        number_turns: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictNappingStatus(attacker, defender, number_turns) }
+    }
+
+    <span class="doccomment">/// Inflicts the Yawning status condition on a target monster if possible.
+    ///
+    /// No status is returned.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `number_turns` - How many turns the status should be applied for.
+    </span><span class="kw">pub fn </span>try_inflict_yawning_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        number_turns: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictYawningStatus(attacker, defender, number_turns) }
+    }
+
+    <span class="doccomment">/// Inflicts the Sleepless status condition on a target monster if possible.
+    ///
+    /// No status is returned.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>try_inflict_sleepless_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictSleeplessStatus(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Inflicts the Paused status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `param3` - Unknown.
+    /// * `number_turns` - How many turns the status should be applied for.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_paused_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        param3: i32,
+        number_turns: i32,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictPausedStatus(
+                attacker,
+                defender,
+                param3,
+                number_turns,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Infatuated status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_infatuated_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictInfatuatedStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Burn status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `special_effect` - Flag to apply some special effect alongside the burn?
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_burn_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        special_effect: bool,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictBurnStatus(
+                attacker,
+                defender,
+                special_effect <span class="kw">as </span>ffi::bool_,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Burn status condition on all team members if possible.
+    </span><span class="kw">pub fn </span>try_inflict_burn_status_whole_team(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _global_dungeon_struct: <span class="kw-2">&amp;mut </span>GlobalDungeonData,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing &amp; have a mutable reference to the global
+        // dungeon data.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictBurnStatusWholeTeam() }
+    }
+
+    <span class="doccomment">/// Inflicts the Poisoned status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_poisoned_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictPoisonedStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Badly Poisoned status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_badly_poisoned_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictBadlyPoisonedStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Frozen status condition on a target monster if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure.
+    </span><span class="kw">pub fn </span>try_inflict_frozen_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictFrozenStatus(attacker, defender, log_failure <span class="kw">as </span>ffi::bool_) }
+    }
+
+    <span class="doccomment">/// Inflicts the Constriction status condition on a target monster if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `animation_id` - animation ID
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure.
+    </span><span class="kw">pub fn </span>try_inflict_constriction_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        animation_id: i32,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictConstrictionStatus(
+                attacker,
+                defender,
+                animation_id,
+                log_failure <span class="kw">as </span>ffi::bool_,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Inflicts the Shadow Hold (AKA Immobilized) status condition on a target monster if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure.
+    </span><span class="kw">pub fn </span>try_inflict_shadow_hold_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictShadowHoldStatus(attacker, defender, log_failure <span class="kw">as </span>ffi::bool_) }
+    }
+
+    <span class="doccomment">/// Inflicts the Shadow Hold (AKA Immobilized) status condition on a target monster if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>try_inflict_ingrain_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictIngrainStatus(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Inflicts the Wrapped status condition on a target monster if possible.
+    ///
+    /// This also gives the user the Wrap status (Wrapped around foe).
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>try_inflict_wrapped_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictWrappedStatus(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Inflicts the Petrified status condition on a target monster if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>try_inflict_petrified_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictPetrifiedStatus(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Inflicts the Cringe status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_cringe_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictCringeStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Paralysis status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_paralysis_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictParalysisStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Confused status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_confused_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictConfusedStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Cowering status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_cowering_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictCoweringStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Leech Seed status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    /// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.
+    </span><span class="kw">pub fn </span>try_inflict_leech_seed_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+        check_only: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryInflictLeechSeedStatus(
+                attacker,
+                defender,
+                log_failure <span class="kw">as </span>ffi::bool_,
+                check_only <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Inflicts the Destiny Bond status condition on a target monster if possible.
+    ///
+    /// Returns true if the target monster was affected.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>try_inflict_destiny_bond_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryInflictDestinyBond(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Lowers the specified offensive stat on the target monster.
+    ///
+    /// `param_5` and `param_6` are unknown.
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>lower_offensive_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        n_stages: i16,
+        param_5: ffi::undefined,
+        param_6: ffi::undefined,
+    ) {
+        ffi::LowerOffensiveStat(attacker, defender, stat_idx, n_stages, param_5, param_6)
+    }
+
+    <span class="doccomment">/// Lowers the specified defensive stat on the target monster.
+    ///
+    /// `param_5` and `param_6` are unknown.
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>lower_defensive_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        n_stages: i16,
+        param_5: ffi::undefined,
+        param_6: ffi::undefined,
+    ) {
+        ffi::LowerDefensiveStat(attacker, defender, stat_idx, n_stages, param_5, param_6)
+    }
+
+    <span class="doccomment">/// Boosts the specified offensive stat on the target monster.
+    </span><span class="kw">pub fn </span>boost_offensive_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        n_stages: i16,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::BoostOffensiveStat(attacker, defender, stat_idx, n_stages) }
+    }
+
+    <span class="doccomment">/// Boosts the specified defensive stat on the target monster.
+    </span><span class="kw">pub fn </span>boost_defensive_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        n_stages: i16,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::BoostDefensiveStat(attacker, defender, stat_idx, n_stages) }
+    }
+
+    <span class="doccomment">/// Applies a multiplier to the specified offensive stat on the target monster.
+    ///
+    /// This affects struct [`ffi::monster_stat_modifiers.offensive_multipliers`], for moves like
+    /// Charm and Memento.
+    ///
+    /// `param_5` is unknown.
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>apply_offensive_stat_multiplier(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        multiplier: i32,
+        param_5: ffi::undefined,
+    ) {
+        ffi::ApplyOffensiveStatMultiplier(attacker, defender, stat_idx, multiplier, param_5)
+    }
+
+    <span class="doccomment">/// Applies a multiplier to the specified defensive stat on the target monster.
+    ///
+    /// This affects struct [`ffi::monster_stat_modifiers.defensive_multipliers`], for moves like
+    /// Charm and Memento.
+    ///
+    /// `param_5` is unknown.
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>apply_defensive_stat_multiplier(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        multiplier: i32,
+        param_5: ffi::undefined,
+    ) {
+        ffi::ApplyDefensiveStatMultiplier(attacker, defender, stat_idx, multiplier, param_5)
+    }
+
+    <span class="doccomment">/// Boosts the specified hit chance stat (accuracy or evasion) on the target monster.
+    </span><span class="kw">pub fn </span>boost_hit_chance_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::BoostHitChanceStat(attacker, defender, stat_idx) }
+    }
+
+    <span class="doccomment">/// Lowers the specified hit chance stat (accuracy or evasion) on the target monster.
+    </span><span class="kw">pub fn </span>lower_hit_chance_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        param_4: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::LowerHitChanceStat(attacker, defender, stat_idx, param_4) }
+    }
+
+    <span class="doccomment">/// Resets the specified hit chance stat (accuracy or evasion) back to normal on the
+    /// target monster.
+    </span><span class="kw">pub fn </span>reset_hit_chance_stat(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        stat_idx: i32,
+        param_4: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::ResetHitChanceStat(attacker, defender, stat_idx, param_4) }
+    }
+
+    <span class="doccomment">/// Boosts the speed of the target monster.
+    ///
+    /// If the number of turns specified is 0, a random turn count will be selected using the
+    /// default SPEED_BOOST_DURATION_RANGE (see symbol table).
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `n_stages` - The number of stages to boost the speed by.
+    /// * `n_turns` - The number of turns.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    </span><span class="kw">pub fn </span>boost_speed(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        n_stages: i32,
+        n_turns: i32,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::BoostSpeed(
+                attacker,
+                defender,
+                n_stages,
+                n_turns,
+                log_failure <span class="kw">as </span>ffi::bool_,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Lowers the speed of the target monster.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `n_stages` - The number of stages to boost the speed by.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    </span><span class="kw">pub fn </span>lower_speed(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        n_stages: i32,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::LowerSpeed(attacker, defender, n_stages, log_failure <span class="kw">as </span>ffi::bool_) }
+    }
+
+    <span class="doccomment">/// Randomly boosts or lowers the speed of the target monster by one stage with equal
+    /// probability.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>boost_or_lower_speed(<span class="kw-2">&amp;</span><span class="self">self</span>, attacker: <span class="kw-2">&amp;mut </span>DungeonEntity, defender: <span class="kw-2">&amp;mut </span>DungeonEntity) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::BoostOrLowerSpeed(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Lowers the speed of the target monster.
+    ///
+    /// Returns Whether or not a move was sealed.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    </span><span class="kw">pub fn </span>try_seal_move(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log_failure: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TrySealMove(attacker, defender, log_failure <span class="kw">as </span>ffi::bool_) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Activate the Quick Feet ability on the defender, if the monster has it and it&#39;s active.
+    ///
+    /// Returns Whether or not the ability was activated.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>try_activate_quick_feet(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryActivateQuickFeet(attacker, defender) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Restore HP and possibly boost max HP of the target monster if possible.
+    ///
+    /// Returns Whether or not HP was restored.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `hp_to_restore` - The amount of HP to restore.
+    /// * `max_hp_boost` - The max HP boost to attempt to apply.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    </span><span class="kw">pub fn </span>try_increase_hp(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        hp_to_restore: i32,
+        max_hp_boost: i32,
+        log_failure: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryIncreaseHp(
+                attacker,
+                defender,
+                hp_to_restore,
+                max_hp_boost,
+                log_failure <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Restores the PP of all the target&#39;s moves by the specified amount.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `pp_to_restore` - The amount of PP to restore.
+    /// * `log_failure` - Flag to log a message to the dungeon message log on failure
+    </span><span class="kw">pub fn </span>restore_move_pp(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        pp_to_restore: i32,
+        log_failure: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::RestoreMovePP(
+                attacker,
+                defender,
+                pp_to_restore,
+                (!log_failure) <span class="kw">as </span>ffi::bool_,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Apply an item effect.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `item` - The item that was used / thrown.
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>apply_item_effect(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        param_1: ffi::undefined4,
+        param_2: ffi::undefined4,
+        param_3: ffi::undefined4,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        item: <span class="kw-2">&amp;mut </span>DungeonItem,
+    ) {
+        ffi::ApplyItemEffect(param_1, param_2, param_3, attacker, defender, item)
+    }
+
+    <span class="doccomment">/// Applies the Violent Seed boost to an entity.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    </span><span class="kw">pub fn </span>violent_seed_boost(<span class="kw-2">&amp;</span><span class="self">self</span>, attacker: <span class="kw-2">&amp;mut </span>DungeonEntity, defender: <span class="kw-2">&amp;mut </span>DungeonEntity) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::ViolentSeedBoost(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Applies the IQ and possible stat boosts from eating a Gummi to the target monster.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `gummi_type` - Type of the Gummi that was eaten.
+    /// * `stat_boost` - The amount of stat boost to apply; if a random stat boost occurs.
+    </span><span class="kw">pub fn </span>apply_gummi_boosts(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        gummi_type: type_catalog::Type,
+        stat_boost: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::ApplyGummiBoostsDungeonMode(attacker, defender, gummi_type, stat_boost) }
+    }
+
+    <span class="doccomment">/// Applies the IQ and possible stat boosts from eating a Gummi to the target monster.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `direction` - The direction
+    </span><span class="kw">pub fn </span>try_pounce(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        direction: Direction,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryPounce(attacker, defender, direction <span class="kw">as </span>ffi::direction_id::Type) }
+    }
+
+    <span class="doccomment">/// Blows away the target monster in a given direction if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `direction` - The direction
+    </span><span class="kw">pub fn </span>try_blow_away(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        direction: Direction,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TryBlowAway(attacker, defender, direction <span class="kw">as </span>ffi::direction_id::Type) }
+    }
+
+    <span class="doccomment">/// Makes the target monster warp if possible.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `warp_type` - The type of warp to apply.
+    /// * `position` - The position to warp to (if warp type is position-based).
+    </span><span class="kw">pub fn </span>try_warp(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        warp_type: WarpType,
+        position: ffi::position,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::TryWarp(
+                attacker,
+                defender,
+                warp_type <span class="kw">as </span>ffi::warp_type::Type,
+                position,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Adds to a monster&#39;s experience points, subject to experience boosting effects.
+    ///
+    /// This function appears to be called only under special circumstances. Possibly when granting
+    /// experience from damage (e.g., Joy Ribbon)?
+    ///
+    /// Interestingly, the `attacker` isn&#39;t actually used. This might be a compiler
+    /// optimization to avoid shuffling registers, since this function might be called alongside
+    /// lots of other functions that have both the attacker and defender as the first two arguments.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `base_exp` - base experience gain, before boosts.
+    </span><span class="kw">pub fn </span>add_exp_special(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        base_exp: i32,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::AddExpSpecial(attacker, defender, base_exp) }
+    }
+
+    <span class="doccomment">/// The user entity attempts to switch places with the target entity (i.e. by the effect of the
+    /// Switcher Orb).
+    ///
+    /// The function checks for the Suction Cups ability for both the user and the target, and for
+    /// the Mold Breaker ability on the user.
+    </span><span class="kw">pub fn </span>try_switch_place(<span class="kw-2">&amp;</span><span class="self">self</span>, attacker: <span class="kw-2">&amp;mut </span>DungeonEntity, defender: <span class="kw-2">&amp;mut </span>DungeonEntity) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::TrySwitchPlace(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Cures the target&#39;s freeze, shadow hold, ingrain, petrified, constriction or wrap (both as
+    /// user and as target) status due to the action of the user.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to cure this status.
+    /// * `defender` - The monster that is being cured from this status.
+    /// * `log` - Flag to log a message to the dungeon message log.
+    </span><span class="kw">pub fn </span>end_frozen_class_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        log: bool,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::EndFrozenClassStatus(attacker, defender, log <span class="kw">as </span>ffi::bool_) }
+    }
+
+    <span class="doccomment">/// Cures the target&#39;s cringe, confusion, cowering, pause, taunt, encore or infatuated status
+    /// due to the action of the user, and prints the event to the log.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to cure this status.
+    /// * `defender` - The monster that is being cured from this status.
+    </span><span class="kw">pub fn </span>end_cringe_class_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+    ) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::EndCringeClassStatus(attacker, defender) }
+    }
+
+    <span class="doccomment">/// Frees from the wrap status all monsters which are wrapped by/around the monster passed as
+    /// parameter.
+    </span><span class="kw">pub fn </span>free_other_wrapped_monsters(<span class="kw-2">&amp;</span><span class="self">self</span>, target: <span class="kw-2">&amp;mut </span>DungeonEntity) {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{ ffi::FreeOtherWrappedMonsters(target) }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DungeonEffectsEmitter</span> {
-    <span class="doccomment">/// Low-level functions internal to the dungeon engine.</span>
-    <span class="doccomment">/// Consider using one of the other functions instead for most cases.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DungeonEffectsInternals</span> {
-        <span class="ident">DungeonEffectsInternals</span>(<span class="self">self</span>)
+<span class="doccomment">/// Internal functions for battle effect calculations.
+</span><span class="kw">pub struct </span>DungeonEffectsInternals&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DungeonEffectsEmitter);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DungeonEffectsInternals&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Applies damage to a monster. Displays the damage animation, lowers its health and handles
+    /// reviving if applicable.
+    ///
+    /// The EU version has some additional checks related to printing fainting messages under
+    /// specific circumstances.
+    ///
+    /// Returns true if the target fainted (reviving does not count as fainting).
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `damage_data` - Mutable reference to the damage_data struct that contains info about the
+    ///                   damage to deal
+    /// * `param_4` - ?
+    /// * `param_5` - ?
+    /// * `param_6` - ?
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>apply_damage(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        damage_data: <span class="kw-2">&amp;mut </span>ffi::damage_data,
+        param_4: ffi::undefined4,
+        param_5: <span class="kw-2">*mut </span>ffi::undefined4,
+        param_6: <span class="kw-2">*mut </span>ffi::undefined4,
+    ) -&gt; bool {
+        ffi::ApplyDamage(attacker, defender, damage_data, param_4, param_5, param_6) &gt; <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Determines if a move used hits or misses the target.
+    ///
+    /// # Arguments
+    /// * `attacker` - The monster that is trying to inflict this status.
+    /// * `defender` - The monster that is being inflicted with this status.
+    /// * `the_move` - Reference to move data
+    /// * `use_second_accuracy` - True if the move&#39;s first accuracy (accuracy1) should be used, false
+    ///                           if its second accuracy (accuracy2) should be used instead.
+    </span><span class="kw">pub fn </span>move_hit_check(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        the_move: <span class="kw-2">&amp;</span>Move,
+        use_second_accuracy: bool,
+    ) -&gt; bool {
+        <span class="comment">// SAFETY: We have a lease on the overlay existing.
+        </span><span class="kw">unsafe </span>{
+            ffi::MoveHitCheck(
+                attacker,
+                defender,
+                <span class="macro">force_mut_ptr!</span>(the_move),
+                use_second_accuracy <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
     }
 
-    <span class="doccomment">/// Returns true if the target is within range of the user&#39;s move, false otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the user does not have Course Checker, it simply checks if the distance between user</span>
-    <span class="doccomment">/// and target is less or equal than the move range.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Otherwise, it will iterate through all tiles in the direction specified, checking for</span>
-    <span class="doccomment">/// walls or other monsters in the way, and return false if they are found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `move_range` is the range in number of tiles.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_target_in_range</span>(
+    <span class="doccomment">/// Handles the effects that happen after a move is used. Includes a loop that is run for
+    /// each target, multiple ability checks and the giant switch statement that executes the
+    /// effect of the move used given its ID.
+    ///
+    /// # Arguments
+    /// * `param_1` - pointer to some struct
+    /// * `attacker` - attacker pointer
+    /// * `the_move` - pointer to move data
+    /// * `param_4` - ?
+    /// * `param_5` - ?
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>execute_move_effect(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>,
-        <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">DungeonEntity</span>,
-        <span class="ident">direction</span>: <span class="ident">Direction</span>,
-        <span class="ident">move_range</span>: <span class="ident">i32</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::IsTargetInRange</span>(
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">user</span>),
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">target</span>),
-                <span class="ident">direction</span> <span class="kw">as</span> <span class="ident">ffi::direction_id::Type</span>,
-                <span class="ident">move_range</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Deals damage from a move or item used by an attacking monster on a defending monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the amount of damage dealt.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deal_damage</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">used_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>,
-        <span class="ident">damage_multiplier</span>: <span class="ident">I24F8</span>,
-        <span class="ident">item_id</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">item_catalog::Type</span>&gt;,
-    ) -&gt; <span class="ident">i32</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::DealDamage</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">used_move</span>),
-                <span class="ident">damage_multiplier</span>.<span class="ident">to_bits</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
-                <span class="ident">item_id</span>.<span class="ident">unwrap_or</span>(<span class="ident">item_catalog::ITEM_NOTHING</span>),
-            )
-        }
-    }
-
-    <span class="doccomment">/// Deals damage from a move or item used by an attacking monster on a defending monster, and</span>
-    <span class="doccomment">/// also deals recoil damage to the attacker.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns whether or not damage was dealt.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deal_damage_with_recoil</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">used_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>,
-        <span class="ident">item_id</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">item_catalog::Type</span>&gt;,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::DealDamageWithRecoil</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">used_move</span>),
-                <span class="ident">item_id</span>.<span class="ident">unwrap_or</span>(<span class="ident">item_catalog::ITEM_NOTHING</span>),
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Sleep status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No status is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `number_turns` - How many turns the status should be applied for.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_sleep_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">number_turns</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
+        param_1: <span class="kw-2">*mut </span>ffi::undefined4,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        the_move: <span class="kw-2">&amp;</span>Move,
+        param_4: ffi::undefined4,
+        param_5: ffi::undefined4,
     ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictSleepStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">number_turns</span>, <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>)
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Nightmare status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No status is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `number_turns` - How many turns the status should be applied for.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_nightmare_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">number_turns</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictNightmareStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">number_turns</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Napping status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No status is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `number_turns` - How many turns the status should be applied for.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_napping_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">number_turns</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictNappingStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">number_turns</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Yawning status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No status is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `number_turns` - How many turns the status should be applied for.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_yawning_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">number_turns</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictYawningStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">number_turns</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Sleepless status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No status is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_sleepless_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictSleeplessStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Paused status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `param3` - Unknown.</span>
-    <span class="doccomment">/// * `number_turns` - How many turns the status should be applied for.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_paused_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">param3</span>: <span class="ident">i32</span>,
-        <span class="ident">number_turns</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictPausedStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">param3</span>,
-                <span class="ident">number_turns</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Infatuated status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_infatuated_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictInfatuatedStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Burn status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `special_effect` - Flag to apply some special effect alongside the burn?</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_burn_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">special_effect</span>: <span class="ident">bool</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictBurnStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">special_effect</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Burn status condition on all team members if possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_burn_status_whole_team</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_global_dungeon_struct</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GlobalDungeonData</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing &amp; have a mutable reference to the global</span>
-        <span class="comment">// dungeon data.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictBurnStatusWholeTeam</span>() }
-    }
-
-    <span class="doccomment">/// Inflicts the Poisoned status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_poisoned_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictPoisonedStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Badly Poisoned status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_badly_poisoned_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictBadlyPoisonedStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Frozen status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_frozen_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictFrozenStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Constriction status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `animation_id` - animation ID</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_constriction_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">animation_id</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictConstrictionStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">animation_id</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            )
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Shadow Hold (AKA Immobilized) status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_shadow_hold_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictShadowHoldStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Shadow Hold (AKA Immobilized) status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_ingrain_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictIngrainStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Wrapped status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This also gives the user the Wrap status (Wrapped around foe).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_wrapped_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictWrappedStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Petrified status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_petrified_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictPetrifiedStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Inflicts the Cringe status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_cringe_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictCringeStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Paralysis status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_paralysis_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictParalysisStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Confused status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_confused_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictConfusedStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Cowering status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_cowering_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictCoweringStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Leech Seed status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="doccomment">/// * `check_only` - Flag to only perform the check for inflicting without actually inflicting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_leech_seed_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-        <span class="ident">check_only</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryInflictLeechSeedStatus</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">check_only</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Inflicts the Destiny Bond status condition on a target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target monster was affected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inflict_destiny_bond_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryInflictDestinyBond</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Lowers the specified offensive stat on the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `param_5` and `param_6` are unknown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">lower_offensive_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">n_stages</span>: <span class="ident">i16</span>,
-        <span class="ident">param_5</span>: <span class="ident">ffi::undefined</span>,
-        <span class="ident">param_6</span>: <span class="ident">ffi::undefined</span>,
-    ) {
-        <span class="ident">ffi::LowerOffensiveStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">n_stages</span>, <span class="ident">param_5</span>, <span class="ident">param_6</span>)
-    }
-
-    <span class="doccomment">/// Lowers the specified defensive stat on the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `param_5` and `param_6` are unknown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">lower_defensive_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">n_stages</span>: <span class="ident">i16</span>,
-        <span class="ident">param_5</span>: <span class="ident">ffi::undefined</span>,
-        <span class="ident">param_6</span>: <span class="ident">ffi::undefined</span>,
-    ) {
-        <span class="ident">ffi::LowerDefensiveStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">n_stages</span>, <span class="ident">param_5</span>, <span class="ident">param_6</span>)
-    }
-
-    <span class="doccomment">/// Boosts the specified offensive stat on the target monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boost_offensive_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">n_stages</span>: <span class="ident">i16</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::BoostOffensiveStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">n_stages</span>) }
-    }
-
-    <span class="doccomment">/// Boosts the specified defensive stat on the target monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boost_defensive_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">n_stages</span>: <span class="ident">i16</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::BoostDefensiveStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">n_stages</span>) }
-    }
-
-    <span class="doccomment">/// Applies a multiplier to the specified offensive stat on the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This affects struct [`ffi::monster_stat_modifiers.offensive_multipliers`], for moves like</span>
-    <span class="doccomment">/// Charm and Memento.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `param_5` is unknown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">apply_offensive_stat_multiplier</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">multiplier</span>: <span class="ident">i32</span>,
-        <span class="ident">param_5</span>: <span class="ident">ffi::undefined</span>,
-    ) {
-        <span class="ident">ffi::ApplyOffensiveStatMultiplier</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">multiplier</span>, <span class="ident">param_5</span>)
-    }
-
-    <span class="doccomment">/// Applies a multiplier to the specified defensive stat on the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This affects struct [`ffi::monster_stat_modifiers.defensive_multipliers`], for moves like</span>
-    <span class="doccomment">/// Charm and Memento.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `param_5` is unknown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">apply_defensive_stat_multiplier</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">multiplier</span>: <span class="ident">i32</span>,
-        <span class="ident">param_5</span>: <span class="ident">ffi::undefined</span>,
-    ) {
-        <span class="ident">ffi::ApplyDefensiveStatMultiplier</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">multiplier</span>, <span class="ident">param_5</span>)
-    }
-
-    <span class="doccomment">/// Boosts the specified hit chance stat (accuracy or evasion) on the target monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boost_hit_chance_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::BoostHitChanceStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>) }
-    }
-
-    <span class="doccomment">/// Lowers the specified hit chance stat (accuracy or evasion) on the target monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower_hit_chance_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">param_4</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::LowerHitChanceStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">param_4</span>) }
-    }
-
-    <span class="doccomment">/// Resets the specified hit chance stat (accuracy or evasion) back to normal on the</span>
-    <span class="doccomment">/// target monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_hit_chance_stat</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">stat_idx</span>: <span class="ident">i32</span>,
-        <span class="ident">param_4</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ResetHitChanceStat</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">stat_idx</span>, <span class="ident">param_4</span>) }
-    }
-
-    <span class="doccomment">/// Boosts the speed of the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the number of turns specified is 0, a random turn count will be selected using the</span>
-    <span class="doccomment">/// default SPEED_BOOST_DURATION_RANGE (see symbol table).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `n_stages` - The number of stages to boost the speed by.</span>
-    <span class="doccomment">/// * `n_turns` - The number of turns.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boost_speed</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">n_stages</span>: <span class="ident">i32</span>,
-        <span class="ident">n_turns</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::BoostSpeed</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">n_stages</span>,
-                <span class="ident">n_turns</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            )
-        }
-    }
-
-    <span class="doccomment">/// Lowers the speed of the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `n_stages` - The number of stages to boost the speed by.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower_speed</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">n_stages</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::LowerSpeed</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">n_stages</span>, <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
-    }
-
-    <span class="doccomment">/// Randomly boosts or lowers the speed of the target monster by one stage with equal</span>
-    <span class="doccomment">/// probability.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boost_or_lower_speed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>, <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::BoostOrLowerSpeed</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Lowers the speed of the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns Whether or not a move was sealed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_seal_move</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TrySealMove</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) &gt; <span class="number">0</span> }
-    }
-
-    <span class="doccomment">/// Activate the Quick Feet ability on the defender, if the monster has it and it&#39;s active.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns Whether or not the ability was activated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_activate_quick_feet</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryActivateQuickFeet</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) &gt; <span class="number">0</span> }
-    }
-
-    <span class="doccomment">/// Restore HP and possibly boost max HP of the target monster if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns Whether or not HP was restored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `hp_to_restore` - The amount of HP to restore.</span>
-    <span class="doccomment">/// * `max_hp_boost` - The max HP boost to attempt to apply.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_increase_hp</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">hp_to_restore</span>: <span class="ident">i32</span>,
-        <span class="ident">max_hp_boost</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryIncreaseHp</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">hp_to_restore</span>,
-                <span class="ident">max_hp_boost</span>,
-                <span class="ident">log_failure</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Restores the PP of all the target&#39;s moves by the specified amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `pp_to_restore` - The amount of PP to restore.</span>
-    <span class="doccomment">/// * `log_failure` - Flag to log a message to the dungeon message log on failure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restore_move_pp</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">pp_to_restore</span>: <span class="ident">i32</span>,
-        <span class="ident">log_failure</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::RestoreMovePP</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">pp_to_restore</span>,
-                (!<span class="ident">log_failure</span>) <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            )
-        }
-    }
-
-    <span class="doccomment">/// Apply an item effect.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `item` - The item that was used / thrown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">apply_item_effect</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">param_1</span>: <span class="ident">ffi::undefined4</span>,
-        <span class="ident">param_2</span>: <span class="ident">ffi::undefined4</span>,
-        <span class="ident">param_3</span>: <span class="ident">ffi::undefined4</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">item</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonItem</span>,
-    ) {
-        <span class="ident">ffi::ApplyItemEffect</span>(<span class="ident">param_1</span>, <span class="ident">param_2</span>, <span class="ident">param_3</span>, <span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">item</span>)
-    }
-
-    <span class="doccomment">/// Applies the Violent Seed boost to an entity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">violent_seed_boost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>, <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ViolentSeedBoost</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Applies the IQ and possible stat boosts from eating a Gummi to the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `gummi_type` - Type of the Gummi that was eaten.</span>
-    <span class="doccomment">/// * `stat_boost` - The amount of stat boost to apply; if a random stat boost occurs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_gummi_boosts</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">gummi_type</span>: <span class="ident">type_catalog::Type</span>,
-        <span class="ident">stat_boost</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::ApplyGummiBoostsDungeonMode</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">gummi_type</span>, <span class="ident">stat_boost</span>) }
-    }
-
-    <span class="doccomment">/// Applies the IQ and possible stat boosts from eating a Gummi to the target monster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `direction` - The direction</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_pounce</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">direction</span>: <span class="ident">Direction</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryPounce</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">direction</span> <span class="kw">as</span> <span class="ident">ffi::direction_id::Type</span>) }
-    }
-
-    <span class="doccomment">/// Blows away the target monster in a given direction if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `direction` - The direction</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_blow_away</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">direction</span>: <span class="ident">Direction</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TryBlowAway</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">direction</span> <span class="kw">as</span> <span class="ident">ffi::direction_id::Type</span>) }
-    }
-
-    <span class="doccomment">/// Makes the target monster warp if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `warp_type` - The type of warp to apply.</span>
-    <span class="doccomment">/// * `position` - The position to warp to (if warp type is position-based).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_warp</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">warp_type</span>: <span class="ident">WarpType</span>,
-        <span class="ident">position</span>: <span class="ident">ffi::position</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::TryWarp</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="ident">warp_type</span> <span class="kw">as</span> <span class="ident">ffi::warp_type::Type</span>,
-                <span class="ident">position</span>,
-            )
-        }
-    }
-
-    <span class="doccomment">/// Adds to a monster&#39;s experience points, subject to experience boosting effects.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function appears to be called only under special circumstances. Possibly when granting</span>
-    <span class="doccomment">/// experience from damage (e.g., Joy Ribbon)?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Interestingly, the `attacker` isn&#39;t actually used. This might be a compiler</span>
-    <span class="doccomment">/// optimization to avoid shuffling registers, since this function might be called alongside</span>
-    <span class="doccomment">/// lots of other functions that have both the attacker and defender as the first two arguments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `base_exp` - base experience gain, before boosts.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_exp_special</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">base_exp</span>: <span class="ident">i32</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::AddExpSpecial</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">base_exp</span>) }
-    }
-
-    <span class="doccomment">/// The user entity attempts to switch places with the target entity (i.e. by the effect of the</span>
-    <span class="doccomment">/// Switcher Orb).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The function checks for the Suction Cups ability for both the user and the target, and for</span>
-    <span class="doccomment">/// the Mold Breaker ability on the user.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_switch_place</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>, <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::TrySwitchPlace</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Cures the target&#39;s freeze, shadow hold, ingrain, petrified, constriction or wrap (both as</span>
-    <span class="doccomment">/// user and as target) status due to the action of the user.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to cure this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being cured from this status.</span>
-    <span class="doccomment">/// * `log` - Flag to log a message to the dungeon message log.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_frozen_class_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">log</span>: <span class="ident">bool</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EndFrozenClassStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">log</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>) }
-    }
-
-    <span class="doccomment">/// Cures the target&#39;s cringe, confusion, cowering, pause, taunt, encore or infatuated status</span>
-    <span class="doccomment">/// due to the action of the user, and prints the event to the log.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to cure this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being cured from this status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_cringe_class_status</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-    ) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::EndCringeClassStatus</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>) }
-    }
-
-    <span class="doccomment">/// Frees from the wrap status all monsters which are wrapped by/around the monster passed as</span>
-    <span class="doccomment">/// parameter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">free_other_wrapped_monsters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>) {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::FreeOtherWrappedMonsters</span>(<span class="ident">target</span>) }
-    }
-}
-
-<span class="doccomment">/// Internal functions for battle effect calculations.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonEffectsInternals</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonEffectsEmitter</span>);
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DungeonEffectsInternals</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="doccomment">/// Applies damage to a monster. Displays the damage animation, lowers its health and handles</span>
-    <span class="doccomment">/// reviving if applicable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The EU version has some additional checks related to printing fainting messages under</span>
-    <span class="doccomment">/// specific circumstances.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the target fainted (reviving does not count as fainting).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `damage_data` - Mutable reference to the damage_data struct that contains info about the</span>
-    <span class="doccomment">///                   damage to deal</span>
-    <span class="doccomment">/// * `param_4` - ?</span>
-    <span class="doccomment">/// * `param_5` - ?</span>
-    <span class="doccomment">/// * `param_6` - ?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">apply_damage</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">damage_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ffi::damage_data</span>,
-        <span class="ident">param_4</span>: <span class="ident">ffi::undefined4</span>,
-        <span class="ident">param_5</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>,
-        <span class="ident">param_6</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="ident">ffi::ApplyDamage</span>(<span class="ident">attacker</span>, <span class="ident">defender</span>, <span class="ident">damage_data</span>, <span class="ident">param_4</span>, <span class="ident">param_5</span>, <span class="ident">param_6</span>) &gt; <span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Determines if a move used hits or misses the target.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - The monster that is trying to inflict this status.</span>
-    <span class="doccomment">/// * `defender` - The monster that is being inflicted with this status.</span>
-    <span class="doccomment">/// * `the_move` - Reference to move data</span>
-    <span class="doccomment">/// * `use_second_accuracy` - True if the move&#39;s first accuracy (accuracy1) should be used, false</span>
-    <span class="doccomment">///                           if its second accuracy (accuracy2) should be used instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">move_hit_check</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">the_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>,
-        <span class="ident">use_second_accuracy</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: We have a lease on the overlay existing.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::MoveHitCheck</span>(
-                <span class="ident">attacker</span>,
-                <span class="ident">defender</span>,
-                <span class="macro">force_mut_ptr!</span>(<span class="ident">the_move</span>),
-                <span class="ident">use_second_accuracy</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-            ) &gt; <span class="number">0</span>
-        }
-    }
-
-    <span class="doccomment">/// Handles the effects that happen after a move is used. Includes a loop that is run for</span>
-    <span class="doccomment">/// each target, multiple ability checks and the giant switch statement that executes the</span>
-    <span class="doccomment">/// effect of the move used given its ID.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `param_1` - pointer to some struct</span>
-    <span class="doccomment">/// * `attacker` - attacker pointer</span>
-    <span class="doccomment">/// * `the_move` - pointer to move data</span>
-    <span class="doccomment">/// * `param_4` - ?</span>
-    <span class="doccomment">/// * `param_5` - ?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">execute_move_effect</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">param_1</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">the_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>,
-        <span class="ident">param_4</span>: <span class="ident">ffi::undefined4</span>,
-        <span class="ident">param_5</span>: <span class="ident">ffi::undefined4</span>,
-    ) {
-        <span class="ident">ffi::ExecuteMoveEffect</span>(
-            <span class="ident">param_1</span>,
-            <span class="ident">attacker</span>,
-            <span class="macro">force_mut_ptr!</span>(<span class="ident">the_move</span>),
-            <span class="ident">param_4</span>,
-            <span class="ident">param_5</span>,
+        ffi::ExecuteMoveEffect(
+            param_1,
+            attacker,
+            <span class="macro">force_mut_ptr!</span>(the_move),
+            param_4,
+            param_5,
         )
     }
 
-    <span class="doccomment">/// Last function called by [`DungeonEffectsEmitter::deal_damage`] to determine the final</span>
-    <span class="doccomment">/// damage dealt by the move.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The result of this call is the return value of DealDamage.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `attacker` - attacker pointer</span>
-    <span class="doccomment">/// * `defender` - defender pointer</span>
-    <span class="doccomment">/// * `the_move` - pointer to move data</span>
-    <span class="doccomment">/// * `param_4` - ?</span>
-    <span class="doccomment">/// * `param_5` - ?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must make sure the undefined params are valid for this function.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">calc_damage_final</span>(
+    <span class="doccomment">/// Last function called by [`DungeonEffectsEmitter::deal_damage`] to determine the final
+    /// damage dealt by the move.
+    ///
+    /// The result of this call is the return value of DealDamage.
+    ///
+    /// # Arguments
+    /// * `attacker` - attacker pointer
+    /// * `defender` - defender pointer
+    /// * `the_move` - pointer to move data
+    /// * `param_4` - ?
+    /// * `param_5` - ?
+    ///
+    /// # Safety
+    /// The caller must make sure the undefined params are valid for this function.
+    </span><span class="kw">pub unsafe fn </span>calc_damage_final(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">attacker</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">defender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DungeonEntity</span>,
-        <span class="ident">used_move</span>: <span class="kw-2">&amp;</span><span class="ident">Move</span>,
-        <span class="ident">param_4</span>: <span class="ident">ffi::undefined4</span>,
-        <span class="ident">param_5</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::undefined4</span>,
-    ) -&gt; <span class="ident">i32</span> {
-        <span class="ident">ffi::CalcDamageFinal</span>(
-            <span class="ident">attacker</span>,
-            <span class="ident">defender</span>,
-            <span class="macro">force_mut_ptr!</span>(<span class="ident">used_move</span>),
-            <span class="ident">param_4</span>,
-            <span class="ident">param_5</span>,
+        attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
+        used_move: <span class="kw-2">&amp;</span>Move,
+        param_4: ffi::undefined4,
+        param_5: <span class="kw-2">*mut </span>ffi::undefined4,
+    ) -&gt; i32 {
+        ffi::CalcDamageFinal(
+            attacker,
+            defender,
+            <span class="macro">force_mut_ptr!</span>(used_move),
+            param_4,
+            param_5,
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

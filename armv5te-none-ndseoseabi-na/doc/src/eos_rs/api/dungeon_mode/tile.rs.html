@@ -200,207 +200,207 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::dungeon_mode</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">core::slice</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>core::slice;
 
-<span class="doccomment">/// Extension trait for [`DungeonTile`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Important safety note</span>
-<span class="doccomment">/// Please see the safety note of [`DungeonEntityExt`]. It also applies to this trait.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonTileExt</span> {
-    <span class="doccomment">/// Initializes the tile struct.</span>
-    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+<span class="doccomment">/// Extension trait for [`DungeonTile`].
+///
+/// # Important safety note
+/// Please see the safety note of [`DungeonEntityExt`]. It also applies to this trait.
+</span><span class="kw">pub trait </span>DungeonTileExt {
+    <span class="doccomment">/// Initializes the tile struct.
+    </span><span class="kw">fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 
-    <span class="doccomment">/// Gets the terrain type of a tile.</span>
-    <span class="doccomment">/// Returns None if the terrain type is invalid.</span>
-    <span class="kw">fn</span> <span class="ident">get_terrain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">TerrainType</span>&gt;;
+    <span class="doccomment">/// Gets the terrain type of a tile.
+    /// Returns None if the terrain type is invalid.
+    </span><span class="kw">fn </span>get_terrain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TerrainType&gt;;
 
-    <span class="doccomment">/// Set the terrain of a specific tile to be an obstacle (wall or secondary terrain).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `secondary_terrain` is true, secondary terrain will be placed, otherwise wall.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Secondary terrain (water/lava) can only be placed in the specified room.</span>
-    <span class="doccomment">/// If the tile room index does not match, a wall will be placed instead.</span>
-    <span class="kw">fn</span> <span class="ident">set_terrain_obstacle_checked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">secondary_terrain</span>: <span class="ident">bool</span>, <span class="ident">room_index</span>: <span class="ident">u8</span>);
+    <span class="doccomment">/// Set the terrain of a specific tile to be an obstacle (wall or secondary terrain).
+    ///
+    /// If `secondary_terrain` is true, secondary terrain will be placed, otherwise wall.
+    ///
+    /// Secondary terrain (water/lava) can only be placed in the specified room.
+    /// If the tile room index does not match, a wall will be placed instead.
+    </span><span class="kw">fn </span>set_terrain_obstacle_checked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secondary_terrain: bool, room_index: u8);
 
-    <span class="doccomment">/// Set a specific tile to have secondary terrain (water/lava), but only if it&#39;s a passable wall.</span>
-    <span class="kw">fn</span> <span class="ident">set_secondary_terrain_on_wall</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+    <span class="doccomment">/// Set a specific tile to have secondary terrain (water/lava), but only if it&#39;s a passable wall.
+    </span><span class="kw">fn </span>set_secondary_terrain_on_wall(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 }
 
-<span class="kw">impl</span> <span class="ident">DungeonTileExt</span> <span class="kw">for</span> <span class="ident">DungeonTile</span> {
-    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::InitializeTile</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) };
+<span class="kw">impl </span>DungeonTileExt <span class="kw">for </span>DungeonTile {
+    <span class="kw">fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::InitializeTile(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) };
     }
 
-    <span class="kw">fn</span> <span class="ident">get_terrain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident">TerrainType</span>&gt; {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetTileTerrain</span>(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
-            .<span class="ident">try_into</span>()
-            .<span class="ident">ok</span>()
+    <span class="kw">fn </span>get_terrain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TerrainType&gt; {
+        <span class="kw">unsafe </span>{ ffi::GetTileTerrain(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
+            .try_into()
+            .ok()
     }
 
-    <span class="kw">fn</span> <span class="ident">set_terrain_obstacle_checked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">secondary_terrain</span>: <span class="ident">bool</span>, <span class="ident">room_index</span>: <span class="ident">u8</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::SetTerrainObstacleChecked</span>(
-                <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
-                <span class="ident">secondary_terrain</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">room_index</span>,
+    <span class="kw">fn </span>set_terrain_obstacle_checked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secondary_terrain: bool, room_index: u8) {
+        <span class="kw">unsafe </span>{
+            ffi::SetTerrainObstacleChecked(
+                <span class="self">self </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
+                secondary_terrain <span class="kw">as </span>ffi::bool_,
+                room_index,
             )
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">set_secondary_terrain_on_wall</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::SetSecondaryTerrainOnWall</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+    <span class="kw">fn </span>set_secondary_terrain_on_wall(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::SetSecondaryTerrainOnWall(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 }
 
-<span class="doccomment">/// Functions for reading from a tile grid.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonTileGridRead</span>&lt;<span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt; {
-    <span class="doccomment">/// Returns the tile at the given position. Panics if the position is out of bounds.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTile</span>&gt;;
+<span class="doccomment">/// Functions for reading from a tile grid.
+</span><span class="kw">pub trait </span>DungeonTileGridRead&lt;<span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt; {
+    <span class="doccomment">/// Returns the tile at the given position. Panics if the position is out of bounds.
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTile&gt;;
 
-    <span class="doccomment">/// Iterate over all tiles in the grid, in row-major order (from top-left to bottom-right).</span>
-    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DungeonTileGridIter</span>&lt;<span class="ident">W</span>&gt;;
+    <span class="doccomment">/// Iterate over all tiles in the grid, in row-major order (from top-left to bottom-right).
+    </span><span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DungeonTileGridIter&lt;W&gt;;
 }
 
-<span class="doccomment">/// Functions for writing into a tile grid.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DungeonTileGridWrite</span>&lt;<span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt;: <span class="ident">DungeonTileGridRead</span>&lt;<span class="ident">W</span>, <span class="ident">H</span>&gt; {
-    <span class="doccomment">/// Returns the tile at the given position, mutably. Panics if the position is out of bounds.</span>
-    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonTile</span>&gt;;
-    <span class="doccomment">/// Place the given tile at the given position. This overwrites the data of the tile that is</span>
-    <span class="doccomment">/// pointed to at this location. Panics if the position is out of bounds.</span>
-    <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>, <span class="ident">tile</span>: <span class="ident">DungeonTile</span>);
+<span class="doccomment">/// Functions for writing into a tile grid.
+</span><span class="kw">pub trait </span>DungeonTileGridWrite&lt;<span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt;: DungeonTileGridRead&lt;W, H&gt; {
+    <span class="doccomment">/// Returns the tile at the given position, mutably. Panics if the position is out of bounds.
+    </span><span class="kw">fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTile&gt;;
+    <span class="doccomment">/// Place the given tile at the given position. This overwrites the data of the tile that is
+    /// pointed to at this location. Panics if the position is out of bounds.
+    </span><span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize, tile: DungeonTile);
 
-    <span class="doccomment">/// Iterate over all tiles in the grid, in row-major order (from top-left to bottom-right).</span>
-    <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DungeonTileGridIterMut</span>&lt;<span class="ident">W</span>&gt;;
+    <span class="doccomment">/// Iterate over all tiles in the grid, in row-major order (from top-left to bottom-right).
+    </span><span class="kw">fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DungeonTileGridIterMut&lt;W&gt;;
 }
 
-<span class="doccomment">/// See [`DungeonTileGridRead`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonTileGridRef</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt;(
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [[<span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>; <span class="ident">W</span>]; <span class="ident">H</span>],
+<span class="doccomment">/// See [`DungeonTileGridRead`].
+</span><span class="kw">pub struct </span>DungeonTileGridRef&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[[<span class="kw-2">*mut </span>ffi::tile; W]; H],
 );
-<span class="doccomment">/// See [`DungeonTileGridRead`] and [`DungeonTileGridWrite`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonTileGridMut</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt;(
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [[<span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>; <span class="ident">W</span>]; <span class="ident">H</span>],
+<span class="doccomment">/// See [`DungeonTileGridRead`] and [`DungeonTileGridWrite`].
+</span><span class="kw">pub struct </span>DungeonTileGridMut&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[[<span class="kw-2">*mut </span>ffi::tile; W]; H],
 );
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt; <span class="ident">DungeonTileGridRead</span>&lt;<span class="ident">W</span>, <span class="ident">H</span>&gt;
-    <span class="kw">for</span> <span class="ident">DungeonTileGridRef</span>&lt;<span class="lifetime">&#39;a</span>, <span class="ident">W</span>, <span class="ident">H</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt; DungeonTileGridRead&lt;W, H&gt;
+    <span class="kw">for </span>DungeonTileGridRef&lt;<span class="lifetime">&#39;a</span>, W, H&gt;
 {
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTile</span>&gt; {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="number">0</span>[<span class="ident">y</span>][<span class="ident">x</span>].<span class="ident">as_ref</span>() }
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTile&gt; {
+        <span class="kw">unsafe </span>{ <span class="self">self</span>.<span class="number">0</span>[y][x].as_ref() }
     }
 
-    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DungeonTileGridIter</span>&lt;<span class="ident">W</span>&gt; {
-        <span class="ident">DungeonTileGridIter</span> {
-            <span class="ident">tiles_iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>(),
-            <span class="ident">cur_row</span>: <span class="prelude-val">None</span>,
-            <span class="ident">cur_row_iter</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DungeonTileGridIter&lt;W&gt; {
+        DungeonTileGridIter {
+            tiles_iter: <span class="self">self</span>.<span class="number">0</span>.iter(),
+            cur_row: <span class="prelude-val">None</span>,
+            cur_row_iter: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt; <span class="ident">DungeonTileGridRead</span>&lt;<span class="ident">W</span>, <span class="ident">H</span>&gt;
-    <span class="kw">for</span> <span class="ident">DungeonTileGridMut</span>&lt;<span class="lifetime">&#39;a</span>, <span class="ident">W</span>, <span class="ident">H</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt; DungeonTileGridRead&lt;W, H&gt;
+    <span class="kw">for </span>DungeonTileGridMut&lt;<span class="lifetime">&#39;a</span>, W, H&gt;
 {
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="ident">DungeonTile</span>&gt; {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="number">0</span>[<span class="ident">y</span>][<span class="ident">x</span>].<span class="ident">as_ref</span>() }
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTile&gt; {
+        <span class="kw">unsafe </span>{ <span class="self">self</span>.<span class="number">0</span>[y][x].as_ref() }
     }
 
-    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DungeonTileGridIter</span>&lt;<span class="ident">W</span>&gt; {
-        <span class="ident">DungeonTileGridIter</span> {
-            <span class="ident">tiles_iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>(),
-            <span class="ident">cur_row</span>: <span class="prelude-val">None</span>,
-            <span class="ident">cur_row_iter</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DungeonTileGridIter&lt;W&gt; {
+        DungeonTileGridIter {
+            tiles_iter: <span class="self">self</span>.<span class="number">0</span>.iter(),
+            cur_row: <span class="prelude-val">None</span>,
+            cur_row_iter: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>, <span class="kw">const</span> <span class="ident">H</span>: <span class="ident">usize</span>&gt; <span class="ident">DungeonTileGridWrite</span>&lt;<span class="ident">W</span>, <span class="ident">H</span>&gt;
-    <span class="kw">for</span> <span class="ident">DungeonTileGridMut</span>&lt;<span class="lifetime">&#39;a</span>, <span class="ident">W</span>, <span class="ident">H</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize, <span class="kw">const </span>H: usize&gt; DungeonTileGridWrite&lt;W, H&gt;
+    <span class="kw">for </span>DungeonTileGridMut&lt;<span class="lifetime">&#39;a</span>, W, H&gt;
 {
-    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut</span> <span class="ident">DungeonTile</span>&gt; {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="number">0</span>[<span class="ident">y</span>][<span class="ident">x</span>].<span class="ident">as_mut</span>().<span class="ident">map</span>(|<span class="ident">tile</span>| <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">tile</span>) }
+    <span class="kw">fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTile&gt; {
+        <span class="kw">unsafe </span>{ <span class="self">self</span>.<span class="number">0</span>[y][x].as_mut().map(|tile| <span class="kw-2">&amp;mut *</span>tile) }
     }
 
-    <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>, <span class="ident">tile</span>: <span class="ident">DungeonTile</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">otile</span> = <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">y</span>][<span class="ident">x</span>] };
-        <span class="ident">otile</span>.<span class="ident">_bitfield_align_1</span> = <span class="ident">tile</span>.<span class="ident">_bitfield_align_1</span>;
-        <span class="ident">otile</span>.<span class="ident">_bitfield_1</span> = <span class="ident">tile</span>.<span class="ident">_bitfield_1</span>;
-        <span class="ident">otile</span>.<span class="ident">spawn_or_visibility_flags</span> = <span class="ident">tile</span>.<span class="ident">spawn_or_visibility_flags</span>;
-        <span class="ident">otile</span>.<span class="ident">texture_id</span> = <span class="ident">tile</span>.<span class="ident">texture_id</span>;
-        <span class="ident">otile</span>.<span class="ident">field_0x6</span> = <span class="ident">tile</span>.<span class="ident">field_0x6</span>;
-        <span class="ident">otile</span>.<span class="ident">room</span> = <span class="ident">tile</span>.<span class="ident">room</span>;
-        <span class="ident">otile</span>.<span class="ident">walkable_neighbor_flags</span> = <span class="ident">tile</span>.<span class="ident">walkable_neighbor_flags</span>;
-        <span class="ident">otile</span>.<span class="ident">monster</span> = <span class="ident">tile</span>.<span class="ident">monster</span>;
-        <span class="ident">otile</span>.<span class="ident">object</span> = <span class="ident">tile</span>.<span class="ident">object</span>;
+    <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize, tile: DungeonTile) {
+        <span class="kw">let </span><span class="kw-2">mut </span>otile = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>[y][x] };
+        otile._bitfield_align_1 = tile._bitfield_align_1;
+        otile._bitfield_1 = tile._bitfield_1;
+        otile.spawn_or_visibility_flags = tile.spawn_or_visibility_flags;
+        otile.texture_id = tile.texture_id;
+        otile.field_0x6 = tile.field_0x6;
+        otile.room = tile.room;
+        otile.walkable_neighbor_flags = tile.walkable_neighbor_flags;
+        otile.monster = tile.monster;
+        otile.object = tile.object;
     }
 
-    <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DungeonTileGridIterMut</span>&lt;<span class="ident">W</span>&gt; {
-        <span class="ident">DungeonTileGridIterMut</span> {
-            <span class="ident">tiles_iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>(),
-            <span class="ident">cur_row</span>: <span class="prelude-val">None</span>,
-            <span class="ident">cur_row_iter</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DungeonTileGridIterMut&lt;W&gt; {
+        DungeonTileGridIterMut {
+            tiles_iter: <span class="self">self</span>.<span class="number">0</span>.iter(),
+            cur_row: <span class="prelude-val">None</span>,
+            cur_row_iter: <span class="prelude-val">None</span>,
         }
     }
-    <span class="comment">// TODO</span>
+    <span class="comment">// TODO
+</span>}
+
+<span class="doccomment">/// A iterator over the tiles in a dungeon tile grid.
+</span><span class="kw">pub struct </span>DungeonTileGridIter&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize&gt; {
+    tiles_iter: slice::Iter&lt;<span class="lifetime">&#39;a</span>, [<span class="kw-2">*mut </span>ffi::tile; W]&gt;,
+    cur_row: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">*mut </span>ffi::tile; W]&gt;,
+    cur_row_iter: <span class="prelude-ty">Option</span>&lt;slice::Iter&lt;<span class="lifetime">&#39;a</span>, <span class="kw-2">*mut </span>ffi::tile&gt;&gt;,
 }
 
-<span class="doccomment">/// A iterator over the tiles in a dungeon tile grid.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonTileGridIter</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>&gt; {
-    <span class="ident">tiles_iter</span>: <span class="ident">slice::Iter</span>&lt;<span class="lifetime">&#39;a</span>, [<span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>; <span class="ident">W</span>]&gt;,
-    <span class="ident">cur_row</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>; <span class="ident">W</span>]&gt;,
-    <span class="ident">cur_row_iter</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">slice::Iter</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>&gt;&gt;,
-}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize&gt; Iterator <span class="kw">for </span>DungeonTileGridIter&lt;<span class="lifetime">&#39;a</span>, W&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DungeonTile;
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>&gt; <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">DungeonTileGridIter</span>&lt;<span class="lifetime">&#39;a</span>, <span class="ident">W</span>&gt; {
-    <span class="kw">type</span> <span class="ident">Item</span> = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DungeonTile</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident"><span class="self">Self</span>::Item</span>&gt; {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cur_row</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">cur_row</span> = <span class="self">self</span>.<span class="ident">tiles_iter</span>.<span class="ident">next</span>();
-            <span class="self">self</span>.<span class="ident">cur_row_iter</span> = <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cur_row</span><span class="question-mark">?</span>.<span class="ident">iter</span>());
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.cur_row.is_none() {
+            <span class="self">self</span>.cur_row = <span class="self">self</span>.tiles_iter.next();
+            <span class="self">self</span>.cur_row_iter = <span class="prelude-val">Some</span>(<span class="self">self</span>.cur_row<span class="question-mark">?</span>.iter());
         }
 
-        <span class="kw">let</span> <span class="ident">tile</span> = <span class="self">self</span>.<span class="ident">cur_row_iter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">next</span>();
-        <span class="kw">match</span> <span class="ident">tile</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">tile</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">tile</span> }),
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// Reached end of row. Unset current row and try next row.</span>
-                <span class="self">self</span>.<span class="ident">cur_row</span> = <span class="prelude-val">None</span>;
-                <span class="self">self</span>.<span class="ident">next</span>()
+        <span class="kw">let </span>tile = <span class="self">self</span>.cur_row_iter.as_mut().unwrap().next();
+        <span class="kw">match </span>tile {
+            <span class="prelude-val">Some</span>(tile) =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;**</span>tile }),
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="comment">// Reached end of row. Unset current row and try next row.
+                </span><span class="self">self</span>.cur_row = <span class="prelude-val">None</span>;
+                <span class="self">self</span>.next()
             }
         }
     }
 }
 
-<span class="doccomment">/// A mutable iterator over the tiles in a dungeon tile grid.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonTileGridIterMut</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>&gt; {
-    <span class="ident">tiles_iter</span>: <span class="ident">slice::Iter</span>&lt;<span class="lifetime">&#39;a</span>, [<span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>; <span class="ident">W</span>]&gt;,
-    <span class="ident">cur_row</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>; <span class="ident">W</span>]&gt;,
-    <span class="ident">cur_row_iter</span>: <span class="prelude-ty">Option</span>&lt;<span class="ident">slice::Iter</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw-2">*mut</span> <span class="ident">ffi::tile</span>&gt;&gt;,
+<span class="doccomment">/// A mutable iterator over the tiles in a dungeon tile grid.
+</span><span class="kw">pub struct </span>DungeonTileGridIterMut&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize&gt; {
+    tiles_iter: slice::Iter&lt;<span class="lifetime">&#39;a</span>, [<span class="kw-2">*mut </span>ffi::tile; W]&gt;,
+    cur_row: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">*mut </span>ffi::tile; W]&gt;,
+    cur_row_iter: <span class="prelude-ty">Option</span>&lt;slice::Iter&lt;<span class="lifetime">&#39;a</span>, <span class="kw-2">*mut </span>ffi::tile&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span>&gt; <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">DungeonTileGridIterMut</span>&lt;<span class="lifetime">&#39;a</span>, <span class="ident">W</span>&gt; {
-    <span class="kw">type</span> <span class="ident">Item</span> = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">DungeonTile</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>W: usize&gt; Iterator <span class="kw">for </span>DungeonTileGridIterMut&lt;<span class="lifetime">&#39;a</span>, W&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DungeonTile;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="ident"><span class="self">Self</span>::Item</span>&gt; {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cur_row</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">cur_row</span> = <span class="self">self</span>.<span class="ident">tiles_iter</span>.<span class="ident">next</span>();
-            <span class="self">self</span>.<span class="ident">cur_row_iter</span> = <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cur_row</span><span class="question-mark">?</span>.<span class="ident">iter</span>());
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.cur_row.is_none() {
+            <span class="self">self</span>.cur_row = <span class="self">self</span>.tiles_iter.next();
+            <span class="self">self</span>.cur_row_iter = <span class="prelude-val">Some</span>(<span class="self">self</span>.cur_row<span class="question-mark">?</span>.iter());
         }
 
-        <span class="kw">let</span> <span class="ident">tile</span> = <span class="self">self</span>.<span class="ident">cur_row_iter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">next</span>();
-        <span class="kw">match</span> <span class="ident">tile</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">tile</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">tile</span> }),
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// Reached end of row. Unset current row and try next row.</span>
-                <span class="self">self</span>.<span class="ident">cur_row</span> = <span class="prelude-val">None</span>;
-                <span class="self">self</span>.<span class="ident">next</span>()
+        <span class="kw">let </span>tile = <span class="self">self</span>.cur_row_iter.as_mut().unwrap().next();
+        <span class="kw">match </span>tile {
+            <span class="prelude-val">Some</span>(tile) =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut **</span>tile }),
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="comment">// Reached end of row. Unset current row and try next row.
+                </span><span class="self">self</span>.cur_row = <span class="prelude-val">None</span>;
+                <span class="self">self</span>.next()
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

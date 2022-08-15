@@ -662,669 +662,669 @@
 <span id="662">662</span>
 <span id="663">663</span>
 <span id="664">664</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi::type_matchup::Type</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span><span class="kw">crate</span>::ffi::type_matchup::Type;
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Move index of a monster, used by some functions.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TargetTypeIndex</span> {
-    <span class="ident">FirstType</span> = <span class="number">0</span>,
-    <span class="ident">SecondType</span> = <span class="number">1</span>,
+<span class="attribute">#[repr(i32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Move index of a monster, used by some functions.
+</span><span class="kw">pub enum </span>TargetTypeIndex {
+    FirstType = <span class="number">0</span>,
+    SecondType = <span class="number">1</span>,
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Describes the effectiveness of a move&#39;s type against type(s).</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DungeonTypeMatchup</span> {
-    <span class="ident">Immune</span> = <span class="ident">ffi::type_matchup::MATCHUP_IMMUNE</span>,
-    <span class="ident">NotVeryEffective</span> = <span class="ident">ffi::type_matchup::MATCHUP_NOT_VERY_EFFECTIVE</span>,
-    <span class="ident">Neutral</span> = <span class="ident">ffi::type_matchup::MATCHUP_NEUTRAL</span>,
-    <span class="ident">SuperEffective</span> = <span class="ident">ffi::type_matchup::MATCHUP_SUPER_EFFECTIVE</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Describes the effectiveness of a move&#39;s type against type(s).
+</span><span class="kw">pub enum </span>DungeonTypeMatchup {
+    Immune = ffi::type_matchup::MATCHUP_IMMUNE,
+    NotVeryEffective = ffi::type_matchup::MATCHUP_NOT_VERY_EFFECTIVE,
+    Neutral = ffi::type_matchup::MATCHUP_NEUTRAL,
+    SuperEffective = ffi::type_matchup::MATCHUP_SUPER_EFFECTIVE,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::type_matchup::Type</span>&gt; <span class="kw">for</span> <span class="ident">DungeonTypeMatchup</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::type_matchup::Type&gt; <span class="kw">for </span>DungeonTypeMatchup {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::type_matchup::MATCHUP_IMMUNE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonTypeMatchup::Immune</span>),
-            <span class="ident">ffi::type_matchup::MATCHUP_NOT_VERY_EFFECTIVE</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">DungeonTypeMatchup::NotVeryEffective</span>)
+    <span class="kw">fn </span>try_from(value: Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::type_matchup::MATCHUP_IMMUNE =&gt; <span class="prelude-val">Ok</span>(DungeonTypeMatchup::Immune),
+            ffi::type_matchup::MATCHUP_NOT_VERY_EFFECTIVE =&gt; {
+                <span class="prelude-val">Ok</span>(DungeonTypeMatchup::NotVeryEffective)
             }
-            <span class="ident">ffi::type_matchup::MATCHUP_NEUTRAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonTypeMatchup::Neutral</span>),
-            <span class="ident">ffi::type_matchup::MATCHUP_SUPER_EFFECTIVE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonTypeMatchup::SuperEffective</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+            ffi::type_matchup::MATCHUP_NEUTRAL =&gt; <span class="prelude-val">Ok</span>(DungeonTypeMatchup::Neutral),
+            ffi::type_matchup::MATCHUP_SUPER_EFFECTIVE =&gt; <span class="prelude-val">Ok</span>(DungeonTypeMatchup::SuperEffective),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// The type of an entity in a dungeon.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DungeonEntityType</span> {
-    <span class="ident">Nothing</span> = <span class="ident">ffi::entity_type::ENTITY_NOTHING</span>,
-    <span class="ident">Monster</span> = <span class="ident">ffi::entity_type::ENTITY_MONSTER</span>,
-    <span class="ident">Trap</span> = <span class="ident">ffi::entity_type::ENTITY_TRAP</span>,
-    <span class="ident">Item</span> = <span class="ident">ffi::entity_type::ENTITY_ITEM</span>,
-    <span class="ident">HiddenStairs</span> = <span class="ident">ffi::entity_type::ENTITY_HIDDEN_STAIRS</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// The type of an entity in a dungeon.
+</span><span class="kw">pub enum </span>DungeonEntityType {
+    Nothing = ffi::entity_type::ENTITY_NOTHING,
+    Monster = ffi::entity_type::ENTITY_MONSTER,
+    Trap = ffi::entity_type::ENTITY_TRAP,
+    Item = ffi::entity_type::ENTITY_ITEM,
+    HiddenStairs = ffi::entity_type::ENTITY_HIDDEN_STAIRS,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::entity_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">DungeonEntityType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::entity_type::Type&gt; <span class="kw">for </span>DungeonEntityType {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::entity_type::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::entity_type::ENTITY_NOTHING</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonEntityType::Nothing</span>),
-            <span class="ident">ffi::entity_type::ENTITY_MONSTER</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonEntityType::Monster</span>),
-            <span class="ident">ffi::entity_type::ENTITY_TRAP</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonEntityType::Trap</span>),
-            <span class="ident">ffi::entity_type::ENTITY_ITEM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonEntityType::Item</span>),
-            <span class="ident">ffi::entity_type::ENTITY_HIDDEN_STAIRS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonEntityType::HiddenStairs</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::entity_type::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::entity_type::ENTITY_NOTHING =&gt; <span class="prelude-val">Ok</span>(DungeonEntityType::Nothing),
+            ffi::entity_type::ENTITY_MONSTER =&gt; <span class="prelude-val">Ok</span>(DungeonEntityType::Monster),
+            ffi::entity_type::ENTITY_TRAP =&gt; <span class="prelude-val">Ok</span>(DungeonEntityType::Trap),
+            ffi::entity_type::ENTITY_ITEM =&gt; <span class="prelude-val">Ok</span>(DungeonEntityType::Item),
+            ffi::entity_type::ENTITY_HIDDEN_STAIRS =&gt; <span class="prelude-val">Ok</span>(DungeonEntityType::HiddenStairs),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// The category of a move.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MoveCategory</span> {
-    <span class="prelude-val">None</span> = <span class="ident">ffi::move_category::CATEGORY_NONE</span>,
-    <span class="ident">Physical</span> = <span class="ident">ffi::move_category::CATEGORY_PHYSICAL</span>,
-    <span class="ident">Special</span> = <span class="ident">ffi::move_category::CATEGORY_SPECIAL</span>,
-    <span class="ident">Status</span> = <span class="ident">ffi::move_category::CATEGORY_STATUS</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// The category of a move.
+</span><span class="kw">pub enum </span>MoveCategory {
+    <span class="prelude-val">None </span>= ffi::move_category::CATEGORY_NONE,
+    Physical = ffi::move_category::CATEGORY_PHYSICAL,
+    Special = ffi::move_category::CATEGORY_SPECIAL,
+    Status = ffi::move_category::CATEGORY_STATUS,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::move_category::Type</span>&gt; <span class="kw">for</span> <span class="ident">MoveCategory</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::move_category::Type&gt; <span class="kw">for </span>MoveCategory {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::move_category::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::move_category::CATEGORY_NONE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveCategory::None</span>),
-            <span class="ident">ffi::move_category::CATEGORY_PHYSICAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveCategory::Physical</span>),
-            <span class="ident">ffi::move_category::CATEGORY_SPECIAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveCategory::Special</span>),
-            <span class="ident">ffi::move_category::CATEGORY_STATUS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MoveCategory::Status</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::move_category::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::move_category::CATEGORY_NONE =&gt; <span class="prelude-val">Ok</span>(MoveCategory::None),
+            ffi::move_category::CATEGORY_PHYSICAL =&gt; <span class="prelude-val">Ok</span>(MoveCategory::Physical),
+            ffi::move_category::CATEGORY_SPECIAL =&gt; <span class="prelude-val">Ok</span>(MoveCategory::Special),
+            ffi::move_category::CATEGORY_STATUS =&gt; <span class="prelude-val">Ok</span>(MoveCategory::Status),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// The type of a floor.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FloorType</span> {
-    <span class="doccomment">/// The floor is neither a fixed floor nor does it contain a rescue point.</span>
-    <span class="ident">Normal</span> = <span class="ident">ffi::floor_type::FLOOR_TYPE_NORMAL</span>,
-    <span class="doccomment">/// The floor is a fixed floor.</span>
-    <span class="ident">Fixed</span> = <span class="ident">ffi::floor_type::FLOOR_TYPE_FIXED</span>,
-    <span class="doccomment">/// The floor has a rescue point.</span>
-    <span class="ident">Rescue</span> = <span class="ident">ffi::floor_type::FLOOR_TYPE_RESCUE</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// The type of a floor.
+</span><span class="kw">pub enum </span>FloorType {
+    <span class="doccomment">/// The floor is neither a fixed floor nor does it contain a rescue point.
+    </span>Normal = ffi::floor_type::FLOOR_TYPE_NORMAL,
+    <span class="doccomment">/// The floor is a fixed floor.
+    </span>Fixed = ffi::floor_type::FLOOR_TYPE_FIXED,
+    <span class="doccomment">/// The floor has a rescue point.
+    </span>Rescue = ffi::floor_type::FLOOR_TYPE_RESCUE,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::floor_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">FloorType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::floor_type::Type&gt; <span class="kw">for </span>FloorType {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::floor_type::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::floor_type::FLOOR_TYPE_NORMAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorType::Normal</span>),
-            <span class="ident">ffi::floor_type::FLOOR_TYPE_FIXED</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorType::Fixed</span>),
-            <span class="ident">ffi::floor_type::FLOOR_TYPE_RESCUE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorType::Rescue</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::floor_type::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::floor_type::FLOOR_TYPE_NORMAL =&gt; <span class="prelude-val">Ok</span>(FloorType::Normal),
+            ffi::floor_type::FLOOR_TYPE_FIXED =&gt; <span class="prelude-val">Ok</span>(FloorType::Fixed),
+            ffi::floor_type::FLOOR_TYPE_RESCUE =&gt; <span class="prelude-val">Ok</span>(FloorType::Rescue),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// The type of terrain of a tile.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TerrainType</span> {
-    <span class="ident">Wall</span> = <span class="ident">ffi::terrain_type::TERRAIN_WALL</span>,
-    <span class="ident">Normal</span> = <span class="ident">ffi::terrain_type::TERRAIN_NORMAL</span>,
-    <span class="ident">Secondary</span> = <span class="ident">ffi::terrain_type::TERRAIN_SECONDARY</span>,
-    <span class="ident">Chasm</span> = <span class="ident">ffi::terrain_type::TERRAIN_CHASM</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// The type of terrain of a tile.
+</span><span class="kw">pub enum </span>TerrainType {
+    Wall = ffi::terrain_type::TERRAIN_WALL,
+    Normal = ffi::terrain_type::TERRAIN_NORMAL,
+    Secondary = ffi::terrain_type::TERRAIN_SECONDARY,
+    Chasm = ffi::terrain_type::TERRAIN_CHASM,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::terrain_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">TerrainType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::terrain_type::Type&gt; <span class="kw">for </span>TerrainType {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::terrain_type::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::terrain_type::TERRAIN_WALL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TerrainType::Wall</span>),
-            <span class="ident">ffi::terrain_type::TERRAIN_NORMAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TerrainType::Normal</span>),
-            <span class="ident">ffi::terrain_type::TERRAIN_SECONDARY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TerrainType::Secondary</span>),
-            <span class="ident">ffi::terrain_type::TERRAIN_CHASM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TerrainType::Chasm</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::terrain_type::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::terrain_type::TERRAIN_WALL =&gt; <span class="prelude-val">Ok</span>(TerrainType::Wall),
+            ffi::terrain_type::TERRAIN_NORMAL =&gt; <span class="prelude-val">Ok</span>(TerrainType::Normal),
+            ffi::terrain_type::TERRAIN_SECONDARY =&gt; <span class="prelude-val">Ok</span>(TerrainType::Secondary),
+            ffi::terrain_type::TERRAIN_CHASM =&gt; <span class="prelude-val">Ok</span>(TerrainType::Chasm),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// The type of secondary terrain of a tile.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SecondaryTerrainType</span> {
-    <span class="ident">Water</span> = <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_WATER</span>,
-    <span class="ident">Lava</span> = <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_LAVA</span>,
-    <span class="ident">Chasm</span> = <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_CHASM</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// The type of secondary terrain of a tile.
+</span><span class="kw">pub enum </span>SecondaryTerrainType {
+    Water = ffi::secondary_terrain_type::SECONDARY_TERRAIN_WATER,
+    Lava = ffi::secondary_terrain_type::SECONDARY_TERRAIN_LAVA,
+    Chasm = ffi::secondary_terrain_type::SECONDARY_TERRAIN_CHASM,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::secondary_terrain_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">SecondaryTerrainType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::secondary_terrain_type::Type&gt; <span class="kw">for </span>SecondaryTerrainType {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::secondary_terrain_type::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_WATER</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SecondaryTerrainType::Water</span>),
-            <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_LAVA</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SecondaryTerrainType::Lava</span>),
-            <span class="ident">ffi::secondary_terrain_type::SECONDARY_TERRAIN_CHASM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SecondaryTerrainType::Chasm</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::secondary_terrain_type::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::secondary_terrain_type::SECONDARY_TERRAIN_WATER =&gt; <span class="prelude-val">Ok</span>(SecondaryTerrainType::Water),
+            ffi::secondary_terrain_type::SECONDARY_TERRAIN_LAVA =&gt; <span class="prelude-val">Ok</span>(SecondaryTerrainType::Lava),
+            ffi::secondary_terrain_type::SECONDARY_TERRAIN_CHASM =&gt; <span class="prelude-val">Ok</span>(SecondaryTerrainType::Chasm),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Types of weather.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Weather</span> {
-    <span class="ident">Clear</span> = <span class="ident">ffi::weather_id::WEATHER_CLEAR</span>,
-    <span class="ident">Sunny</span> = <span class="ident">ffi::weather_id::WEATHER_SUNNY</span>,
-    <span class="ident">Sandstorm</span> = <span class="ident">ffi::weather_id::WEATHER_SANDSTORM</span>,
-    <span class="ident">Cloudy</span> = <span class="ident">ffi::weather_id::WEATHER_CLOUDY</span>,
-    <span class="ident">Rain</span> = <span class="ident">ffi::weather_id::WEATHER_RAIN</span>,
-    <span class="ident">Hail</span> = <span class="ident">ffi::weather_id::WEATHER_HAIL</span>,
-    <span class="ident">Fog</span> = <span class="ident">ffi::weather_id::WEATHER_FOG</span>,
-    <span class="ident">Snow</span> = <span class="ident">ffi::weather_id::WEATHER_SNOW</span>,
-    <span class="ident">Random</span> = <span class="ident">ffi::weather_id::WEATHER_RANDOM</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Types of weather.
+</span><span class="kw">pub enum </span>Weather {
+    Clear = ffi::weather_id::WEATHER_CLEAR,
+    Sunny = ffi::weather_id::WEATHER_SUNNY,
+    Sandstorm = ffi::weather_id::WEATHER_SANDSTORM,
+    Cloudy = ffi::weather_id::WEATHER_CLOUDY,
+    Rain = ffi::weather_id::WEATHER_RAIN,
+    Hail = ffi::weather_id::WEATHER_HAIL,
+    Fog = ffi::weather_id::WEATHER_FOG,
+    Snow = ffi::weather_id::WEATHER_SNOW,
+    Random = ffi::weather_id::WEATHER_RANDOM,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::weather_id::Type</span>&gt; <span class="kw">for</span> <span class="ident">Weather</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::weather_id::Type&gt; <span class="kw">for </span>Weather {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::weather_id::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::weather_id::WEATHER_CLEAR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Clear</span>),
-            <span class="ident">ffi::weather_id::WEATHER_SUNNY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Sunny</span>),
-            <span class="ident">ffi::weather_id::WEATHER_SANDSTORM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Sandstorm</span>),
-            <span class="ident">ffi::weather_id::WEATHER_CLOUDY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Cloudy</span>),
-            <span class="ident">ffi::weather_id::WEATHER_RAIN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Rain</span>),
-            <span class="ident">ffi::weather_id::WEATHER_HAIL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Hail</span>),
-            <span class="ident">ffi::weather_id::WEATHER_FOG</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Fog</span>),
-            <span class="ident">ffi::weather_id::WEATHER_SNOW</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Snow</span>),
-            <span class="ident">ffi::weather_id::WEATHER_RANDOM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Weather::Random</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::weather_id::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::weather_id::WEATHER_CLEAR =&gt; <span class="prelude-val">Ok</span>(Weather::Clear),
+            ffi::weather_id::WEATHER_SUNNY =&gt; <span class="prelude-val">Ok</span>(Weather::Sunny),
+            ffi::weather_id::WEATHER_SANDSTORM =&gt; <span class="prelude-val">Ok</span>(Weather::Sandstorm),
+            ffi::weather_id::WEATHER_CLOUDY =&gt; <span class="prelude-val">Ok</span>(Weather::Cloudy),
+            ffi::weather_id::WEATHER_RAIN =&gt; <span class="prelude-val">Ok</span>(Weather::Rain),
+            ffi::weather_id::WEATHER_HAIL =&gt; <span class="prelude-val">Ok</span>(Weather::Hail),
+            ffi::weather_id::WEATHER_FOG =&gt; <span class="prelude-val">Ok</span>(Weather::Fog),
+            ffi::weather_id::WEATHER_SNOW =&gt; <span class="prelude-val">Ok</span>(Weather::Snow),
+            ffi::weather_id::WEATHER_RANDOM =&gt; <span class="prelude-val">Ok</span>(Weather::Random),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Types of weather.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DungeonObjective</span> {
-    <span class="ident">Story</span> = <span class="ident">ffi::dungeon_objective::OBJECTIVE_STORY</span>,
-    <span class="ident">Rescue</span> = <span class="ident">ffi::dungeon_objective::OBJECTIVE_RESCUE</span>,
-    <span class="ident">Normal</span> = <span class="ident">ffi::dungeon_objective::OBJECTIVE_NORMAL</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Types of weather.
+</span><span class="kw">pub enum </span>DungeonObjective {
+    Story = ffi::dungeon_objective::OBJECTIVE_STORY,
+    Rescue = ffi::dungeon_objective::OBJECTIVE_RESCUE,
+    Normal = ffi::dungeon_objective::OBJECTIVE_NORMAL,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::dungeon_objective::Type</span>&gt; <span class="kw">for</span> <span class="ident">DungeonObjective</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::dungeon_objective::Type&gt; <span class="kw">for </span>DungeonObjective {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::dungeon_objective::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::dungeon_objective::OBJECTIVE_STORY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonObjective::Story</span>),
-            <span class="ident">ffi::dungeon_objective::OBJECTIVE_RESCUE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonObjective::Rescue</span>),
-            <span class="ident">ffi::dungeon_objective::OBJECTIVE_NORMAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DungeonObjective::Normal</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::dungeon_objective::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::dungeon_objective::OBJECTIVE_STORY =&gt; <span class="prelude-val">Ok</span>(DungeonObjective::Story),
+            ffi::dungeon_objective::OBJECTIVE_RESCUE =&gt; <span class="prelude-val">Ok</span>(DungeonObjective::Rescue),
+            ffi::dungeon_objective::OBJECTIVE_NORMAL =&gt; <span class="prelude-val">Ok</span>(DungeonObjective::Normal),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Direction on the dungeon grid</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Direction</span> {
-    <span class="ident">Down</span> = <span class="ident">ffi::direction_id::DIR_DOWN</span>,
-    <span class="ident">DownRight</span> = <span class="ident">ffi::direction_id::DIR_DOWN_RIGHT</span>,
-    <span class="ident">Right</span> = <span class="ident">ffi::direction_id::DIR_RIGHT</span>,
-    <span class="ident">UpRight</span> = <span class="ident">ffi::direction_id::DIR_UP_RIGHT</span>,
-    <span class="ident">Up</span> = <span class="ident">ffi::direction_id::DIR_UP</span>,
-    <span class="ident">UpLeft</span> = <span class="ident">ffi::direction_id::DIR_UP_LEFT</span>,
-    <span class="ident">Left</span> = <span class="ident">ffi::direction_id::DIR_LEFT</span>,
-    <span class="ident">DownLeft</span> = <span class="ident">ffi::direction_id::DIR_DOWN_LEFT</span>,
-    <span class="ident">Current</span> = <span class="ident">ffi::direction_id::DIR_CURRENT</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Direction on the dungeon grid
+</span><span class="kw">pub enum </span>Direction {
+    Down = ffi::direction_id::DIR_DOWN,
+    DownRight = ffi::direction_id::DIR_DOWN_RIGHT,
+    Right = ffi::direction_id::DIR_RIGHT,
+    UpRight = ffi::direction_id::DIR_UP_RIGHT,
+    Up = ffi::direction_id::DIR_UP,
+    UpLeft = ffi::direction_id::DIR_UP_LEFT,
+    Left = ffi::direction_id::DIR_LEFT,
+    DownLeft = ffi::direction_id::DIR_DOWN_LEFT,
+    Current = ffi::direction_id::DIR_CURRENT,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::direction_id::Type</span>&gt; <span class="kw">for</span> <span class="ident">Direction</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::direction_id::Type&gt; <span class="kw">for </span>Direction {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::direction_id::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::direction_id::DIR_DOWN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::Down</span>),
-            <span class="ident">ffi::direction_id::DIR_DOWN_RIGHT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::DownRight</span>),
-            <span class="ident">ffi::direction_id::DIR_RIGHT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::Right</span>),
-            <span class="ident">ffi::direction_id::DIR_UP_RIGHT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::UpRight</span>),
-            <span class="ident">ffi::direction_id::DIR_UP</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::Up</span>),
-            <span class="ident">ffi::direction_id::DIR_UP_LEFT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::UpLeft</span>),
-            <span class="ident">ffi::direction_id::DIR_LEFT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::Left</span>),
-            <span class="ident">ffi::direction_id::DIR_DOWN_LEFT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::DownLeft</span>),
-            <span class="ident">ffi::direction_id::DIR_CURRENT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Direction::Current</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::direction_id::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::direction_id::DIR_DOWN =&gt; <span class="prelude-val">Ok</span>(Direction::Down),
+            ffi::direction_id::DIR_DOWN_RIGHT =&gt; <span class="prelude-val">Ok</span>(Direction::DownRight),
+            ffi::direction_id::DIR_RIGHT =&gt; <span class="prelude-val">Ok</span>(Direction::Right),
+            ffi::direction_id::DIR_UP_RIGHT =&gt; <span class="prelude-val">Ok</span>(Direction::UpRight),
+            ffi::direction_id::DIR_UP =&gt; <span class="prelude-val">Ok</span>(Direction::Up),
+            ffi::direction_id::DIR_UP_LEFT =&gt; <span class="prelude-val">Ok</span>(Direction::UpLeft),
+            ffi::direction_id::DIR_LEFT =&gt; <span class="prelude-val">Ok</span>(Direction::Left),
+            ffi::direction_id::DIR_DOWN_LEFT =&gt; <span class="prelude-val">Ok</span>(Direction::DownLeft),
+            ffi::direction_id::DIR_CURRENT =&gt; <span class="prelude-val">Ok</span>(Direction::Current),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Different types of warp effects</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WarpType</span> {
-    <span class="doccomment">/// Warp to a random position</span>
-    <span class="ident">Random</span> = <span class="ident">ffi::warp_type::WARP_RANDOM</span>,
-    <span class="doccomment">/// Warp within 2 tiles of the stairs</span>
-    <span class="ident">Stairs2</span> = <span class="ident">ffi::warp_type::WARP_STAIRS_2</span>,
-    <span class="doccomment">/// Warp within 2 tiles of a specified position</span>
-    <span class="ident">PositionFuzzy</span> = <span class="ident">ffi::warp_type::WARP_POSITION_FUZZY</span>,
-    <span class="doccomment">/// Warp to an exact position</span>
-    <span class="ident">PositionExact</span> = <span class="ident">ffi::warp_type::WARP_POSITION_EXACT</span>,
-    <span class="doccomment">/// Warp within 3 tiles of the stairs</span>
-    <span class="ident">Stairs3</span> = <span class="ident">ffi::warp_type::WARP_STAIRS_3</span>,
-    <span class="doccomment">/// Warp within 2 tiles of the leader</span>
-    <span class="ident">Leader</span> = <span class="ident">ffi::warp_type::WARP_LEADER</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Different types of warp effects
+</span><span class="kw">pub enum </span>WarpType {
+    <span class="doccomment">/// Warp to a random position
+    </span>Random = ffi::warp_type::WARP_RANDOM,
+    <span class="doccomment">/// Warp within 2 tiles of the stairs
+    </span>Stairs2 = ffi::warp_type::WARP_STAIRS_2,
+    <span class="doccomment">/// Warp within 2 tiles of a specified position
+    </span>PositionFuzzy = ffi::warp_type::WARP_POSITION_FUZZY,
+    <span class="doccomment">/// Warp to an exact position
+    </span>PositionExact = ffi::warp_type::WARP_POSITION_EXACT,
+    <span class="doccomment">/// Warp within 3 tiles of the stairs
+    </span>Stairs3 = ffi::warp_type::WARP_STAIRS_3,
+    <span class="doccomment">/// Warp within 2 tiles of the leader
+    </span>Leader = ffi::warp_type::WARP_LEADER,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::warp_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">WarpType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::warp_type::Type&gt; <span class="kw">for </span>WarpType {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::warp_type::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::warp_type::WARP_RANDOM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WarpType::Random</span>),
-            <span class="ident">ffi::warp_type::WARP_STAIRS_2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WarpType::Stairs2</span>),
-            <span class="ident">ffi::warp_type::WARP_POSITION_FUZZY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WarpType::PositionFuzzy</span>),
-            <span class="ident">ffi::warp_type::WARP_POSITION_EXACT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WarpType::PositionExact</span>),
-            <span class="ident">ffi::warp_type::WARP_STAIRS_3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WarpType::Stairs3</span>),
-            <span class="ident">ffi::warp_type::WARP_LEADER</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WarpType::Leader</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::warp_type::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::warp_type::WARP_RANDOM =&gt; <span class="prelude-val">Ok</span>(WarpType::Random),
+            ffi::warp_type::WARP_STAIRS_2 =&gt; <span class="prelude-val">Ok</span>(WarpType::Stairs2),
+            ffi::warp_type::WARP_POSITION_FUZZY =&gt; <span class="prelude-val">Ok</span>(WarpType::PositionFuzzy),
+            ffi::warp_type::WARP_POSITION_EXACT =&gt; <span class="prelude-val">Ok</span>(WarpType::PositionExact),
+            ffi::warp_type::WARP_STAIRS_3 =&gt; <span class="prelude-val">Ok</span>(WarpType::Stairs3),
+            ffi::warp_type::WARP_LEADER =&gt; <span class="prelude-val">Ok</span>(WarpType::Leader),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// The status of a monster&#39;s Conversion 2 state.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Conversion2Status</span> {
-    <span class="doccomment">/// The monster is not under the effect of Conversion 2.</span>
-    <span class="prelude-val">None</span> = <span class="number">0</span>,
-    <span class="doccomment">/// The monster is under the effect of Conversion 2 from a status.</span>
-    <span class="ident">FromStatus</span> = <span class="number">1</span>,
-    <span class="doccomment">/// The monster is under the effect of Conversion 2 from an exclusive item.</span>
-    <span class="ident">FromExclusiveItem</span> = <span class="number">2</span>,
+<span class="attribute">#[repr(i32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// The status of a monster&#39;s Conversion 2 state.
+</span><span class="kw">pub enum </span>Conversion2Status {
+    <span class="doccomment">/// The monster is not under the effect of Conversion 2.
+    </span><span class="prelude-val">None </span>= <span class="number">0</span>,
+    <span class="doccomment">/// The monster is under the effect of Conversion 2 from a status.
+    </span>FromStatus = <span class="number">1</span>,
+    <span class="doccomment">/// The monster is under the effect of Conversion 2 from an exclusive item.
+    </span>FromExclusiveItem = <span class="number">2</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">i32</span>&gt; <span class="kw">for</span> <span class="ident">Conversion2Status</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;i32&gt; <span class="kw">for </span>Conversion2Status {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Conversion2Status::None</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Conversion2Status::FromStatus</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Conversion2Status::FromExclusiveItem</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(Conversion2Status::None),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(Conversion2Status::FromStatus),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(Conversion2Status::FromExclusiveItem),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Controls whether the loop that runs until the current floor ends should continue</span>
-<span class="doccomment">/// iterating or not and why</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FloorLoopStatus</span> {
-    <span class="doccomment">/// The floor loop keeps executing as normal</span>
-    <span class="ident">Continue</span> = <span class="number">0</span>,
-    <span class="doccomment">/// The floor loop exits because the leader fainted</span>
-    <span class="ident">LeaderFainted</span> = <span class="number">1</span>,
-    <span class="doccomment">/// The floor loop exits because the floor is over</span>
-    <span class="ident">NextFloor</span> = <span class="number">2</span>,
+<span class="attribute">#[repr(i32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Controls whether the loop that runs until the current floor ends should continue
+/// iterating or not and why
+</span><span class="kw">pub enum </span>FloorLoopStatus {
+    <span class="doccomment">/// The floor loop keeps executing as normal
+    </span>Continue = <span class="number">0</span>,
+    <span class="doccomment">/// The floor loop exits because the leader fainted
+    </span>LeaderFainted = <span class="number">1</span>,
+    <span class="doccomment">/// The floor loop exits because the floor is over
+    </span>NextFloor = <span class="number">2</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::floor_loop_status::Type</span>&gt; <span class="kw">for</span> <span class="ident">FloorLoopStatus</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::floor_loop_status::Type&gt; <span class="kw">for </span>FloorLoopStatus {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::floor_loop_status::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::floor_loop_status::FLOOR_LOOP_CONTINUE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorLoopStatus::Continue</span>),
-            <span class="ident">ffi::floor_loop_status::FLOOR_LOOP_LEADER_FAINTED</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorLoopStatus::LeaderFainted</span>),
-            <span class="ident">ffi::floor_loop_status::FLOOR_LOOP_NEXT_FLOOR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FloorLoopStatus::NextFloor</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: ffi::floor_loop_status::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::floor_loop_status::FLOOR_LOOP_CONTINUE =&gt; <span class="prelude-val">Ok</span>(FloorLoopStatus::Continue),
+            ffi::floor_loop_status::FLOOR_LOOP_LEADER_FAINTED =&gt; <span class="prelude-val">Ok</span>(FloorLoopStatus::LeaderFainted),
+            ffi::floor_loop_status::FLOOR_LOOP_NEXT_FLOOR =&gt; <span class="prelude-val">Ok</span>(FloorLoopStatus::NextFloor),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Group of mission type on a dungeon floor.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionTypeGroup</span> {
-    <span class="ident">RescueClient</span> = <span class="ident">ffi::mission_type::MISSION_RESCUE_CLIENT</span>,
-    <span class="ident">RescueTarget</span> = <span class="ident">ffi::mission_type::MISSION_RESCUE_TARGET</span>,
-    <span class="ident">EscortToTarget</span> = <span class="ident">ffi::mission_type::MISSION_ESCORT_TO_TARGET</span>,
-    <span class="ident">ExploreWithClient</span> = <span class="ident">ffi::mission_type::MISSION_EXPLORE_WITH_CLIENT</span>,
-    <span class="ident">ProspectWithClient</span> = <span class="ident">ffi::mission_type::MISSION_PROSPECT_WITH_CLIENT</span>,
-    <span class="ident">GuideClient</span> = <span class="ident">ffi::mission_type::MISSION_GUIDE_CLIENT</span>,
-    <span class="ident">FindItem</span> = <span class="ident">ffi::mission_type::MISSION_FIND_ITEM</span>,
-    <span class="ident">DeliverItem</span> = <span class="ident">ffi::mission_type::MISSION_DELIVER_ITEM</span>,
-    <span class="ident">SearchForTarget</span> = <span class="ident">ffi::mission_type::MISSION_SEARCH_FOR_TARGET</span>,
-    <span class="ident">TakeItemFromOutlaw</span> = <span class="ident">ffi::mission_type::MISSION_TAKE_ITEM_FROM_OUTLAW</span>,
-    <span class="ident">ArrestOutlaw</span> = <span class="ident">ffi::mission_type::MISSION_ARREST_OUTLAW</span>,
-    <span class="ident">ChallengeRequest</span> = <span class="ident">ffi::mission_type::MISSION_CHALLENGE_REQUEST</span>,
-    <span class="ident">TreasureMemo</span> = <span class="ident">ffi::mission_type::MISSION_TREASURE_MEMO</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Group of mission type on a dungeon floor.
+</span><span class="kw">pub enum </span>MissionTypeGroup {
+    RescueClient = ffi::mission_type::MISSION_RESCUE_CLIENT,
+    RescueTarget = ffi::mission_type::MISSION_RESCUE_TARGET,
+    EscortToTarget = ffi::mission_type::MISSION_ESCORT_TO_TARGET,
+    ExploreWithClient = ffi::mission_type::MISSION_EXPLORE_WITH_CLIENT,
+    ProspectWithClient = ffi::mission_type::MISSION_PROSPECT_WITH_CLIENT,
+    GuideClient = ffi::mission_type::MISSION_GUIDE_CLIENT,
+    FindItem = ffi::mission_type::MISSION_FIND_ITEM,
+    DeliverItem = ffi::mission_type::MISSION_DELIVER_ITEM,
+    SearchForTarget = ffi::mission_type::MISSION_SEARCH_FOR_TARGET,
+    TakeItemFromOutlaw = ffi::mission_type::MISSION_TAKE_ITEM_FROM_OUTLAW,
+    ArrestOutlaw = ffi::mission_type::MISSION_ARREST_OUTLAW,
+    ChallengeRequest = ffi::mission_type::MISSION_CHALLENGE_REQUEST,
+    TreasureMemo = ffi::mission_type::MISSION_TREASURE_MEMO,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_type::Type</span>&gt; <span class="kw">for</span> <span class="ident">MissionTypeGroup</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_type::Type&gt; <span class="kw">for </span>MissionTypeGroup {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::mission_type::MISSION_RESCUE_CLIENT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::RescueClient</span>),
-            <span class="ident">ffi::mission_type::MISSION_RESCUE_TARGET</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::RescueTarget</span>),
-            <span class="ident">ffi::mission_type::MISSION_ESCORT_TO_TARGET</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::EscortToTarget</span>),
-            <span class="ident">ffi::mission_type::MISSION_EXPLORE_WITH_CLIENT</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::ExploreWithClient</span>)
+    <span class="kw">fn </span>try_from(value: Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::mission_type::MISSION_RESCUE_CLIENT =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::RescueClient),
+            ffi::mission_type::MISSION_RESCUE_TARGET =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::RescueTarget),
+            ffi::mission_type::MISSION_ESCORT_TO_TARGET =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::EscortToTarget),
+            ffi::mission_type::MISSION_EXPLORE_WITH_CLIENT =&gt; {
+                <span class="prelude-val">Ok</span>(MissionTypeGroup::ExploreWithClient)
             }
-            <span class="ident">ffi::mission_type::MISSION_PROSPECT_WITH_CLIENT</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::ProspectWithClient</span>)
+            ffi::mission_type::MISSION_PROSPECT_WITH_CLIENT =&gt; {
+                <span class="prelude-val">Ok</span>(MissionTypeGroup::ProspectWithClient)
             }
-            <span class="ident">ffi::mission_type::MISSION_GUIDE_CLIENT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::GuideClient</span>),
-            <span class="ident">ffi::mission_type::MISSION_FIND_ITEM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::FindItem</span>),
-            <span class="ident">ffi::mission_type::MISSION_DELIVER_ITEM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::DeliverItem</span>),
-            <span class="ident">ffi::mission_type::MISSION_SEARCH_FOR_TARGET</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::SearchForTarget</span>),
-            <span class="ident">ffi::mission_type::MISSION_TAKE_ITEM_FROM_OUTLAW</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::TakeItemFromOutlaw</span>)
+            ffi::mission_type::MISSION_GUIDE_CLIENT =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::GuideClient),
+            ffi::mission_type::MISSION_FIND_ITEM =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::FindItem),
+            ffi::mission_type::MISSION_DELIVER_ITEM =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::DeliverItem),
+            ffi::mission_type::MISSION_SEARCH_FOR_TARGET =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::SearchForTarget),
+            ffi::mission_type::MISSION_TAKE_ITEM_FROM_OUTLAW =&gt; {
+                <span class="prelude-val">Ok</span>(MissionTypeGroup::TakeItemFromOutlaw)
             }
-            <span class="ident">ffi::mission_type::MISSION_ARREST_OUTLAW</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::ArrestOutlaw</span>),
-            <span class="ident">ffi::mission_type::MISSION_CHALLENGE_REQUEST</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::ChallengeRequest</span>),
-            <span class="ident">ffi::mission_type::MISSION_TREASURE_MEMO</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionTypeGroup::TreasureMemo</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+            ffi::mission_type::MISSION_ARREST_OUTLAW =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::ArrestOutlaw),
+            ffi::mission_type::MISSION_CHALLENGE_REQUEST =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::ChallengeRequest),
+            ffi::mission_type::MISSION_TREASURE_MEMO =&gt; <span class="prelude-val">Ok</span>(MissionTypeGroup::TreasureMemo),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Specific mission type on a dungeon floor.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionType</span> {
-    <span class="ident">RescueClient</span>,
-    <span class="ident">RescueTarget</span>,
-    <span class="ident">EscortToTarget</span>,
-    <span class="ident">ExploreWithClient</span>(<span class="ident">MissionSubtypeExplore</span>),
-    <span class="ident">ProspectWithClient</span>,
-    <span class="ident">GuideClient</span>,
-    <span class="ident">FindItem</span>,
-    <span class="ident">DeliverItem</span>,
-    <span class="ident">SearchForTarget</span>,
-    <span class="ident">TakeItemFromOutlaw</span>(<span class="ident">MissionSubtypeTakeItem</span>),
-    <span class="ident">ArrestOutlaw</span>(<span class="ident">MissionSubtypeOutlaw</span>),
-    <span class="ident">ChallengeRequest</span>(<span class="ident">MissionSubtypeChallenge</span>),
-    <span class="ident">TreasureMemo</span>,
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Specific mission type on a dungeon floor.
+</span><span class="kw">pub enum </span>MissionType {
+    RescueClient,
+    RescueTarget,
+    EscortToTarget,
+    ExploreWithClient(MissionSubtypeExplore),
+    ProspectWithClient,
+    GuideClient,
+    FindItem,
+    DeliverItem,
+    SearchForTarget,
+    TakeItemFromOutlaw(MissionSubtypeTakeItem),
+    ArrestOutlaw(MissionSubtypeOutlaw),
+    ChallengeRequest(MissionSubtypeChallenge),
+    TreasureMemo,
 }
 
-<span class="kw">impl</span> <span class="ident">MissionType</span> {
-    <span class="doccomment">/// Group for this mission type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MissionTypeGroup</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MissionType::RescueClient</span> =&gt; <span class="ident">MissionTypeGroup::RescueClient</span>,
-            <span class="ident">MissionType::RescueTarget</span> =&gt; <span class="ident">MissionTypeGroup::RescueTarget</span>,
-            <span class="ident">MissionType::EscortToTarget</span> =&gt; <span class="ident">MissionTypeGroup::EscortToTarget</span>,
-            <span class="ident">MissionType::ExploreWithClient</span>(<span class="kw">_</span>) =&gt; <span class="ident">MissionTypeGroup::ExploreWithClient</span>,
-            <span class="ident">MissionType::ProspectWithClient</span> =&gt; <span class="ident">MissionTypeGroup::ProspectWithClient</span>,
-            <span class="ident">MissionType::GuideClient</span> =&gt; <span class="ident">MissionTypeGroup::GuideClient</span>,
-            <span class="ident">MissionType::FindItem</span> =&gt; <span class="ident">MissionTypeGroup::FindItem</span>,
-            <span class="ident">MissionType::DeliverItem</span> =&gt; <span class="ident">MissionTypeGroup::DeliverItem</span>,
-            <span class="ident">MissionType::SearchForTarget</span> =&gt; <span class="ident">MissionTypeGroup::SearchForTarget</span>,
-            <span class="ident">MissionType::TakeItemFromOutlaw</span>(<span class="kw">_</span>) =&gt; <span class="ident">MissionTypeGroup::TakeItemFromOutlaw</span>,
-            <span class="ident">MissionType::ArrestOutlaw</span>(<span class="kw">_</span>) =&gt; <span class="ident">MissionTypeGroup::ArrestOutlaw</span>,
-            <span class="ident">MissionType::ChallengeRequest</span>(<span class="kw">_</span>) =&gt; <span class="ident">MissionTypeGroup::ChallengeRequest</span>,
-            <span class="ident">MissionType::TreasureMemo</span> =&gt; <span class="ident">MissionTypeGroup::TreasureMemo</span>,
+<span class="kw">impl </span>MissionType {
+    <span class="doccomment">/// Group for this mission type.
+    </span><span class="kw">pub fn </span>group(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MissionTypeGroup {
+        <span class="kw">match </span><span class="self">self </span>{
+            MissionType::RescueClient =&gt; MissionTypeGroup::RescueClient,
+            MissionType::RescueTarget =&gt; MissionTypeGroup::RescueTarget,
+            MissionType::EscortToTarget =&gt; MissionTypeGroup::EscortToTarget,
+            MissionType::ExploreWithClient(<span class="kw">_</span>) =&gt; MissionTypeGroup::ExploreWithClient,
+            MissionType::ProspectWithClient =&gt; MissionTypeGroup::ProspectWithClient,
+            MissionType::GuideClient =&gt; MissionTypeGroup::GuideClient,
+            MissionType::FindItem =&gt; MissionTypeGroup::FindItem,
+            MissionType::DeliverItem =&gt; MissionTypeGroup::DeliverItem,
+            MissionType::SearchForTarget =&gt; MissionTypeGroup::SearchForTarget,
+            MissionType::TakeItemFromOutlaw(<span class="kw">_</span>) =&gt; MissionTypeGroup::TakeItemFromOutlaw,
+            MissionType::ArrestOutlaw(<span class="kw">_</span>) =&gt; MissionTypeGroup::ArrestOutlaw,
+            MissionType::ChallengeRequest(<span class="kw">_</span>) =&gt; MissionTypeGroup::ChallengeRequest,
+            MissionType::TreasureMemo =&gt; MissionTypeGroup::TreasureMemo,
         }
     }
 
-    <span class="doccomment">/// Subtype for this mission type as a c-union, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c_subtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ffi::mission_subtype</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mission_subtype</span>: <span class="ident">ffi::mission_subtype</span>;
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> = <span class="ident">::core::mem::MaybeUninit::uninit</span>();
-            <span class="ident">::core::ptr::write_bytes</span>(<span class="ident">s</span>.<span class="ident">as_mut_ptr</span>(), <span class="number">0</span>, <span class="number">1</span>);
-            <span class="ident">mission_subtype</span> = <span class="ident">s</span>.<span class="ident">assume_init</span>();
-            <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">MissionType::ExploreWithClient</span>(<span class="ident">v</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">mission_subtype</span>.<span class="ident">explore</span>.<span class="ident">as_mut</span>() = (<span class="kw-2">*</span><span class="ident">v</span>) <span class="kw">as</span> <span class="ident">ffi::mission_subtype_explore::Type</span>;
+    <span class="doccomment">/// Subtype for this mission type as a c-union, if any.
+    </span><span class="kw">pub fn </span>c_subtype(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ffi::mission_subtype {
+        <span class="kw">let </span><span class="kw-2">mut </span>mission_subtype: ffi::mission_subtype;
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>s = ::core::mem::MaybeUninit::uninit();
+            ::core::ptr::write_bytes(s.as_mut_ptr(), <span class="number">0</span>, <span class="number">1</span>);
+            mission_subtype = s.assume_init();
+            <span class="kw">match </span><span class="self">self </span>{
+                MissionType::ExploreWithClient(v) =&gt; {
+                    <span class="kw-2">*</span>mission_subtype.explore.as_mut() = (<span class="kw-2">*</span>v) <span class="kw">as </span>ffi::mission_subtype_explore::Type;
                 }
-                <span class="ident">MissionType::TakeItemFromOutlaw</span>(<span class="ident">v</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">mission_subtype</span>.<span class="ident">take_item</span>.<span class="ident">as_mut</span>() =
-                        (<span class="kw-2">*</span><span class="ident">v</span>) <span class="kw">as</span> <span class="ident">ffi::mission_subtype_take_item::Type</span>;
+                MissionType::TakeItemFromOutlaw(v) =&gt; {
+                    <span class="kw-2">*</span>mission_subtype.take_item.as_mut() =
+                        (<span class="kw-2">*</span>v) <span class="kw">as </span>ffi::mission_subtype_take_item::Type;
                 }
-                <span class="ident">MissionType::ArrestOutlaw</span>(<span class="ident">v</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">mission_subtype</span>.<span class="ident">outlaw</span>.<span class="ident">as_mut</span>() = (<span class="kw-2">*</span><span class="ident">v</span>) <span class="kw">as</span> <span class="ident">ffi::mission_subtype_outlaw::Type</span>;
+                MissionType::ArrestOutlaw(v) =&gt; {
+                    <span class="kw-2">*</span>mission_subtype.outlaw.as_mut() = (<span class="kw-2">*</span>v) <span class="kw">as </span>ffi::mission_subtype_outlaw::Type;
                 }
-                <span class="ident">MissionType::ChallengeRequest</span>(<span class="ident">v</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">mission_subtype</span>.<span class="ident">challenge</span>.<span class="ident">as_mut</span>() =
-                        (<span class="kw-2">*</span><span class="ident">v</span>) <span class="kw">as</span> <span class="ident">ffi::mission_subtype_challenge::Type</span>;
+                MissionType::ChallengeRequest(v) =&gt; {
+                    <span class="kw-2">*</span>mission_subtype.challenge.as_mut() =
+                        (<span class="kw-2">*</span>v) <span class="kw">as </span>ffi::mission_subtype_challenge::Type;
                 }
-                <span class="kw">_</span> =&gt; <span class="kw-2">*</span><span class="ident">mission_subtype</span>.<span class="ident">none</span>.<span class="ident">as_mut</span>() = <span class="number">0</span>,
+                <span class="kw">_ </span>=&gt; <span class="kw-2">*</span>mission_subtype.none.as_mut() = <span class="number">0</span>,
             }
         }
-        <span class="ident">mission_subtype</span>
+        mission_subtype
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::ExploreWithClient`].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeExplore</span> {
-    <span class="ident">Normal</span> = <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_NORMAL</span>,
-    <span class="ident">SealedChamber</span> = <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_SEALED_CHAMBER</span>,
-    <span class="ident">GoldenChamber</span> = <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_GOLDEN_CHAMBER</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Mission subtype for [`MissionType::ExploreWithClient`].
+</span><span class="kw">pub enum </span>MissionSubtypeExplore {
+    Normal = ffi::mission_subtype_explore::MISSION_EXPLORE_NORMAL,
+    SealedChamber = ffi::mission_subtype_explore::MISSION_EXPLORE_SEALED_CHAMBER,
+    GoldenChamber = ffi::mission_subtype_explore::MISSION_EXPLORE_GOLDEN_CHAMBER,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype_explore::Type</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeExplore</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype_explore::Type&gt; <span class="kw">for </span>MissionSubtypeExplore {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype_explore::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_NORMAL</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeExplore::Normal</span>)
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype_explore::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::mission_subtype_explore::MISSION_EXPLORE_NORMAL =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeExplore::Normal)
             }
-            <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_SEALED_CHAMBER</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeExplore::SealedChamber</span>)
+            ffi::mission_subtype_explore::MISSION_EXPLORE_SEALED_CHAMBER =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeExplore::SealedChamber)
             }
-            <span class="ident">ffi::mission_subtype_explore::MISSION_EXPLORE_GOLDEN_CHAMBER</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeExplore::GoldenChamber</span>)
+            ffi::mission_subtype_explore::MISSION_EXPLORE_GOLDEN_CHAMBER =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeExplore::GoldenChamber)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeExplore</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
-
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.</span>
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="kw-2">*</span><span class="kw">unsafe</span> { <span class="ident">value</span>.<span class="ident">explore</span>.<span class="ident">as_ref</span>() })
-    }
-}
-
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::TakeItemFromOutlaw`].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeTakeItem</span> {
-    <span class="ident">NormalOutlaw</span> = <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_NORMAL_OUTLAW</span>,
-    <span class="ident">HiddenOutlaw</span> = <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_HIDDEN_OUTLAW</span>,
-    <span class="ident">FleeingOutlaw</span> = <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_FLEEING_OUTLAW</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype_take_item::Type</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeTakeItem</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
-
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype_take_item::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_NORMAL_OUTLAW</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeTakeItem::NormalOutlaw</span>)
-            }
-            <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_HIDDEN_OUTLAW</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeTakeItem::HiddenOutlaw</span>)
-            }
-            <span class="ident">ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_FLEEING_OUTLAW</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeTakeItem::FleeingOutlaw</span>)
-            }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeTakeItem</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype&gt; <span class="kw">for </span>MissionSubtypeExplore {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.</span>
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="kw-2">*</span><span class="kw">unsafe</span> { <span class="ident">value</span>.<span class="ident">take_item</span>.<span class="ident">as_ref</span>() })
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.
+        </span><span class="self">Self</span>::try_from(<span class="kw-2">*</span><span class="kw">unsafe </span>{ value.explore.as_ref() })
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::ArrestOutlaw`].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeOutlaw</span> {
-    <span class="ident">Normal0</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_0</span>,
-    <span class="ident">Normal1</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_1</span>,
-    <span class="ident">Normal2</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_2</span>,
-    <span class="ident">Normal3</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_3</span>,
-    <span class="ident">Escort</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_ESCORT</span>,
-    <span class="ident">Fleeing</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_FLEEING</span>,
-    <span class="ident">Hideout</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_HIDEOUT</span>,
-    <span class="ident">MonsterHouse</span> = <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_MONSTER_HOUSE</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Mission subtype for [`MissionType::TakeItemFromOutlaw`].
+</span><span class="kw">pub enum </span>MissionSubtypeTakeItem {
+    NormalOutlaw = ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_NORMAL_OUTLAW,
+    HiddenOutlaw = ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_HIDDEN_OUTLAW,
+    FleeingOutlaw = ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_FLEEING_OUTLAW,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype_take_item::Type</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeOutlaw</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype_take_item::Type&gt; <span class="kw">for </span>MissionSubtypeTakeItem {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype_outlaw::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_0</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Normal0</span>)
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype_take_item::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_NORMAL_OUTLAW =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeTakeItem::NormalOutlaw)
             }
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_1</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Normal1</span>)
+            ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_HIDDEN_OUTLAW =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeTakeItem::HiddenOutlaw)
             }
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_2</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Normal2</span>)
+            ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_FLEEING_OUTLAW =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeTakeItem::FleeingOutlaw)
             }
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_3</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Normal3</span>)
-            }
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_ESCORT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Escort</span>),
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_FLEEING</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Fleeing</span>)
-            }
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_HIDEOUT</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::Hideout</span>)
-            }
-            <span class="ident">ffi::mission_subtype_outlaw::MISSION_OUTLAW_MONSTER_HOUSE</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeOutlaw::MonsterHouse</span>)
-            }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeOutlaw</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype&gt; <span class="kw">for </span>MissionSubtypeTakeItem {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.</span>
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="kw-2">*</span><span class="kw">unsafe</span> { <span class="ident">value</span>.<span class="ident">outlaw</span>.<span class="ident">as_ref</span>() })
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.
+        </span><span class="self">Self</span>::try_from(<span class="kw-2">*</span><span class="kw">unsafe </span>{ value.take_item.as_ref() })
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::ChallengeRequest`].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MissionSubtypeChallenge</span> {
-    <span class="ident">Normal</span> = <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_NORMAL</span>,
-    <span class="ident">Mewtwo</span> = <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_MEWTWO</span>,
-    <span class="ident">Entei</span> = <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_ENTEI</span>,
-    <span class="ident">Raikou</span> = <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_RAIKOU</span>,
-    <span class="ident">Suicune</span> = <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_SUICUNE</span>,
-    <span class="ident">Jirachi</span> = <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_JIRACHI</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Mission subtype for [`MissionType::ArrestOutlaw`].
+</span><span class="kw">pub enum </span>MissionSubtypeOutlaw {
+    Normal0 = ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_0,
+    Normal1 = ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_1,
+    Normal2 = ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_2,
+    Normal3 = ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_3,
+    Escort = ffi::mission_subtype_outlaw::MISSION_OUTLAW_ESCORT,
+    Fleeing = ffi::mission_subtype_outlaw::MISSION_OUTLAW_FLEEING,
+    Hideout = ffi::mission_subtype_outlaw::MISSION_OUTLAW_HIDEOUT,
+    MonsterHouse = ffi::mission_subtype_outlaw::MISSION_OUTLAW_MONSTER_HOUSE,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype_take_item::Type</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeChallenge</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype_take_item::Type&gt; <span class="kw">for </span>MissionSubtypeOutlaw {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype_challenge::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_NORMAL</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeChallenge::Normal</span>)
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype_outlaw::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_0 =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Normal0)
             }
-            <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_MEWTWO</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeChallenge::Mewtwo</span>)
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_1 =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Normal1)
             }
-            <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_ENTEI</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeChallenge::Entei</span>)
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_2 =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Normal2)
             }
-            <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_RAIKOU</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeChallenge::Raikou</span>)
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_3 =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Normal3)
             }
-            <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_SUICUNE</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeChallenge::Suicune</span>)
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_ESCORT =&gt; <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Escort),
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_FLEEING =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Fleeing)
             }
-            <span class="ident">ffi::mission_subtype_challenge::MISSION_CHALLENGE_JIRACHI</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">MissionSubtypeChallenge::Jirachi</span>)
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_HIDEOUT =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::Hideout)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+            ffi::mission_subtype_outlaw::MISSION_OUTLAW_MONSTER_HOUSE =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeOutlaw::MonsterHouse)
+            }
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::mission_subtype</span>&gt; <span class="kw">for</span> <span class="ident">MissionSubtypeChallenge</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype&gt; <span class="kw">for </span>MissionSubtypeOutlaw {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::mission_subtype</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.</span>
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="kw-2">*</span><span class="kw">unsafe</span> { <span class="ident">value</span>.<span class="ident">challenge</span>.<span class="ident">as_ref</span>() })
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.
+        </span><span class="self">Self</span>::try_from(<span class="kw-2">*</span><span class="kw">unsafe </span>{ value.outlaw.as_ref() })
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// List of reasons why you can get forcefully kicked out of a dungeon.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ForcedLossReason</span> {
-    <span class="doccomment">/// You don&#39;t have to get kicked out of the dungeon.</span>
-    <span class="prelude-val">None</span> = <span class="number">0</span>,
-    <span class="doccomment">/// Your partner fainted (before postgame).</span>
-    <span class="ident">PartnerFainted</span> = <span class="number">1</span>,
-    <span class="doccomment">/// Your client fainted.</span>
-    <span class="ident">ClientFainted</span> = <span class="number">2</span>,
-    <span class="doccomment">/// The client you had to escort fainted.</span>
-    <span class="ident">EscortFainted</span> = <span class="number">3</span>,
-    <span class="doccomment">/// &quot;Your client \[name:0\] couldn&#39;t join you. Let&#39;s return to Treasure Town.&quot;</span>
-    <span class="ident">ClientCantJoin</span> = <span class="number">4</span>,
+<span class="attribute">#[repr(u32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// Mission subtype for [`MissionType::ChallengeRequest`].
+</span><span class="kw">pub enum </span>MissionSubtypeChallenge {
+    Normal = ffi::mission_subtype_challenge::MISSION_CHALLENGE_NORMAL,
+    Mewtwo = ffi::mission_subtype_challenge::MISSION_CHALLENGE_MEWTWO,
+    Entei = ffi::mission_subtype_challenge::MISSION_CHALLENGE_ENTEI,
+    Raikou = ffi::mission_subtype_challenge::MISSION_CHALLENGE_RAIKOU,
+    Suicune = ffi::mission_subtype_challenge::MISSION_CHALLENGE_SUICUNE,
+    Jirachi = ffi::mission_subtype_challenge::MISSION_CHALLENGE_JIRACHI,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span>&lt;<span class="ident">ffi::forced_loss_reason::Type</span>&gt; <span class="kw">for</span> <span class="ident">ForcedLossReason</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> = ();
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype_take_item::Type&gt; <span class="kw">for </span>MissionSubtypeChallenge {
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ffi::forced_loss_reason::Type</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span>&gt; {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ffi::forced_loss_reason::FORCED_LOSS_NONE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ForcedLossReason::None</span>),
-            <span class="ident">ffi::forced_loss_reason::FORCED_LOSS_PARTNER_FAINTED</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">ForcedLossReason::PartnerFainted</span>)
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype_challenge::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::mission_subtype_challenge::MISSION_CHALLENGE_NORMAL =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeChallenge::Normal)
             }
-            <span class="ident">ffi::forced_loss_reason::FORCED_LOSS_CLIENT_FAINTED</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">ForcedLossReason::ClientFainted</span>)
+            ffi::mission_subtype_challenge::MISSION_CHALLENGE_MEWTWO =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeChallenge::Mewtwo)
             }
-            <span class="ident">ffi::forced_loss_reason::FORCED_LOSS_ESCORT_FAINTED</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">ForcedLossReason::EscortFainted</span>)
+            ffi::mission_subtype_challenge::MISSION_CHALLENGE_ENTEI =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeChallenge::Entei)
             }
-            <span class="ident">ffi::forced_loss_reason::FORCED_LOSS_CLIENT_CANT_JOIN</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">ForcedLossReason::ClientCantJoin</span>)
+            ffi::mission_subtype_challenge::MISSION_CHALLENGE_RAIKOU =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeChallenge::Raikou)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+            ffi::mission_subtype_challenge::MISSION_CHALLENGE_SUICUNE =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeChallenge::Suicune)
+            }
+            ffi::mission_subtype_challenge::MISSION_CHALLENGE_JIRACHI =&gt; {
+                <span class="prelude-val">Ok</span>(MissionSubtypeChallenge::Jirachi)
+            }
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
+        }
+    }
+}
+
+<span class="kw">impl </span>TryFrom&lt;ffi::mission_subtype&gt; <span class="kw">for </span>MissionSubtypeChallenge {
+    <span class="kw">type </span>Error = ();
+
+    <span class="kw">fn </span>try_from(value: ffi::mission_subtype) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// SAFETY: We just copy the value and we check if it&#39;s a valid enum value.
+        </span><span class="self">Self</span>::try_from(<span class="kw-2">*</span><span class="kw">unsafe </span>{ value.challenge.as_ref() })
+    }
+}
+
+<span class="attribute">#[repr(i32)]</span>
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
+<span class="doccomment">/// List of reasons why you can get forcefully kicked out of a dungeon.
+</span><span class="kw">pub enum </span>ForcedLossReason {
+    <span class="doccomment">/// You don&#39;t have to get kicked out of the dungeon.
+    </span><span class="prelude-val">None </span>= <span class="number">0</span>,
+    <span class="doccomment">/// Your partner fainted (before postgame).
+    </span>PartnerFainted = <span class="number">1</span>,
+    <span class="doccomment">/// Your client fainted.
+    </span>ClientFainted = <span class="number">2</span>,
+    <span class="doccomment">/// The client you had to escort fainted.
+    </span>EscortFainted = <span class="number">3</span>,
+    <span class="doccomment">/// &quot;Your client \[name:0\] couldn&#39;t join you. Let&#39;s return to Treasure Town.&quot;
+    </span>ClientCantJoin = <span class="number">4</span>,
+}
+
+<span class="kw">impl </span>TryFrom&lt;ffi::forced_loss_reason::Type&gt; <span class="kw">for </span>ForcedLossReason {
+    <span class="kw">type </span>Error = ();
+
+    <span class="kw">fn </span>try_from(value: ffi::forced_loss_reason::Type) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            ffi::forced_loss_reason::FORCED_LOSS_NONE =&gt; <span class="prelude-val">Ok</span>(ForcedLossReason::None),
+            ffi::forced_loss_reason::FORCED_LOSS_PARTNER_FAINTED =&gt; {
+                <span class="prelude-val">Ok</span>(ForcedLossReason::PartnerFainted)
+            }
+            ffi::forced_loss_reason::FORCED_LOSS_CLIENT_FAINTED =&gt; {
+                <span class="prelude-val">Ok</span>(ForcedLossReason::ClientFainted)
+            }
+            ffi::forced_loss_reason::FORCED_LOSS_ESCORT_FAINTED =&gt; {
+                <span class="prelude-val">Ok</span>(ForcedLossReason::EscortFainted)
+            }
+            ffi::forced_loss_reason::FORCED_LOSS_CLIENT_CANT_JOIN =&gt; {
+                <span class="prelude-val">Ok</span>(ForcedLossReason::ClientCantJoin)
+            }
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

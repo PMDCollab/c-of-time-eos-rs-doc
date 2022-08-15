@@ -10,17 +10,17 @@
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Utilities for dealing with string conversion.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Utilities for dealing with string conversion.
 
-<span class="kw">use</span> <span class="ident">alloc::ffi::CString</span>;
+</span><span class="kw">use </span>alloc::ffi::CString;
 
-<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
+<span class="kw">use </span>core::fmt::Debug;
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="doccomment">/// Converts a Rust String to a CString.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">str_to_cstring</span>&lt;<span class="ident">S</span>: <span class="ident">AsRef</span>&lt;<span class="ident">str</span>&gt; + <span class="ident">Debug</span>&gt;(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="ident">CString</span> {
-    <span class="ident">CString::new</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>())
-        .<span class="ident">unwrap_or_else</span>(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Was unable to convert {:?} to CString.&quot;</span>, <span class="ident">s</span>.<span class="ident">as_ref</span>()))
+<span class="attribute">#[inline(always)]</span>
+<span class="doccomment">/// Converts a Rust String to a CString.
+</span><span class="kw">pub fn </span>str_to_cstring&lt;S: AsRef&lt;str&gt; + Debug&gt;(s: S) -&gt; CString {
+    CString::new(s.as_ref())
+        .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Was unable to convert {:?} to CString.&quot;</span>, s.as_ref()))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

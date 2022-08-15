@@ -111,118 +111,118 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module related to allocating data on the heap.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module related to allocating data on the heap.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ctypes</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::panic</span>;
-<span class="kw">use</span> <span class="ident">core::alloc</span>::{<span class="ident">AllocError</span>, <span class="ident">Allocator</span>, <span class="ident">GlobalAlloc</span>, <span class="ident">Layout</span>};
-<span class="kw">use</span> <span class="ident">core::ptr::NonNull</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ctypes;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="attribute">#[cfg(not(test))]</span>
+<span class="kw">use </span><span class="kw">crate</span>::panic;
+<span class="kw">use </span>core::alloc::{AllocError, Allocator, GlobalAlloc, Layout};
+<span class="kw">use </span>core::ptr::NonNull;
 
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> = <span class="string">&quot;global_allocator&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> = <span class="string">&quot;global_allocator&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-<span class="attribute">#[<span class="ident">global_allocator</span>]</span>
-<span class="doccomment">/// Global allocator ([`EoSDefaultAllocator`]).</span>
-<span class="doccomment">/// You can disable registering this, by disabling the `global_allocator` feature of this crate,</span>
-<span class="doccomment">/// you can then register you own global allocator.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ALLOCATOR</span>: <span class="ident">EoSDefaultAllocator</span> = <span class="ident">EoSDefaultAllocator</span>;
+<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;global_allocator&quot;</span>)))]</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;global_allocator&quot;</span>)]</span>
+<span class="attribute">#[cfg(not(test))]</span>
+<span class="attribute">#[global_allocator]</span>
+<span class="doccomment">/// Global allocator ([`EoSDefaultAllocator`]).
+/// You can disable registering this, by disabling the `global_allocator` feature of this crate,
+/// you can then register you own global allocator.
+</span><span class="kw">pub static </span>ALLOCATOR: EoSDefaultAllocator = EoSDefaultAllocator;
 
-<span class="doccomment">/// The game&#39;s allocation functions wrapped in a struct. This is set up as the global allocator,</span>
-<span class="doccomment">/// unless the `global_allocator` feature is turned off.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It uses the default memory arena ([`ffi::MemAlloc`] and [`ffi::MemFree`] functions are used).</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EoSDefaultAllocator</span>;
+<span class="doccomment">/// The game&#39;s allocation functions wrapped in a struct. This is set up as the global allocator,
+/// unless the `global_allocator` feature is turned off.
+///
+/// It uses the default memory arena ([`ffi::MemAlloc`] and [`ffi::MemFree`] functions are used).
+</span><span class="kw">pub struct </span>EoSDefaultAllocator;
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">GlobalAlloc</span> <span class="kw">for</span> <span class="ident">EoSDefaultAllocator</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">alloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
-        <span class="ident">ffi::MemAlloc</span>(<span class="ident">layout</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>
+<span class="kw">unsafe impl </span>GlobalAlloc <span class="kw">for </span>EoSDefaultAllocator {
+    <span class="kw">unsafe fn </span>alloc(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: Layout) -&gt; <span class="kw-2">*mut </span>u8 {
+        ffi::MemAlloc(layout.size() <span class="kw">as </span>u32, <span class="number">0</span>) <span class="kw">as </span><span class="kw-2">*mut </span>u8
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">dealloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">_layout</span>: <span class="ident">Layout</span>) {
-        <span class="ident">ffi::MemFree</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">ctypes::c_void</span>);
+    <span class="kw">unsafe fn </span>dealloc(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: <span class="kw-2">*mut </span>u8, _layout: Layout) {
+        ffi::MemFree(ptr <span class="kw">as </span><span class="kw-2">*mut </span>ctypes::c_void);
     }
 }
 
-<span class="doccomment">/// On allocation errors, you should call [`alloc_error_handler`].</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Allocator</span> <span class="kw">for</span> <span class="ident">EoSDefaultAllocator</span> {
-    <span class="kw">fn</span> <span class="ident">allocate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="ident">NonNull</span>&lt;[<span class="ident">u8</span>]&gt;, <span class="ident">AllocError</span>&gt; {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">raw_ptr</span> = <span class="ident">ffi::MemAlloc</span>(<span class="ident">layout</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>;
-            <span class="kw">let</span> <span class="ident">ptr</span> = <span class="ident">NonNull::new</span>(<span class="ident">raw_ptr</span>).<span class="ident">ok_or</span>(<span class="ident">AllocError</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">NonNull::slice_from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>.<span class="ident">size</span>()))
+<span class="doccomment">/// On allocation errors, you should call [`alloc_error_handler`].
+</span><span class="kw">unsafe impl </span>Allocator <span class="kw">for </span>EoSDefaultAllocator {
+    <span class="kw">fn </span>allocate(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;[u8]&gt;, AllocError&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>raw_ptr = ffi::MemAlloc(layout.size() <span class="kw">as </span>u32, <span class="number">0</span>) <span class="kw">as </span><span class="kw-2">*mut </span>u8;
+            <span class="kw">let </span>ptr = NonNull::new(raw_ptr).ok_or(AllocError)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(NonNull::slice_from_raw_parts(ptr, layout.size()))
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">NonNull</span>&lt;<span class="ident">u8</span>&gt;, <span class="ident">_layout</span>: <span class="ident">Layout</span>) {
-        <span class="ident">ffi::MemFree</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">ctypes::c_void</span>);
+    <span class="kw">unsafe fn </span>deallocate(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: NonNull&lt;u8&gt;, _layout: Layout) {
+        ffi::MemFree(ptr.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>ctypes::c_void);
     }
 }
 
-<span class="doccomment">/// An allocator that can be used with any specified memory area. You can set up a new arena</span>
-<span class="doccomment">/// with [`create_mem_arena`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EoSCustomAllocator</span>(<span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span>);
+<span class="doccomment">/// An allocator that can be used with any specified memory area. You can set up a new arena
+/// with [`create_mem_arena`].
+</span><span class="kw">pub struct </span>EoSCustomAllocator(<span class="kw-2">*mut </span>ffi::mem_arena);
 
-<span class="kw">impl</span> <span class="ident">EoSCustomAllocator</span> {
-    <span class="doccomment">/// Creates a new custom allocator with the specified memory area.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The memory arena must be valid and stay valid during the lifetime of this struct.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">arena</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EoSCustomAllocator</span>(<span class="ident">arena</span>)
+<span class="kw">impl </span>EoSCustomAllocator {
+    <span class="doccomment">/// Creates a new custom allocator with the specified memory area.
+    ///
+    /// # Safety
+    /// The memory arena must be valid and stay valid during the lifetime of this struct.
+    </span><span class="kw">pub const unsafe fn </span>new(arena: <span class="kw-2">*mut </span>ffi::mem_arena) -&gt; <span class="self">Self </span>{
+        EoSCustomAllocator(arena)
     }
 }
 
-<span class="doccomment">/// To use a custom allocator as the global allocator, disable the `global_allocator` feature</span>
-<span class="doccomment">/// and register your custom allocator as the global allocator.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">GlobalAlloc</span> <span class="kw">for</span> <span class="ident">EoSCustomAllocator</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">alloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
-        <span class="ident">ffi::MemLocateSet</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">layout</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>
+<span class="doccomment">/// To use a custom allocator as the global allocator, disable the `global_allocator` feature
+/// and register your custom allocator as the global allocator.
+</span><span class="kw">unsafe impl </span>GlobalAlloc <span class="kw">for </span>EoSCustomAllocator {
+    <span class="kw">unsafe fn </span>alloc(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: Layout) -&gt; <span class="kw-2">*mut </span>u8 {
+        ffi::MemLocateSet(<span class="self">self</span>.<span class="number">0</span>, layout.size() <span class="kw">as </span>u32, <span class="number">0</span>) <span class="kw">as </span><span class="kw-2">*mut </span>u8
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">dealloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">_layout</span>: <span class="ident">Layout</span>) {
-        <span class="ident">ffi::MemLocateUnset</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">ctypes::c_void</span>);
+    <span class="kw">unsafe fn </span>dealloc(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: <span class="kw-2">*mut </span>u8, _layout: Layout) {
+        ffi::MemLocateUnset(<span class="self">self</span>.<span class="number">0</span>, ptr <span class="kw">as </span><span class="kw-2">*mut </span>ctypes::c_void);
     }
 }
 
-<span class="doccomment">/// On allocation errors, you should call [`alloc_error_handler`].</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Allocator</span> <span class="kw">for</span> <span class="ident">EoSCustomAllocator</span> {
-    <span class="kw">fn</span> <span class="ident">allocate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="ident">NonNull</span>&lt;[<span class="ident">u8</span>]&gt;, <span class="ident">AllocError</span>&gt; {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">raw_ptr</span> = <span class="ident">ffi::MemLocateSet</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">layout</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>;
-            <span class="kw">let</span> <span class="ident">ptr</span> = <span class="ident">NonNull::new</span>(<span class="ident">raw_ptr</span>).<span class="ident">ok_or</span>(<span class="ident">AllocError</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">NonNull::slice_from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>.<span class="ident">size</span>()))
+<span class="doccomment">/// On allocation errors, you should call [`alloc_error_handler`].
+</span><span class="kw">unsafe impl </span>Allocator <span class="kw">for </span>EoSCustomAllocator {
+    <span class="kw">fn </span>allocate(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;[u8]&gt;, AllocError&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>raw_ptr = ffi::MemLocateSet(<span class="self">self</span>.<span class="number">0</span>, layout.size() <span class="kw">as </span>u32, <span class="number">0</span>) <span class="kw">as </span><span class="kw-2">*mut </span>u8;
+            <span class="kw">let </span>ptr = NonNull::new(raw_ptr).ok_or(AllocError)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(NonNull::slice_from_raw_parts(ptr, layout.size()))
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">NonNull</span>&lt;<span class="ident">u8</span>&gt;, <span class="ident">_layout</span>: <span class="ident">Layout</span>) {
-        <span class="ident">ffi::MemLocateUnset</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">ctypes::c_void</span>);
+    <span class="kw">unsafe fn </span>deallocate(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: NonNull&lt;u8&gt;, _layout: Layout) {
+        ffi::MemLocateUnset(<span class="self">self</span>.<span class="number">0</span>, ptr.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>ctypes::c_void);
     }
 }
 
-<span class="doccomment">/// Creates a new memory arena within a given block of memory. Returns the memory arena.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Arguments</span>
-<span class="doccomment">/// * `mem` - memory region in which to create the arena, as {pointer, length}</span>
-<span class="doccomment">/// * `max_blocks` - maximum number of blocks that the arena can hold</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// `mem` must be a valid pointer + length to an unused memory location. `max_blocks` must fit</span>
-<span class="doccomment">/// into the length of `mem`.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">create_mem_arena</span>(<span class="ident">mem</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::iovec</span>, <span class="ident">max_blocks</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::mem_arena</span> {
-    <span class="ident">ffi::CreateMemArena</span>(<span class="ident">mem</span>, <span class="ident">max_blocks</span>)
+<span class="doccomment">/// Creates a new memory arena within a given block of memory. Returns the memory arena.
+///
+/// # Arguments
+/// * `mem` - memory region in which to create the arena, as {pointer, length}
+/// * `max_blocks` - maximum number of blocks that the arena can hold
+///
+/// # Safety
+/// `mem` must be a valid pointer + length to an unused memory location. `max_blocks` must fit
+/// into the length of `mem`.
+</span><span class="kw">pub unsafe fn </span>create_mem_arena(mem: <span class="kw-2">*mut </span>ffi::iovec, max_blocks: u32) -&gt; <span class="kw-2">*mut </span>ffi::mem_arena {
+    ffi::CreateMemArena(mem, max_blocks)
 }
 
-<span class="doccomment">/// Allocation error handler. Will freeze the game and output an error message.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-<span class="attribute">#[<span class="ident">alloc_error_handler</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alloc_error_handler</span>(<span class="kw">_</span>: <span class="ident">Layout</span>) -&gt; ! {
-    <span class="kw">let</span> <span class="ident">err</span> = <span class="string">b&quot;[rs] OUT OF MEMORY!\0&quot;</span>;
-    <span class="kw">unsafe</span> {
-        <span class="ident">ffi::DebugPrint</span>(<span class="number">2</span>, <span class="ident">err</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ctypes::c_char</span>);
+<span class="doccomment">/// Allocation error handler. Will freeze the game and output an error message.
+</span><span class="attribute">#[cfg(not(test))]</span>
+<span class="attribute">#[alloc_error_handler]</span>
+<span class="kw">pub fn </span>alloc_error_handler(<span class="kw">_</span>: Layout) -&gt; ! {
+    <span class="kw">let </span>err = <span class="string">b&quot;[rs] OUT OF MEMORY!\0&quot;</span>;
+    <span class="kw">unsafe </span>{
+        ffi::DebugPrint(<span class="number">2</span>, err.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>ctypes::c_char);
     }
-    <span class="kw">unsafe</span> { <span class="ident">panic::WaitForever</span>() }
+    <span class="kw">unsafe </span>{ panic::WaitForever() }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -73,80 +73,80 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Type aliases and small wrapper types for common ffi types and modules.</span>
-<span class="doccomment">//! These are generally to be preferred over directly</span>
-<span class="doccomment">//! using the ffi types and modules.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `..._catalog` re-exports are catalogs of IDs of items, moves, etc.</span>
-<span class="doccomment">//! that exist in the base game. The `Type` item of these catalogs specifies</span>
-<span class="doccomment">//! the type of the IDs.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Type aliases and small wrapper types for common ffi types and modules.
+//! These are generally to be preferred over directly
+//! using the ffi types and modules.
+//!
+//! The `..._catalog` re-exports are catalogs of IDs of items, moves, etc.
+//! that exist in the base game. The `Type` item of these catalogs specifies
+//! the type of the IDs.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>core::ops::{Deref, DerefMut};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::ability_id</span> <span class="kw">as</span> <span class="ident">ability_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::dungeon_group_id</span> <span class="kw">as</span> <span class="ident">dungeon_group_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::dungeon_id</span> <span class="kw">as</span> <span class="ident">dungeon_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::exclusive_item_effect_id</span> <span class="kw">as</span> <span class="ident">exclusive_item_effect_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::fixed_room_id</span> <span class="kw">as</span> <span class="ident">fixed_room_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::iq_group_id</span> <span class="kw">as</span> <span class="ident">iq_group_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::iq_skill_id</span> <span class="kw">as</span> <span class="ident">iq_skill_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::item_id</span> <span class="kw">as</span> <span class="ident">item_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::monster_id</span> <span class="kw">as</span> <span class="ident">monster_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::move_id</span> <span class="kw">as</span> <span class="ident">move_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::script_opcode_id</span> <span class="kw">as</span> <span class="ident">script_opcode_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::script_var_id</span> <span class="kw">as</span> <span class="ident">script_var_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::special_process_id</span> <span class="kw">as</span> <span class="ident">special_process_catalog</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ffi::type_id</span> <span class="kw">as</span> <span class="ident">type_catalog</span>;
+<span class="kw">pub use </span>ffi::ability_id <span class="kw">as </span>ability_catalog;
+<span class="kw">pub use </span>ffi::dungeon_group_id <span class="kw">as </span>dungeon_group_catalog;
+<span class="kw">pub use </span>ffi::dungeon_id <span class="kw">as </span>dungeon_catalog;
+<span class="kw">pub use </span>ffi::exclusive_item_effect_id <span class="kw">as </span>exclusive_item_effect_catalog;
+<span class="kw">pub use </span>ffi::fixed_room_id <span class="kw">as </span>fixed_room_catalog;
+<span class="kw">pub use </span>ffi::iq_group_id <span class="kw">as </span>iq_group_catalog;
+<span class="kw">pub use </span>ffi::iq_skill_id <span class="kw">as </span>iq_skill_catalog;
+<span class="kw">pub use </span>ffi::item_id <span class="kw">as </span>item_catalog;
+<span class="kw">pub use </span>ffi::monster_id <span class="kw">as </span>monster_catalog;
+<span class="kw">pub use </span>ffi::move_id <span class="kw">as </span>move_catalog;
+<span class="kw">pub use </span>ffi::script_opcode_id <span class="kw">as </span>script_opcode_catalog;
+<span class="kw">pub use </span>ffi::script_var_id <span class="kw">as </span>script_var_catalog;
+<span class="kw">pub use </span>ffi::special_process_id <span class="kw">as </span>special_process_catalog;
+<span class="kw">pub use </span>ffi::type_id <span class="kw">as </span>type_catalog;
 
-<span class="doccomment">/// A monster move.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Move</span> = <span class="ident">ffi::move_</span>;
+<span class="doccomment">/// A monster move.
+</span><span class="kw">pub type </span>Move = ffi::move_;
 
-<span class="doccomment">/// Entity in a dungeon. Has a [`crate::api::dungeon_mode::DungeonEntityType`].</span>
-<span class="doccomment">/// Use the [`crate::api::dungeon_mode::DungeonEntityExt`] trait to access dungeon related</span>
-<span class="doccomment">/// functionality.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonEntity</span> = <span class="ident">ffi::entity</span>;
-<span class="doccomment">/// Extended info struct for [`DungeonEntity`] objects that are items.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonItem</span> = <span class="ident">ffi::item</span>;
-<span class="doccomment">/// Extended info struct for [`DungeonEntity`] objects that are traps.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonTrap</span> = <span class="ident">ffi::trap</span>;
-<span class="doccomment">/// Reference type for the info struct for [`DungeonEntity`] objects that are monsters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This and `DungeonMonsterMut` exist for ease of use with the</span>
-<span class="doccomment">/// [`crate::api::dungeon_mode::DungeonMonsterExtRead`] and</span>
-<span class="doccomment">/// [`crate::api::dungeon_mode::DungeonMonsterExtWrite`] traits, where some of their functions</span>
-<span class="doccomment">/// actually require the entity to work with, we store a reference to the entity struct in our</span>
-<span class="doccomment">/// monster wrapper structs.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonMonsterRef</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::monster</span>, <span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ffi::entity</span>);
-<span class="doccomment">/// Mutable reference type for the info struct for [`DungeonEntity`] objects that are monsters.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DungeonMonsterMut</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::monster</span>, <span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ffi::entity</span>);
-<span class="doccomment">/// A struct representing a single dungeon tile.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DungeonTile</span> = <span class="ident">ffi::tile</span>;
+<span class="doccomment">/// Entity in a dungeon. Has a [`crate::api::dungeon_mode::DungeonEntityType`].
+/// Use the [`crate::api::dungeon_mode::DungeonEntityExt`] trait to access dungeon related
+/// functionality.
+</span><span class="kw">pub type </span>DungeonEntity = ffi::entity;
+<span class="doccomment">/// Extended info struct for [`DungeonEntity`] objects that are items.
+</span><span class="kw">pub type </span>DungeonItem = ffi::item;
+<span class="doccomment">/// Extended info struct for [`DungeonEntity`] objects that are traps.
+</span><span class="kw">pub type </span>DungeonTrap = ffi::trap;
+<span class="doccomment">/// Reference type for the info struct for [`DungeonEntity`] objects that are monsters.
+///
+/// This and `DungeonMonsterMut` exist for ease of use with the
+/// [`crate::api::dungeon_mode::DungeonMonsterExtRead`] and
+/// [`crate::api::dungeon_mode::DungeonMonsterExtWrite`] traits, where some of their functions
+/// actually require the entity to work with, we store a reference to the entity struct in our
+/// monster wrapper structs.
+</span><span class="kw">pub struct </span>DungeonMonsterRef&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ffi::monster, <span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ffi::entity);
+<span class="doccomment">/// Mutable reference type for the info struct for [`DungeonEntity`] objects that are monsters.
+</span><span class="kw">pub struct </span>DungeonMonsterMut&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::monster, <span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ffi::entity);
+<span class="doccomment">/// A struct representing a single dungeon tile.
+</span><span class="kw">pub type </span>DungeonTile = ffi::tile;
 
-<span class="doccomment">/// Essentially [`core::convert::AsRef`].</span>
-<span class="doccomment">/// (Sadly we can&#39;t use the `AsRef` trait, because it doesn&#39;t allow explicit lifetimes.)</span>
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DungeonMonsterMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="doccomment">/// Get a [`DungeonMonsterRef`] from this [`DungeonMonsterMut`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">DungeonMonsterRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="ident">DungeonMonsterRef</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
+<span class="doccomment">/// Essentially [`core::convert::AsRef`].
+/// (Sadly we can&#39;t use the `AsRef` trait, because it doesn&#39;t allow explicit lifetimes.)
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DungeonMonsterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Get a [`DungeonMonsterRef`] from this [`DungeonMonsterMut`].
+    </span><span class="kw">pub fn </span>as_ref(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; DungeonMonsterRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+        DungeonMonsterRef(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
     }
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">DungeonMonsterRef</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type</span> <span class="ident">Target</span> = <span class="ident">ffi::monster</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Deref <span class="kw">for </span>DungeonMonsterRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target = ffi::monster;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type</span> <span class="ident">Target</span> = <span class="ident">ffi::monster</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Deref <span class="kw">for </span>DungeonMonsterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target = ffi::monster;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">DungeonMonsterMut</span>&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DerefMut <span class="kw">for </span>DungeonMonsterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

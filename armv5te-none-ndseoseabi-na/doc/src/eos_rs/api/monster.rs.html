@@ -82,89 +82,89 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of monsters in a general context.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of monsters in a general context.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::objects::monster_catalog</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::objects::monster_catalog;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>alloc::vec::Vec;
 
-<span class="doccomment">/// Metadata of a monster species.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct provides general metadata about monster species in the game.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MonsterSpeciesInfo</span>(<span class="ident">monster_catalog::Type</span>);
+<span class="doccomment">/// Metadata of a monster species.
+///
+/// This struct provides general metadata about monster species in the game.
+</span><span class="kw">pub struct </span>MonsterSpeciesInfo(monster_catalog::Type);
 
-<span class="kw">impl</span> <span class="ident">MonsterSpeciesInfo</span> {
-    <span class="doccomment">/// Returns the info struct for the monster species with the given ID.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The caller should make sure the ID is valid (refers to an existing monster species),</span>
-    <span class="doccomment">/// otherwise the data returned by methods of this struct will be invalid and undefined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="ident">monster_idx</span>: <span class="ident">monster_catalog::Type</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">monster_idx</span>)
+<span class="kw">impl </span>MonsterSpeciesInfo {
+    <span class="doccomment">/// Returns the info struct for the monster species with the given ID.
+    ///
+    /// The caller should make sure the ID is valid (refers to an existing monster species),
+    /// otherwise the data returned by methods of this struct will be invalid and undefined.
+    </span><span class="kw">pub fn </span>get(monster_idx: monster_catalog::Type) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(monster_idx)
     }
 
-    <span class="doccomment">/// Returns the ID of this monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">monster_catalog::Type</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns the ID of this monster.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; monster_catalog::Type {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the gender field of the monster.
+    </span><span class="kw">pub fn </span>gender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="comment">// TODO: Enum.
+        </span><span class="kw">unsafe </span>{ ffi::GetMonsterGender(<span class="self">self</span>.<span class="number">0</span>) }
     }
 
-    <span class="doccomment">/// Returns the gender field of the monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="comment">// TODO: Enum.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetMonsterGender</span>(<span class="self">self</span>.<span class="number">0</span>) }
+    <span class="doccomment">/// Returns the sprite size of the monster. If the size is between 1 and 6,
+    /// 6 will be returned.
+    </span><span class="kw">pub fn </span>sprite_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="comment">// TODO: Enum.
+        </span><span class="kw">unsafe </span>{ ffi::GetSpriteSize(<span class="self">self</span>.<span class="number">0</span>) }
     }
 
-    <span class="doccomment">/// Returns the sprite size of the monster. If the size is between 1 and 6,</span>
-    <span class="doccomment">/// 6 will be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sprite_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="comment">// TODO: Enum.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetSpriteSize</span>(<span class="self">self</span>.<span class="number">0</span>) }
+    <span class="doccomment">/// Returns the sprite file size of the monster.
+    </span><span class="kw">pub fn </span>sprite_file_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="kw">unsafe </span>{ ffi::GetSpriteFileSize(<span class="self">self</span>.<span class="number">0</span>) }
     }
 
-    <span class="doccomment">/// Returns the sprite file size of the monster.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sprite_file_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::GetSpriteFileSize</span>(<span class="self">self</span>.<span class="number">0</span>) }
+    <span class="doccomment">/// Returns the pre-evolution id of a monster given its ID.
+    </span><span class="kw">pub fn </span>pre_evolution(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterSpeciesInfo {
+        <span class="kw">unsafe </span>{ <span class="self">Self</span>::get(ffi::GetMonsterPreEvolution(<span class="self">self</span>.<span class="number">0</span>)) }
     }
 
-    <span class="doccomment">/// Returns the pre-evolution id of a monster given its ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_evolution</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MonsterSpeciesInfo</span> {
-        <span class="kw">unsafe</span> { <span class="ident"><span class="self">Self</span>::get</span>(<span class="ident">ffi::GetMonsterPreEvolution</span>(<span class="self">self</span>.<span class="number">0</span>)) }
-    }
-
-    <span class="doccomment">/// Returns a list of all the possible evolutions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will panic if the monster has more than 32 evolutions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `ignore_sprite_size` - True to skip the check that prevents returning monsters with a</span>
-    <span class="doccomment">///                          different sprite size than the current one.</span>
-    <span class="doccomment">/// * `include_shedinja`   - True to skip the check that prevents Shedinja from being counted</span>
-    <span class="doccomment">///                          as a potential evolution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">evolutions</span>(
+    <span class="doccomment">/// Returns a list of all the possible evolutions.
+    ///
+    /// This will panic if the monster has more than 32 evolutions.
+    ///
+    /// # Arguments
+    /// * `ignore_sprite_size` - True to skip the check that prevents returning monsters with a
+    ///                          different sprite size than the current one.
+    /// * `include_shedinja`   - True to skip the check that prevents Shedinja from being counted
+    ///                          as a potential evolution.
+    </span><span class="kw">pub fn </span>evolutions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ignore_sprite_size</span>: <span class="ident">bool</span>,
-        <span class="ident">include_shedinja</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">Vec</span>&lt;<span class="ident">MonsterSpeciesInfo</span>&gt; {
-        <span class="kw">const</span> <span class="ident">MAX_EVOLUTIONS</span>: <span class="ident">i32</span> = <span class="number">32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_list</span> = [<span class="number">0</span>; <span class="ident">MAX_EVOLUTIONS</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="kw">let</span> <span class="ident">count</span> = <span class="kw">unsafe</span> {
-            <span class="ident">ffi::GetEvolutions</span>(
+        ignore_sprite_size: bool,
+        include_shedinja: bool,
+    ) -&gt; Vec&lt;MonsterSpeciesInfo&gt; {
+        <span class="kw">const </span>MAX_EVOLUTIONS: i32 = <span class="number">32</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>output_list = [<span class="number">0</span>; MAX_EVOLUTIONS <span class="kw">as </span>usize];
+        <span class="kw">let </span>count = <span class="kw">unsafe </span>{
+            ffi::GetEvolutions(
                 <span class="self">self</span>.<span class="number">0</span>,
-                <span class="ident">output_list</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">ignore_sprite_size</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
-                <span class="ident">include_shedinja</span> <span class="kw">as</span> <span class="ident">ffi::bool_</span>,
+                output_list.as_mut_ptr(),
+                ignore_sprite_size <span class="kw">as </span>ffi::bool_,
+                include_shedinja <span class="kw">as </span>ffi::bool_,
             )
         };
-        <span class="kw">if</span> <span class="ident">count</span> &gt;= <span class="ident">MAX_EVOLUTIONS</span> {
-            <span class="comment">// uh oh. Memory is corrupted now, so time to bail.</span>
-            <span class="comment">// THIS PANIC IS NOT UNWIND SAFE (not that it matters).</span>
-            <span class="macro">panic!</span>(<span class="string">&quot;Monster has more than {} evolutions.&quot;</span>, <span class="ident">MAX_EVOLUTIONS</span>);
+        <span class="kw">if </span>count &gt;= MAX_EVOLUTIONS {
+            <span class="comment">// uh oh. Memory is corrupted now, so time to bail.
+            // THIS PANIC IS NOT UNWIND SAFE (not that it matters).
+            </span><span class="macro">panic!</span>(<span class="string">&quot;Monster has more than {} evolutions.&quot;</span>, MAX_EVOLUTIONS);
         }
-        <span class="ident">output_list</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">take</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">map</span>(<span class="ident">MonsterSpeciesInfo</span>)
-            .<span class="ident">collect</span>()
+        output_list
+            .into_iter()
+            .take(count <span class="kw">as </span>usize)
+            .map(MonsterSpeciesInfo)
+            .collect()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

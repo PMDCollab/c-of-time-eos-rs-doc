@@ -154,161 +154,161 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module for dealing with the load-state of Nintendo DS overlays.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module for dealing with the load-state of Nintendo DS overlays.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="doccomment">/// This represents a promise to the compiler that while a reference</span>
-<span class="doccomment">/// to this struct exists, the overlay N is loaded.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used as a parameter in functions that need a given overlay to be loaded.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Dropping the lease does *not* unload an overlay, but you can use</span>
-<span class="doccomment">/// the [`Self::unload`] method on a lease to do so.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can clone a lease, but you will have the responsibility to make</span>
-<span class="doccomment">/// sure the overlay is not unloaded while clone lease is in use too.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OverlayLoadLease</span>&lt;<span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u32</span>&gt;(());
+<span class="doccomment">/// This represents a promise to the compiler that while a reference
+/// to this struct exists, the overlay N is loaded.
+///
+/// This is used as a parameter in functions that need a given overlay to be loaded.
+///
+/// Dropping the lease does *not* unload an overlay, but you can use
+/// the [`Self::unload`] method on a lease to do so.
+///
+/// You can clone a lease, but you will have the responsibility to make
+/// sure the overlay is not unloaded while clone lease is in use too.
+</span><span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>OverlayLoadLease&lt;<span class="kw">const </span>N: u32&gt;(());
 
-<span class="kw">impl</span>&lt;<span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u32</span>&gt; <span class="ident">OverlayLoadLease</span>&lt;<span class="ident">N</span>&gt; {
-    <span class="doccomment">/// Gets a lease on a loaded overlay.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a runtime checked version of `acquire_unchecked`.</span>
-    <span class="doccomment">/// It will panic if the overlay is not loaded.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Important</span>
-    <span class="doccomment">/// Even though this function is marked as safe, since it</span>
-    <span class="doccomment">/// checks if the overlay is loaded, you still need to make</span>
-    <span class="doccomment">/// sure the overlay is not unloaded during the lifetime</span>
-    <span class="doccomment">/// of the returned object.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">acquire</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> !<span class="ident"><span class="self">Self</span>::is_loaded</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;Overlay {} is not loaded.&quot;</span>, <span class="ident">N</span>);
+<span class="kw">impl</span>&lt;<span class="kw">const </span>N: u32&gt; OverlayLoadLease&lt;N&gt; {
+    <span class="doccomment">/// Gets a lease on a loaded overlay.
+    ///
+    /// This is a runtime checked version of `acquire_unchecked`.
+    /// It will panic if the overlay is not loaded.
+    ///
+    /// # Important
+    /// Even though this function is marked as safe, since it
+    /// checks if the overlay is loaded, you still need to make
+    /// sure the overlay is not unloaded during the lifetime
+    /// of the returned object.
+    </span><span class="kw">pub fn </span>acquire() -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>!<span class="self">Self</span>::is_loaded() {
+            <span class="macro">panic!</span>(<span class="string">&quot;Overlay {} is not loaded.&quot;</span>, N);
         }
         <span class="self">Self</span>(())
     }
-    <span class="doccomment">/// Gets a lease on a loaded overlay.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// You need to make sure the overlay is actually loaded and won&#39;t</span>
-    <span class="doccomment">/// get unloaded during the lifetime of the returned object.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">acquire_unchecked</span>() -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Gets a lease on a loaded overlay.
+    ///
+    /// # Safety
+    /// You need to make sure the overlay is actually loaded and won&#39;t
+    /// get unloaded during the lifetime of the returned object.
+    </span><span class="kw">pub unsafe fn </span>acquire_unchecked() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(())
     }
 
-    <span class="doccomment">/// Checks if the overlay is loaded.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_loaded</span>() -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::OverlayIsLoaded</span>(<span class="ident"><span class="self">Self</span>::group_id</span>()) &gt; <span class="number">0</span> }
+    <span class="doccomment">/// Checks if the overlay is loaded.
+    </span><span class="kw">pub fn </span>is_loaded() -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::OverlayIsLoaded(<span class="self">Self</span>::group_id()) &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Loads the given overlay if it isn&#39;t already loaded.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// This will change how memory is mapped. You will need to make</span>
-    <span class="doccomment">/// sure there are no conflicts with other overlays and that all</span>
-    <span class="doccomment">/// memory currently referenced will still be valid after this call.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> !<span class="ident"><span class="self">Self</span>::is_loaded</span>() {
-            <span class="ident">ffi::LoadOverlay</span>(<span class="ident"><span class="self">Self</span>::group_id</span>())
+    <span class="doccomment">/// Loads the given overlay if it isn&#39;t already loaded.
+    ///
+    /// # Safety
+    /// This will change how memory is mapped. You will need to make
+    /// sure there are no conflicts with other overlays and that all
+    /// memory currently referenced will still be valid after this call.
+    </span><span class="kw">pub unsafe fn </span>load() -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>!<span class="self">Self</span>::is_loaded() {
+            ffi::LoadOverlay(<span class="self">Self</span>::group_id())
         }
         <span class="self">Self</span>(())
     }
 
-    <span class="doccomment">/// Unloads the overlay.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// This will render all still existing leases on the overlay invalid.</span>
-    <span class="doccomment">/// You need to make sure that all leases are dropped.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unload</span>(<span class="self">self</span>) {
-        <span class="ident">ffi::UnloadOverlay</span>(<span class="ident"><span class="self">Self</span>::group_id</span>());
+    <span class="doccomment">/// Unloads the overlay.
+    ///
+    /// # Safety
+    /// This will render all still existing leases on the overlay invalid.
+    /// You need to make sure that all leases are dropped.
+    </span><span class="kw">pub unsafe fn </span>unload(<span class="self">self</span>) {
+        ffi::UnloadOverlay(<span class="self">Self</span>::group_id());
     }
 
-    <span class="doccomment">/// Returns the group ID of the overlay. This supports all game builtin overlays.</span>
-    <span class="doccomment">/// Panics if no mapping is known.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_id</span>() -&gt; <span class="ident">u32</span> {
-        <span class="kw">match</span> <span class="ident">N</span> {
-            <span class="number">0</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_0</span>,
-            <span class="number">1</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_1</span>,
-            <span class="number">2</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_2</span>,
-            <span class="number">3</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_3</span>,
-            <span class="number">4</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_4</span>,
-            <span class="number">5</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_5</span>,
-            <span class="number">6</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_6</span>,
-            <span class="number">7</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_7</span>,
-            <span class="number">8</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_8</span>,
-            <span class="number">9</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_9</span>,
-            <span class="number">10</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_10</span>,
-            <span class="number">11</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_11</span>,
-            <span class="number">12</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_12</span>,
-            <span class="number">13</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_13</span>,
-            <span class="number">14</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_14</span>,
-            <span class="number">15</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_15</span>,
-            <span class="number">16</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_16</span>,
-            <span class="number">17</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_17</span>,
-            <span class="number">18</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_18</span>,
-            <span class="number">19</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_19</span>,
-            <span class="number">20</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_20</span>,
-            <span class="number">21</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_21</span>,
-            <span class="number">22</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_22</span>,
-            <span class="number">23</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_23</span>,
-            <span class="number">24</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_24</span>,
-            <span class="number">25</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_25</span>,
-            <span class="number">26</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_26</span>,
-            <span class="number">27</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_27</span>,
-            <span class="number">28</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_28</span>,
-            <span class="number">29</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_29</span>,
-            <span class="number">30</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_30</span>,
-            <span class="number">31</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_31</span>,
-            <span class="number">32</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_32</span>,
-            <span class="number">33</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_33</span>,
-            <span class="number">34</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_34</span>,
-            <span class="number">35</span> =&gt; <span class="ident">ffi::overlay_group_id::OGROUP_OVERLAY_35</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;No known overlay group for overlay.&quot;</span>),
+    <span class="doccomment">/// Returns the group ID of the overlay. This supports all game builtin overlays.
+    /// Panics if no mapping is known.
+    </span><span class="kw">pub fn </span>group_id() -&gt; u32 {
+        <span class="kw">match </span>N {
+            <span class="number">0 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_0,
+            <span class="number">1 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_1,
+            <span class="number">2 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_2,
+            <span class="number">3 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_3,
+            <span class="number">4 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_4,
+            <span class="number">5 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_5,
+            <span class="number">6 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_6,
+            <span class="number">7 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_7,
+            <span class="number">8 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_8,
+            <span class="number">9 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_9,
+            <span class="number">10 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_10,
+            <span class="number">11 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_11,
+            <span class="number">12 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_12,
+            <span class="number">13 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_13,
+            <span class="number">14 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_14,
+            <span class="number">15 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_15,
+            <span class="number">16 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_16,
+            <span class="number">17 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_17,
+            <span class="number">18 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_18,
+            <span class="number">19 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_19,
+            <span class="number">20 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_20,
+            <span class="number">21 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_21,
+            <span class="number">22 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_22,
+            <span class="number">23 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_23,
+            <span class="number">24 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_24,
+            <span class="number">25 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_25,
+            <span class="number">26 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_26,
+            <span class="number">27 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_27,
+            <span class="number">28 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_28,
+            <span class="number">29 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_29,
+            <span class="number">30 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_30,
+            <span class="number">31 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_31,
+            <span class="number">32 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_32,
+            <span class="number">33 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_33,
+            <span class="number">34 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_34,
+            <span class="number">35 </span>=&gt; ffi::overlay_group_id::OGROUP_OVERLAY_35,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;No known overlay group for overlay.&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// Trait for all structs that require a lease to be created (but nothing else).</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CreatableWithLease</span>&lt;<span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u32</span>&gt;
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Trait for all structs that require a lease to be created (but nothing else).
+</span><span class="kw">pub trait </span>CreatableWithLease&lt;<span class="kw">const </span>N: u32&gt;
+<span class="kw">where
+    </span><span class="self">Self</span>: Sized,
 {
-    <span class="doccomment">/// Internal constructor that needs to be implemented. Don&#39;t call this directly.</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">_create</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="ident">N</span>&gt;) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Internal constructor that needs to be implemented. Don&#39;t call this directly.
+    </span><span class="attribute">#[doc(hidden)]</span>
+    <span class="kw">fn </span>_create(lease: OverlayLoadLease&lt;N&gt;) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Create a new instance by providing a lease.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Important</span>
-    <span class="doccomment">/// Overlay 29 must not be unloaded during the lifetime of the returned object.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">lease</span>: <span class="ident">OverlayLoadLease</span>&lt;<span class="ident">N</span>&gt;) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_create</span>(<span class="ident">lease</span>)
+    <span class="doccomment">/// Create a new instance by providing a lease.
+    ///
+    /// # Important
+    /// Overlay 29 must not be unloaded during the lifetime of the returned object.
+    </span><span class="kw">fn </span>new(lease: OverlayLoadLease&lt;N&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::_create(lease)
     }
 
-    <span class="doccomment">/// Create a new instance by checking if the overlay</span>
-    <span class="doccomment">/// is loaded and acquiring a lease on it.</span>
-    <span class="doccomment">/// This will panic if the overlay is not loaded.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Important</span>
-    <span class="doccomment">/// Overlay 29 must not be unloaded during the lifetime of the returned object.</span>
-    <span class="kw">fn</span> <span class="ident">new_checked</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_create</span>(<span class="ident">OverlayLoadLease</span>::&lt;<span class="ident">N</span>&gt;<span class="ident">::acquire</span>())
+    <span class="doccomment">/// Create a new instance by checking if the overlay
+    /// is loaded and acquiring a lease on it.
+    /// This will panic if the overlay is not loaded.
+    ///
+    /// # Important
+    /// Overlay 29 must not be unloaded during the lifetime of the returned object.
+    </span><span class="kw">fn </span>new_checked() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::_create(OverlayLoadLease::&lt;N&gt;::acquire())
     }
 
-    <span class="doccomment">/// Create a new lease.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// This function is unsafe because it does not check if the overlay is loaded.</span>
-    <span class="doccomment">/// You need to make sure that the overlay is loaded before calling this function,</span>
-    <span class="doccomment">/// and additionally ensure that during the lifetime of this object the overlay</span>
-    <span class="doccomment">/// is not unloaded.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new_unchecked</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_create</span>(<span class="ident">OverlayLoadLease</span>::&lt;<span class="ident">N</span>&gt;<span class="ident">::acquire_unchecked</span>())
+    <span class="doccomment">/// Create a new lease.
+    ///
+    /// # Safety
+    /// This function is unsafe because it does not check if the overlay is loaded.
+    /// You need to make sure that the overlay is loaded before calling this function,
+    /// and additionally ensure that during the lifetime of this object the overlay
+    /// is not unloaded.
+    </span><span class="kw">unsafe fn </span>new_unchecked() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::_create(OverlayLoadLease::&lt;N&gt;::acquire_unchecked())
     }
 
-    <span class="doccomment">/// Returns a reference to the overlay lease.</span>
-    <span class="kw">fn</span> <span class="ident">lease</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OverlayLoadLease</span>&lt;<span class="ident">N</span>&gt;;
+    <span class="doccomment">/// Returns a reference to the overlay lease.
+    </span><span class="kw">fn </span>lease(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OverlayLoadLease&lt;N&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -23,7 +23,7 @@ for log macros to work.</p>
 <h4 id="syntax-of-argument"><a href="#syntax-of-argument">Syntax of argument</a></h4>
 <p><code>&lt;Function Name; Rust Identifier&gt;</code></p>
 <h4 id="signature-of-raw-patch-functions-registered-this-way"><a href="#signature-of-raw-patch-functions-registered-this-way">Signature of raw patch functions registered this way:</a></h4>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">no_mangle</span>]</span> <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="comment">/* ? */</span>) <span class="comment">/* -&gt; ? */</span> { <span class="comment">/* ... */</span> }</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[no_mangle]</span> <span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>function(<span class="comment">/* ? */</span>) <span class="comment">/* -&gt; ? */ </span>{ <span class="comment">/* ... */ </span>}</code></pre></div>
 <p>Can be optionally marked unsafe.</p>
 <h4 id="note"><a href="#note">Note</a></h4>
 <p>At the present time, defining raw patches in this macro doesn’t actually do anything.
@@ -35,25 +35,25 @@ so please add your patches.</p>
 <p><code>&lt;Function Name; Rust Identifier&gt;: item_effect &lt;Item ID; Literal number or Path&gt;</code></p>
 <p>Item ID is the ID of the item itself, not an internal item effect ID.</p>
 <h4 id="signature-of-raw-patch-functions-registered-this-way-1"><a href="#signature-of-raw-patch-functions-registered-this-way-1">Signature of raw patch functions registered this way:</a></h4>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(
-    <span class="ident">effects</span>: <span class="kw-2">&amp;</span><span class="ident">eos_rs::api::dungeon_mode::DungeonEffectsEmitter</span>,
-    <span class="ident">user</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
-    <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
-    <span class="ident">used_item</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonItem</span>,
-    <span class="ident">is_thrown</span>: <span class="ident">bool</span>
-) { <span class="comment">/* ... */</span> }</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub fn </span>function(
+    effects: <span class="kw-2">&amp;</span>eos_rs::api::dungeon_mode::DungeonEffectsEmitter,
+    user: <span class="kw-2">&amp;mut </span>eos_rs::api::objects::DungeonEntity,
+    target: <span class="kw-2">&amp;mut </span>eos_rs::api::objects::DungeonEntity,
+    used_item: <span class="kw-2">&amp;mut </span>eos_rs::api::objects::DungeonItem,
+    is_thrown: bool
+) { <span class="comment">/* ... */ </span>}</code></pre></div>
 <h3 id="move-effect"><a href="#move-effect">Move Effect</a></h3>
 <p>Registers a function that will be called for the defined move when it is used in a dungeon.</p>
 <h4 id="syntax-of-argument-2"><a href="#syntax-of-argument-2">Syntax of argument</a></h4>
 <p><code>&lt;Function Name; Rust Identifier&gt;: move_effect &lt;Move ID; Literal number or Path&gt;</code></p>
 <p>Move ID is the ID of the move itself, not an internal move effect ID.</p>
 <h4 id="signature-of-raw-patch-functions-registered-this-way-2"><a href="#signature-of-raw-patch-functions-registered-this-way-2">Signature of raw patch functions registered this way:</a></h4>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(
-    <span class="ident">effects</span>: <span class="kw-2">&amp;</span><span class="ident">eos_rs::api::dungeon_mode::DungeonEffectsEmitter</span>,
-    <span class="ident">user</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
-    <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::DungeonEntity</span>,
-    <span class="ident">used_move</span>: <span class="kw-2">&amp;mut</span> <span class="ident">eos_rs::api::objects::Move</span>
-) { <span class="comment">/* ... */</span> }</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub fn </span>function(
+    effects: <span class="kw-2">&amp;</span>eos_rs::api::dungeon_mode::DungeonEffectsEmitter,
+    user: <span class="kw-2">&amp;mut </span>eos_rs::api::objects::DungeonEntity,
+    target: <span class="kw-2">&amp;mut </span>eos_rs::api::objects::DungeonEntity,
+    used_move: <span class="kw-2">&amp;mut </span>eos_rs::api::objects::Move
+) { <span class="comment">/* ... */ </span>}</code></pre></div>
 <h3 id="special-process"><a href="#special-process">Special Process</a></h3>
 <p>Registers a function that can be called from the script engine using the “special process”
 mechanism.</p>
@@ -62,7 +62,7 @@ mechanism.</p>
 <p>Process ID is the ID as used in the script engine (first parameter to the <code>ProcessSpecial</code>
 opcode).</p>
 <h4 id="signature-of-raw-patch-functions-registered-this-way-3"><a href="#signature-of-raw-patch-functions-registered-this-way-3">Signature of raw patch functions registered this way:</a></h4>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="ident">arg1</span>: <span class="ident">i16</span>, <span class="ident">arg2</span>: <span class="ident">i16</span>, <span class="ident">ov11</span>: <span class="kw-2">&amp;</span><span class="ident">eos_rs::api::overlay::OverlayLoadLease</span>&lt;<span class="number">11</span>&gt;) -&gt; <span class="ident">i32</span> { <span class="comment">/* ... */</span> <span class="number">0</span> }</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub fn </span>function(arg1: i16, arg2: i16, ov11: <span class="kw-2">&amp;</span>eos_rs::api::overlay::OverlayLoadLease&lt;<span class="number">11</span>&gt;) -&gt; i32 { <span class="comment">/* ... */ </span><span class="number">0 </span>}</code></pre></div>
 <h3 id="asm-glue-code"><a href="#asm-glue-code">ASM glue code</a></h3>
 <p>This is a literal string. It will later during the build process be converted into a <code>cotpatch</code>
 file that is placed in the <code>patches/</code> directory of <code>c-of-time</code>.</p>
@@ -71,59 +71,59 @@ file that is placed in the <code>patches/</code> directory of <code>c-of-time</c
 <h2 id="what-this-will-generate"><a href="#what-this-will-generate">What this will generate</a></h2>
 <p>This will generate three functions at the place it’s called:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="doccomment">/// This function is called from C code of `c-of-time` (see `src/item_effects.c` in the</span>
-<span class="doccomment">/// `c-of-time` repository).</span>
-<span class="doccomment">/// It will select all item effects defined in this macro for the related item and call it.</span>
-<span class="doccomment">/// This function will also set up the logger.</span>
-<span class="doccomment">/// It will log a warning if it can&#39;t find any item effects.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// NOTE: By default `src/item_effects.c` is written in a way that will only call</span>
-<span class="doccomment">/// the Rust codebase, if there is no item effect already defined in C code.</span>
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">eos_rs_apply_item_effect</span>(
-    <span class="ident">user</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
-    <span class="ident">target</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
-    <span class="ident">used_item</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::item</span>,
-    <span class="ident">is_thrown</span>: <span class="ident">eos_rs::ffi::bool_</span>
-) -&gt; <span class="ident">eos_rs::ffi::bool_</span> { <span class="comment">/* ... */</span> }
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="doccomment">/// This function is called from C code of `c-of-time` (see `src/item_effects.c` in the
+/// `c-of-time` repository).
+/// It will select all item effects defined in this macro for the related item and call it.
+/// This function will also set up the logger.
+/// It will log a warning if it can&#39;t find any item effects.
+///
+/// NOTE: By default `src/item_effects.c` is written in a way that will only call
+/// the Rust codebase, if there is no item effect already defined in C code.
+</span><span class="attribute">#[no_mangle]</span>
+<span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>eos_rs_apply_item_effect(
+    user: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
+    target: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
+    used_item: <span class="kw-2">*mut </span>eos_rs::ffi::item,
+    is_thrown: eos_rs::ffi::bool_
+) -&gt; eos_rs::ffi::bool_ { <span class="comment">/* ... */ </span>}
 
-<span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for move effects.</span>
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">eos_rs_apply_move_effect</span>(
-    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::move_effect_input</span>,
-    <span class="ident">user</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
-    <span class="ident">target</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::entity</span>,
-    <span class="ident">used_move</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::move_</span>
-) -&gt; <span class="ident">eos_rs::ffi::bool_</span> { <span class="comment">/* ... */</span> }
+<span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for move effects.
+</span><span class="attribute">#[no_mangle]</span>
+<span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>eos_rs_apply_move_effect(
+    data: <span class="kw-2">*mut </span>eos_rs::ffi::move_effect_input,
+    user: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
+    target: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
+    used_move: <span class="kw-2">*mut </span>eos_rs::ffi::move_
+) -&gt; eos_rs::ffi::bool_ { <span class="comment">/* ... */ </span>}
 
-<span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for special processes.</span>
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">eos_rs_call_special_process</span>(
-    <span class="ident">unknown</span>: <span class="kw-2">*mut</span> <span class="ident">eos_rs::ffi::undefined4</span>,
-    <span class="ident">special_process_id</span>: <span class="ident">eos_rs::ctypes::c_uint</span>,
-    <span class="ident">arg1</span>: <span class="ident">eos_rs::ctypes::c_short</span>,
-    <span class="ident">arg2</span>: <span class="ident">eos_rs::ctypes::c_short</span>,
-    <span class="ident">return_val</span>: <span class="kw-2">*mut</span> <span class="ident">i32</span>
-) { <span class="comment">/* ... */</span> }</code></pre></div>
+<span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for special processes.
+</span><span class="attribute">#[no_mangle]</span>
+<span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>eos_rs_call_special_process(
+    unknown: <span class="kw-2">*mut </span>eos_rs::ffi::undefined4,
+    special_process_id: eos_rs::ctypes::c_uint,
+    arg1: eos_rs::ctypes::c_short,
+    arg2: eos_rs::ctypes::c_short,
+    return_val: <span class="kw-2">*mut </span>i32
+) { <span class="comment">/* ... */ </span>}</code></pre></div>
 <h2 id="example"><a href="#example">Example</a></h2>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">eos_rs_proc::patches</span>;  <span class="comment">// use `eos_rs::patches` from public code. The proc crate is private.</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>eos_rs_proc::patches;  <span class="comment">// use `eos_rs::patches` from public code. The proc crate is private.
 
-<span class="comment">// `has_high_health`, `print_args` etc. are functions.</span>
-<span class="comment">// See `rust/src/main.rs` in the default `c-of-time` repository for more details.</span>
-<span class="macro">patches!</span> {
-    <span class="ident">has_high_health</span>,
-    <span class="ident">print_args</span>: <span class="ident">special_process</span> <span class="number">101</span>,
-    <span class="ident">just_panic</span>: <span class="ident">special_process</span> <span class="number">102</span>,
-    <span class="ident">oran_berry_burn</span>: <span class="ident">item_effect</span> <span class="ident">eos_rs::item_catalog::ITEM_ORAN_BERRY</span>,
-    <span class="ident">cut_badly_poisoned</span>: <span class="ident">eos_rs::move_effect</span> <span class="ident">move_catalog::MOVE_CUT</span>,
+// `has_high_health`, `print_args` etc. are functions.
+// See `rust/src/main.rs` in the default `c-of-time` repository for more details.
+</span><span class="macro">patches!</span> {
+    has_high_health,
+    print_args: special_process <span class="number">101</span>,
+    just_panic: special_process <span class="number">102</span>,
+    oran_berry_burn: item_effect eos_rs::item_catalog::ITEM_ORAN_BERRY,
+    cut_badly_poisoned: eos_rs::move_effect move_catalog::MOVE_CUT,
     <span class="string">&quot;
 HasLowHealth+0:
   B has_high_health
-    &quot;</span>
-}</code></pre></div>
+    &quot;
+</span>}</code></pre></div>
 <h2 id="notes"><a href="#notes">Notes</a></h2>
 <p>The ASM glue code is not processed at runtime, this is done by the <code>eos-rs-build</code> crate
 during build.
 It will extract the ASM glue code to the <code>patches/</code> directory in the <code>c-of-time</code>
 base directory (in the default configuration of the <code>c-of-time</code> repository.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

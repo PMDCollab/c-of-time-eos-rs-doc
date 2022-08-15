@@ -2,9 +2,9 @@
 <p>All calls to <a href="../../prelude/trait.Write.html#tymethod.write"><code>write</code></a> on the returned instance will return <code>Ok(buf.len())</code>
 and the contents of the buffer will not be inspected.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">acid_io::Write</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>acid_io::Write;
 
-<span class="kw">let</span> <span class="ident">buffer</span> = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">8</span>];
-<span class="kw">let</span> <span class="ident">num_bytes</span> = <span class="ident">acid_io::sink</span>().<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>).<span class="ident">unwrap</span>();
-<span class="macro">assert_eq!</span>(<span class="ident">num_bytes</span>, <span class="number">5</span>);</code></pre></div>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+<span class="kw">let </span>buffer = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">8</span>];
+<span class="kw">let </span>num_bytes = acid_io::sink().write(<span class="kw-2">&amp;</span>buffer).unwrap();
+<span class="macro">assert_eq!</span>(num_bytes, <span class="number">5</span>);</code></pre></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

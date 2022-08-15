@@ -14,21 +14,21 @@
 <span id="14">14</span>
 <span id="15">15</span>
 <span id="16">16</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Math functions.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Math functions.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="doccomment">/// Computes the Euclidean norm of a two-component integer array, sort of like hypotf(3).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">euclidean_norm</span>(<span class="ident">vec2</span>: <span class="kw-2">&amp;</span>[<span class="ident">i32</span>; <span class="number">2</span>]) -&gt; <span class="ident">f32</span> {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::EuclideanNorm</span>(<span class="ident">vec2</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+<span class="doccomment">/// Computes the Euclidean norm of a two-component integer array, sort of like hypotf(3).
+</span><span class="kw">pub fn </span>euclidean_norm(vec2: <span class="kw-2">&amp;</span>[i32; <span class="number">2</span>]) -&gt; f32 {
+    <span class="kw">unsafe </span>{ ffi::EuclideanNorm(vec2.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
 }
 
-<span class="doccomment">/// Clamps the absolute values in a two-component integer array.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Given an integer array [x, y] and a maximum absolute value M, clamps each element of the array</span>
-<span class="doccomment">/// to M (`max`) such that the output array is [min(max(x, -M), M), min(max(y, -M), M)].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clamp_component_abs</span>(<span class="ident">vec2</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">i32</span>; <span class="number">2</span>], <span class="ident">max</span>: <span class="ident">i32</span>) {
-    <span class="kw">unsafe</span> { <span class="ident">ffi::ClampComponentAbs</span>(<span class="ident">vec2</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">max</span>) }
+<span class="doccomment">/// Clamps the absolute values in a two-component integer array.
+///
+/// Given an integer array [x, y] and a maximum absolute value M, clamps each element of the array
+/// to M (`max`) such that the output array is [min(max(x, -M), M), min(max(y, -M), M)].
+</span><span class="kw">pub fn </span>clamp_component_abs(vec2: <span class="kw-2">&amp;mut </span>[i32; <span class="number">2</span>], max: i32) {
+    <span class="kw">unsafe </span>{ ffi::ClampComponentAbs(vec2.as_mut_ptr(), max) }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>
