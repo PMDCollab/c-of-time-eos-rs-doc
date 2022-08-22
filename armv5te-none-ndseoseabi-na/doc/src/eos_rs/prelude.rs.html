@@ -18,17 +18,17 @@
 //! and set up the allocator and panic handler.
 //! Logging macros of the [`log`] crate are also included.
 
-</span><span class="attribute">#[cfg(not(test))]</span>
-<span class="kw">pub use </span><span class="kw">crate</span>::allocation::ALLOCATOR;
-<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;io&quot;</span>)))]</span>
-<span class="attribute">#[cfg(feature = <span class="string">&quot;io&quot;</span>)]</span>
-<span class="kw">pub use </span><span class="kw">crate</span>::api::io::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(not(test))]</span>
-<span class="attribute">#[allow(unused_imports)]</span>
-<span class="comment">// I&#39;m not sure if without this import the panic_handler will be registered.
+</span><span class="attribute">#[cfg(not(test))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::allocation::ALLOCATOR;
+<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;io&quot;</span>)))]
+#[cfg(feature = <span class="string">&quot;io&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::api::io::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(not(test))]
+#[allow(unused_imports)]
+</span><span class="comment">// I&#39;m not sure if without this import the panic_handler will be registered.
 </span><span class="kw">pub use </span><span class="kw">crate</span>::panic::<span class="kw-2">*</span>;
-<span class="attribute">#[doc(hidden)]</span> <span class="comment">// So it&#39;s not documented twice.
+<span class="attribute">#[doc(hidden)] </span><span class="comment">// So it&#39;s not documented twice.
 </span><span class="kw">pub use </span><span class="kw">crate</span>::patches;
 <span class="kw">pub use </span>log::{debug, error, info, trace, warn};
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

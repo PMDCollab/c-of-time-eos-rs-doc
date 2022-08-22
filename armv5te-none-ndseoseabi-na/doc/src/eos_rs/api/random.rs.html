@@ -546,8 +546,8 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]</span>
-<span class="kw">mod </span>test {
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::ctypes::c_int;
     <span class="kw">use </span>alloc::vec::Vec;
@@ -556,8 +556,8 @@
     <span class="kw">const </span>RAND_16_RETURN: u16 = <span class="number">2000</span>;
     <span class="kw">const </span>RAND_32_RETURN: i32 = <span class="number">1234</span>;
 
-    <span class="attribute">#[derive(Clone, Copy, Eq, PartialEq, Debug)]</span>
-    <span class="kw">enum </span>RngCall {
+    <span class="attribute">#[derive(Clone, Copy, Eq, PartialEq, Debug)]
+    </span><span class="kw">enum </span>RngCall {
         Rand16,
         Rand32,
         RandRange32(c_int, c_int),
@@ -598,8 +598,8 @@
         }
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_i32_unbounded_unbounded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_i32_unbounded_unbounded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_i32_internal(<span class="kw-2">&amp;mut </span>mock, ..);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -607,8 +607,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_32_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_i32_unbounded_included() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_i32_unbounded_included() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_i32_internal(<span class="kw-2">&amp;mut </span>mock, ..=<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -616,8 +616,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_32_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_i32_unbounded_excluded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_i32_unbounded_excluded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_i32_internal(<span class="kw-2">&amp;mut </span>mock, ..<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -625,8 +625,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_32_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_i32_included_unbounded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_i32_included_unbounded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_i32_internal(<span class="kw-2">&amp;mut </span>mock, <span class="number">10</span>..);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -634,8 +634,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_32_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_i32_included_included() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_i32_included_included() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_i32_internal(<span class="kw-2">&amp;mut </span>mock, <span class="number">10</span>..=<span class="number">20</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -643,8 +643,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_32_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_i32_included_excluded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_i32_included_excluded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_i32_internal(<span class="kw-2">&amp;mut </span>mock, <span class="number">10</span>..<span class="number">20</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -652,9 +652,9 @@
         <span class="macro">assert_eq!</span>(result, RAND_32_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_excluded_unbounded() {
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_excluded_unbounded() {
         rand_i32_internal(
             <span class="kw-2">&amp;mut </span>MockRng(Vec::new()),
             ExcludedStartRange {
@@ -664,9 +664,9 @@
         );
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_excluded_included() {
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_excluded_included() {
         rand_i32_internal(
             <span class="kw-2">&amp;mut </span>MockRng(Vec::new()),
             ExcludedStartRange {
@@ -676,9 +676,9 @@
         );
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_excluded_excluded() {
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_excluded_excluded() {
         rand_i32_internal(
             <span class="kw-2">&amp;mut </span>MockRng(Vec::new()),
             ExcludedStartRange {
@@ -688,40 +688,40 @@
         );
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_reverse_range_excluded() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_reverse_range_excluded() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..<span class="number">2</span>).into_iter().count(), <span class="number">0</span>);
         rand_i32_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..<span class="number">2</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_empty_range_excluded() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_empty_range_excluded() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..<span class="number">3</span>).into_iter().count(), <span class="number">0</span>);
         rand_i32_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..<span class="number">3</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_reverse_range_included() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_reverse_range_included() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..=<span class="number">1</span>).into_iter().count(), <span class="number">0</span>);
         rand_i32_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..=<span class="number">1</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_i32_empty_range_included_anti() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_i32_empty_range_included_anti() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..=<span class="number">2</span>).into_iter().count(), <span class="number">0</span>);
         rand_i32_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..=<span class="number">2</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_u16_unbounded_unbounded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_u16_unbounded_unbounded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_u16_internal(<span class="kw-2">&amp;mut </span>mock, ..);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -729,8 +729,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_16_RETURN);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_u16_unbounded_included() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_u16_unbounded_included() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_u16_internal(<span class="kw-2">&amp;mut </span>mock, ..=<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -738,8 +738,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_16_RETURN / (u16::MAX / <span class="number">11</span>));
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_u16_unbounded_excluded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_u16_unbounded_excluded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_u16_internal(<span class="kw-2">&amp;mut </span>mock, ..<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -747,8 +747,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_16_RETURN % <span class="number">10</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_u16_included_unbounded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_u16_included_unbounded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_u16_internal(<span class="kw-2">&amp;mut </span>mock, <span class="number">10</span>..);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -756,8 +756,8 @@
         <span class="macro">assert_eq!</span>(result, RAND_16_RETURN + <span class="number">10</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_u16_included_included() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_u16_included_included() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_u16_internal(<span class="kw-2">&amp;mut </span>mock, <span class="number">10</span>..=<span class="number">20</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -765,8 +765,8 @@
         <span class="macro">assert_eq!</span>(result, <span class="number">10 </span>+ RAND_16_RETURN / (u16::MAX / <span class="number">11</span>));
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="kw">fn </span>test_rand_u16_included_excluded() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rand_u16_included_excluded() {
         <span class="kw">let </span><span class="kw-2">mut </span>mock = MockRng(Vec::new());
         <span class="kw">let </span>result = rand_u16_internal(<span class="kw-2">&amp;mut </span>mock, <span class="number">10</span>..<span class="number">20</span>);
         <span class="macro">assert_eq!</span>(mock.<span class="number">0</span>.len(), <span class="number">1</span>);
@@ -774,9 +774,9 @@
         <span class="macro">assert_eq!</span>(result, (RAND_16_RETURN % <span class="number">10</span>) + <span class="number">10</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_excluded_unbounded() {
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_excluded_unbounded() {
         rand_u16_internal(
             <span class="kw-2">&amp;mut </span>MockRng(Vec::new()),
             ExcludedStartRange {
@@ -786,9 +786,9 @@
         );
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_excluded_included() {
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_excluded_included() {
         rand_u16_internal(
             <span class="kw-2">&amp;mut </span>MockRng(Vec::new()),
             ExcludedStartRange {
@@ -798,9 +798,9 @@
         );
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_excluded_excluded() {
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_excluded_excluded() {
         rand_u16_internal(
             <span class="kw-2">&amp;mut </span>MockRng(Vec::new()),
             ExcludedStartRange {
@@ -810,37 +810,37 @@
         );
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_reverse_range_excluded() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_reverse_range_excluded() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..<span class="number">2</span>).into_iter().count(), <span class="number">0</span>);
         rand_u16_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..<span class="number">2</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_empty_range_excluded() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_empty_range_excluded() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..<span class="number">3</span>).into_iter().count(), <span class="number">0</span>);
         rand_u16_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..<span class="number">3</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_reverse_range_included() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_reverse_range_included() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..=<span class="number">1</span>).into_iter().count(), <span class="number">0</span>);
         rand_u16_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..=<span class="number">1</span>);
     }
 
-    <span class="attribute">#[test]</span>
-    <span class="attribute">#[allow(clippy::reversed_empty_ranges)]</span>
-    <span class="attribute">#[should_panic]</span>
-    <span class="kw">fn </span>test_rand_u16_empty_range_included_anti() {
+    <span class="attribute">#[test]
+    #[allow(clippy::reversed_empty_ranges)]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_rand_u16_empty_range_included_anti() {
         <span class="macro">assert_eq!</span>((<span class="number">3</span>..=<span class="number">2</span>).into_iter().count(), <span class="number">0</span>);
         rand_u16_internal(<span class="kw-2">&amp;mut </span>MockRng(Vec::new()), <span class="number">3</span>..=<span class="number">2</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

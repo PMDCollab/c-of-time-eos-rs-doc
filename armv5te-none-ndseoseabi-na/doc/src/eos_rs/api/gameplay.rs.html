@@ -670,23 +670,23 @@
 <span class="kw">use </span>core::ptr;
 
 <span class="doccomment">/// Describes an active team setup
-</span><span class="attribute">#[non_exhaustive]</span>
-<span class="kw">pub enum </span>TeamSetup {
+</span><span class="attribute">#[non_exhaustive]
+</span><span class="kw">pub enum </span>TeamSetup {
     HeroOnly,
     HeroAndPartnerOnly,
 }
 
-<span class="attribute">#[repr(i32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Move index of a monster, used by some functions.
+<span class="attribute">#[repr(i32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Move index of a monster, used by some functions.
 </span><span class="kw">pub enum </span>TargetTypeIndex {
     FirstType = <span class="number">0</span>,
     SecondType = <span class="number">1</span>,
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq)]</span>
-<span class="doccomment">/// The rank a player scored in the sentry duty (footprint) minigame.
+<span class="attribute">#[repr(u32)]
+#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq)]
+</span><span class="doccomment">/// The rank a player scored in the sentry duty (footprint) minigame.
 </span><span class="kw">pub enum </span>SentryGameRank {
     First = <span class="number">0</span>,
     Second = <span class="number">1</span>,
@@ -1325,4 +1325,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

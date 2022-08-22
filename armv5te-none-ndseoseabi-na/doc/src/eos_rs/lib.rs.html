@@ -90,21 +90,21 @@
 //! affiliates. This is an unofficial fan project.
 
 </span><span class="comment">// Allow std for tests. Make sure to NOT cross-compile when using tests.
-</span><span class="attribute">#![cfg_attr(not(test), no_std)]</span>
-<span class="attribute">#![feature(alloc_error_handler)]</span>
-<span class="comment">// This will be stable pretty soon:
-</span><span class="attribute">#![feature(alloc_c_string)]</span>
-<span class="attribute">#![feature(core_c_str)]</span>
-<span class="attribute">#![feature(allocator_api)]</span>
-<span class="attribute">#![feature(nonnull_slice_from_raw_parts)]</span>
-<span class="attribute">#![cfg_attr(docsrs, feature(doc_cfg))]</span>
-<span class="attribute">#![allow(clippy::too_many_arguments)]</span>
+</span><span class="attribute">#![cfg_attr(not(test), no_std)]
+#![feature(alloc_error_handler)]
+</span><span class="comment">// This will be stable pretty soon:
+</span><span class="attribute">#![feature(alloc_c_string)]
+#![feature(core_c_str)]
+#![feature(allocator_api)]
+#![feature(nonnull_slice_from_raw_parts)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![allow(clippy::too_many_arguments)]
 
-<span class="kw">extern crate </span>alloc;
+</span><span class="kw">extern crate </span>alloc;
 <span class="kw">extern crate </span>compiler_builtins_local;
 
-<span class="attribute">#[macro_use]</span>
-<span class="kw">mod </span>macros;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>macros;
 
 <span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>ctypes;
@@ -118,7 +118,7 @@
 
 <span class="kw">pub use </span>eos_rs_proc::patches;
 
-<span class="attribute">#[cfg(not(test))]</span>
-<span class="kw">mod </span>panic;
+<span class="attribute">#[cfg(not(test))]
+</span><span class="kw">mod </span>panic;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

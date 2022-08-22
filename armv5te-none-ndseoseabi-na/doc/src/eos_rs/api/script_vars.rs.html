@@ -793,9 +793,9 @@
 ///
 /// You can convert into this from [`script_var_type::Type`] with
 /// [`TryInto::try_into`] / [`TryFrom::try_from`].
-</span><span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, Debug)]</span>
-<span class="kw">pub enum </span>ScriptVariableValueType {
+</span><span class="attribute">#[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+</span><span class="kw">pub enum </span>ScriptVariableValueType {
     <span class="prelude-val">None </span>= script_var_type::VARTYPE_NONE,
     Bit = script_var_type::VARTYPE_BIT,
     String = script_var_type::VARTYPE_STRING,
@@ -829,8 +829,8 @@
 }
 
 <span class="doccomment">/// Value of a script variable.
-</span><span class="attribute">#[derive(Clone, Eq, PartialEq)]</span>
-<span class="kw">pub enum </span>ScriptVariableValue {
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>ScriptVariableValue {
     <span class="prelude-val">None</span>,
     Bit(bool),
     String(CString),
@@ -1174,10 +1174,10 @@
 </span><span class="kw">pub struct </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
 <span class="doccomment">/// Read actions for script variables.
-</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
-<span class="kw">pub trait </span>ScriptVariableRead: PartialEq + Eq {
-    <span class="attribute">#[doc(hidden)]</span>
-    <span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void;
+</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+</span><span class="kw">pub trait </span>ScriptVariableRead: PartialEq + Eq {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void;
 
     <span class="doccomment">/// Returns the variable ID
     </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; script_var_catalog::Type;
@@ -1365,8 +1365,8 @@
 }
 
 <span class="doccomment">/// Write actions for script variables.
-</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
-<span class="kw">pub trait </span>ScriptVariableWrite: ScriptVariableRead {
+</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+</span><span class="kw">pub trait </span>ScriptVariableWrite: ScriptVariableRead {
     <span class="doccomment">/// Zero-initialize the values of the given script variable.
     </span><span class="kw">fn </span>zero_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, var_id: script_var_catalog::Type) {
         <span class="macro">assert!</span>(var_id &lt; script_var_catalog::VAR_LOCAL0);
@@ -1503,8 +1503,8 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= other.<span class="number">0 </span>{
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
@@ -1525,8 +1525,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= other.<span class="number">0 </span>{
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
@@ -1548,9 +1548,9 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="attribute">#[inline(always)]</span>
-<span class="kw">fn </span>is_local(var_id: script_var_catalog::Type) -&gt; bool {
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>is_local(var_id: script_var_catalog::Type) -&gt; bool {
     var_id &gt;= script_var_catalog::VAR_LOCAL0
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

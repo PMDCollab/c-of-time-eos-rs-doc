@@ -203,9 +203,9 @@
 <span id="203">203</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits, structs and functions related to ground mode.
 
-</span><span class="attribute">#[allow(unused_imports)]</span> <span class="comment">// for easier reference in the docs of script_special_process_call
+</span><span class="attribute">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
 </span><span class="kw">use </span><span class="kw">crate</span>::api::gameplay;
-<span class="attribute">#[allow(unused_imports)]</span> <span class="comment">// for easier reference in the docs of script_special_process_call
+<span class="attribute">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
 </span><span class="kw">use </span><span class="kw">crate</span>::api::objects::special_process_catalog::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::{CreatableWithLease, OverlayLoadLease};
@@ -379,8 +379,8 @@
     /// # Parameters
     /// * `size` - initial memory arena pointer, or null.
     /// * `flags` - `MemAlloc` flags.
-    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
-    <span class="kw">pub fn </span>get_alloc_arena_ground(
+    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="kw">pub fn </span>get_alloc_arena_ground(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         arena: <span class="kw-2">*mut </span>ffi::mem_arena,
         flags: u32,
@@ -395,8 +395,8 @@
     /// # Parameters
     /// * `size` - initial memory arena pointer, or null.
     /// * `flags` - `MemAlloc` flags.
-    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]</span>
-    <span class="kw">pub fn </span>get_free_arena_ground(
+    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="kw">pub fn </span>get_free_arena_ground(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         arena: <span class="kw-2">*mut </span>ffi::mem_arena,
         flags: u32,
@@ -405,4 +405,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

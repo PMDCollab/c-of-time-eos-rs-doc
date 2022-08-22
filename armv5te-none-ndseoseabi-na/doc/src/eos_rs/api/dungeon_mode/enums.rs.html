@@ -665,17 +665,17 @@
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span><span class="kw">crate</span>::ffi::type_matchup::Type;
 
-<span class="attribute">#[repr(i32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Move index of a monster, used by some functions.
+<span class="attribute">#[repr(i32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Move index of a monster, used by some functions.
 </span><span class="kw">pub enum </span>TargetTypeIndex {
     FirstType = <span class="number">0</span>,
     SecondType = <span class="number">1</span>,
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Describes the effectiveness of a move&#39;s type against type(s).
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Describes the effectiveness of a move&#39;s type against type(s).
 </span><span class="kw">pub enum </span>DungeonTypeMatchup {
     Immune = ffi::type_matchup::MATCHUP_IMMUNE,
     NotVeryEffective = ffi::type_matchup::MATCHUP_NOT_VERY_EFFECTIVE,
@@ -699,9 +699,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// The type of an entity in a dungeon.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// The type of an entity in a dungeon.
 </span><span class="kw">pub enum </span>DungeonEntityType {
     Nothing = ffi::entity_type::ENTITY_NOTHING,
     Monster = ffi::entity_type::ENTITY_MONSTER,
@@ -725,9 +725,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// The category of a move.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// The category of a move.
 </span><span class="kw">pub enum </span>MoveCategory {
     <span class="prelude-val">None </span>= ffi::move_category::CATEGORY_NONE,
     Physical = ffi::move_category::CATEGORY_PHYSICAL,
@@ -749,9 +749,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// The type of a floor.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// The type of a floor.
 </span><span class="kw">pub enum </span>FloorType {
     <span class="doccomment">/// The floor is neither a fixed floor nor does it contain a rescue point.
     </span>Normal = ffi::floor_type::FLOOR_TYPE_NORMAL,
@@ -774,9 +774,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// The type of terrain of a tile.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// The type of terrain of a tile.
 </span><span class="kw">pub enum </span>TerrainType {
     Wall = ffi::terrain_type::TERRAIN_WALL,
     Normal = ffi::terrain_type::TERRAIN_NORMAL,
@@ -798,9 +798,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// The type of secondary terrain of a tile.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// The type of secondary terrain of a tile.
 </span><span class="kw">pub enum </span>SecondaryTerrainType {
     Water = ffi::secondary_terrain_type::SECONDARY_TERRAIN_WATER,
     Lava = ffi::secondary_terrain_type::SECONDARY_TERRAIN_LAVA,
@@ -820,9 +820,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Types of weather.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Types of weather.
 </span><span class="kw">pub enum </span>Weather {
     Clear = ffi::weather_id::WEATHER_CLEAR,
     Sunny = ffi::weather_id::WEATHER_SUNNY,
@@ -854,9 +854,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Types of weather.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Types of weather.
 </span><span class="kw">pub enum </span>DungeonObjective {
     Story = ffi::dungeon_objective::OBJECTIVE_STORY,
     Rescue = ffi::dungeon_objective::OBJECTIVE_RESCUE,
@@ -876,9 +876,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Direction on the dungeon grid
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Direction on the dungeon grid
 </span><span class="kw">pub enum </span>Direction {
     Down = ffi::direction_id::DIR_DOWN,
     DownRight = ffi::direction_id::DIR_DOWN_RIGHT,
@@ -910,9 +910,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Different types of warp effects
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Different types of warp effects
 </span><span class="kw">pub enum </span>WarpType {
     <span class="doccomment">/// Warp to a random position
     </span>Random = ffi::warp_type::WARP_RANDOM,
@@ -944,9 +944,9 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// The status of a monster&#39;s Conversion 2 state.
+<span class="attribute">#[repr(i32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// The status of a monster&#39;s Conversion 2 state.
 </span><span class="kw">pub enum </span>Conversion2Status {
     <span class="doccomment">/// The monster is not under the effect of Conversion 2.
     </span><span class="prelude-val">None </span>= <span class="number">0</span>,
@@ -969,9 +969,9 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Controls whether the loop that runs until the current floor ends should continue
+<span class="attribute">#[repr(i32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Controls whether the loop that runs until the current floor ends should continue
 /// iterating or not and why
 </span><span class="kw">pub enum </span>FloorLoopStatus {
     <span class="doccomment">/// The floor loop keeps executing as normal
@@ -995,9 +995,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Group of mission type on a dungeon floor.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Group of mission type on a dungeon floor.
 </span><span class="kw">pub enum </span>MissionTypeGroup {
     RescueClient = ffi::mission_type::MISSION_RESCUE_CLIENT,
     RescueTarget = ffi::mission_type::MISSION_RESCUE_TARGET,
@@ -1043,8 +1043,8 @@
     }
 }
 
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Specific mission type on a dungeon floor.
+<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Specific mission type on a dungeon floor.
 </span><span class="kw">pub enum </span>MissionType {
     RescueClient,
     RescueTarget,
@@ -1110,9 +1110,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::ExploreWithClient`].
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Mission subtype for [`MissionType::ExploreWithClient`].
 </span><span class="kw">pub enum </span>MissionSubtypeExplore {
     Normal = ffi::mission_subtype_explore::MISSION_EXPLORE_NORMAL,
     SealedChamber = ffi::mission_subtype_explore::MISSION_EXPLORE_SEALED_CHAMBER,
@@ -1147,9 +1147,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::TakeItemFromOutlaw`].
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Mission subtype for [`MissionType::TakeItemFromOutlaw`].
 </span><span class="kw">pub enum </span>MissionSubtypeTakeItem {
     NormalOutlaw = ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_NORMAL_OUTLAW,
     HiddenOutlaw = ffi::mission_subtype_take_item::MISSION_TAKE_ITEM_HIDDEN_OUTLAW,
@@ -1184,9 +1184,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::ArrestOutlaw`].
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Mission subtype for [`MissionType::ArrestOutlaw`].
 </span><span class="kw">pub enum </span>MissionSubtypeOutlaw {
     Normal0 = ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_0,
     Normal1 = ffi::mission_subtype_outlaw::MISSION_OUTLAW_NORMAL_1,
@@ -1239,9 +1239,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Mission subtype for [`MissionType::ChallengeRequest`].
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Mission subtype for [`MissionType::ChallengeRequest`].
 </span><span class="kw">pub enum </span>MissionSubtypeChallenge {
     Normal = ffi::mission_subtype_challenge::MISSION_CHALLENGE_NORMAL,
     Mewtwo = ffi::mission_subtype_challenge::MISSION_CHALLENGE_MEWTWO,
@@ -1288,9 +1288,9 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// List of reasons why you can get forcefully kicked out of a dungeon.
+<span class="attribute">#[repr(i32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// List of reasons why you can get forcefully kicked out of a dungeon.
 </span><span class="kw">pub enum </span>ForcedLossReason {
     <span class="doccomment">/// You don&#39;t have to get kicked out of the dungeon.
     </span><span class="prelude-val">None </span>= <span class="number">0</span>,
@@ -1327,4 +1327,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

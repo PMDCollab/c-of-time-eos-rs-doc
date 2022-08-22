@@ -15,10 +15,10 @@
 /// This macro mostly exists because we make some optimistic assumptions about the ffi
 /// functions actually only requiring const pointers in some instances, even if the C
 /// headers don&#39;t declare them as const.
-</span><span class="macro">macro_rules!</span> force_mut_ptr {
+</span><span class="macro">macro_rules! </span>force_mut_ptr {
     (<span class="macro-nonterminal">$x</span>:expr) =&gt; {
         <span class="macro-nonterminal">$x </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*mut </span><span class="kw">_
     </span>};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

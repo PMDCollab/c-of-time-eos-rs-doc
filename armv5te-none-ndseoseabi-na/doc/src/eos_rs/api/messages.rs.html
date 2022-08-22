@@ -468,16 +468,16 @@
     <span class="doccomment">/// Converts the format string to the formatted string.
     ///
     /// Builds String from a str. The input is the format string to use.
-    </span><span class="attribute">#[allow(clippy::needless_return)]</span>
-    <span class="kw">pub fn </span>build&lt;S: AsRef&lt;str&gt;&gt;(<span class="self">self</span>, format: S) -&gt; String {
-        <span class="attribute">#[cfg(debug_assertions)]</span>
-        <span class="kw">return </span><span class="self">self
+    </span><span class="attribute">#[allow(clippy::needless_return)]
+    </span><span class="kw">pub fn </span>build&lt;S: AsRef&lt;str&gt;&gt;(<span class="self">self</span>, format: S) -&gt; String {
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span><span class="kw">return </span><span class="self">self
             </span>.build_from_cstr_as_cstring(str_to_cstring(format.as_ref()))
             .into_string()
             .expect(<span class="string">&quot;Failed to convert game string to String (invalid UTF-8)&quot;</span>);
         <span class="comment">// Save some precious size in release mode
-        </span><span class="attribute">#[cfg(not(debug_assertions))]</span>
-        <span class="self">self</span>.build_from_cstr_as_cstring(str_to_cstring(format.as_ref()))
+        </span><span class="attribute">#[cfg(not(debug_assertions))]
+        </span><span class="self">self</span>.build_from_cstr_as_cstring(str_to_cstring(format.as_ref()))
             .into_string()
             .unwrap()
     }
@@ -485,16 +485,16 @@
     <span class="doccomment">/// Converts the format string to the formatted string.
     ///
     /// Builds String from a CStr. The input is the format string to use.
-    </span><span class="attribute">#[allow(clippy::needless_return)]</span>
-    <span class="kw">pub fn </span>build_from_cstr&lt;S: AsRef&lt;CStr&gt;&gt;(<span class="self">self</span>, format: S) -&gt; String {
-        <span class="attribute">#[cfg(debug_assertions)]</span>
-        <span class="kw">return </span><span class="self">self
+    </span><span class="attribute">#[allow(clippy::needless_return)]
+    </span><span class="kw">pub fn </span>build_from_cstr&lt;S: AsRef&lt;CStr&gt;&gt;(<span class="self">self</span>, format: S) -&gt; String {
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span><span class="kw">return </span><span class="self">self
             </span>.build_from_cstr_as_cstring(format.as_ref())
             .into_string()
             .expect(<span class="string">&quot;Failed to convert game string to String (invalid UTF-8)&quot;</span>);
         <span class="comment">// Save some precious size in release mode
-        </span><span class="attribute">#[cfg(not(debug_assertions))]</span>
-        <span class="self">self</span>.build_from_cstr_as_cstring(format.as_ref())
+        </span><span class="attribute">#[cfg(not(debug_assertions))]
+        </span><span class="self">self</span>.build_from_cstr_as_cstring(format.as_ref())
             .into_string()
             .unwrap()
     }
@@ -567,4 +567,4 @@
     <span class="kw">unsafe </span>{ ffi::SetBothScreensWindowsColor(palette_idx <span class="kw">as </span>i32) }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

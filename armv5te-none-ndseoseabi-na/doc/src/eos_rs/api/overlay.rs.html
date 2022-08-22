@@ -168,8 +168,8 @@
 ///
 /// You can clone a lease, but you will have the responsibility to make
 /// sure the overlay is not unloaded while clone lease is in use too.
-</span><span class="attribute">#[derive(Clone)]</span>
-<span class="kw">pub struct </span>OverlayLoadLease&lt;<span class="kw">const </span>N: u32&gt;(());
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>OverlayLoadLease&lt;<span class="kw">const </span>N: u32&gt;(());
 
 <span class="kw">impl</span>&lt;<span class="kw">const </span>N: u32&gt; OverlayLoadLease&lt;N&gt; {
     <span class="doccomment">/// Gets a lease on a loaded overlay.
@@ -275,8 +275,8 @@
     </span><span class="self">Self</span>: Sized,
 {
     <span class="doccomment">/// Internal constructor that needs to be implemented. Don&#39;t call this directly.
-    </span><span class="attribute">#[doc(hidden)]</span>
-    <span class="kw">fn </span>_create(lease: OverlayLoadLease&lt;N&gt;) -&gt; <span class="self">Self</span>;
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>_create(lease: OverlayLoadLease&lt;N&gt;) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Create a new instance by providing a lease.
     ///
@@ -311,4 +311,4 @@
     </span><span class="kw">fn </span>lease(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OverlayLoadLease&lt;N&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

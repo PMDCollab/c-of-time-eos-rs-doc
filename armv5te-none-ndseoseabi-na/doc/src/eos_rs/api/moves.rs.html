@@ -249,9 +249,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::api::objects::{type_catalog, Move};
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Move target (i.e., who does a move affect when used?).
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Move target (i.e., who does a move affect when used?).
 </span><span class="kw">pub enum </span>MoveTarget {
     Enemies = ffi::move_target::TARGET_ENEMIES,
     Party = ffi::move_target::TARGET_PARTY,
@@ -281,9 +281,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Move range.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Move range.
 </span><span class="kw">pub enum </span>MoveRange {
     Front = ffi::move_range::RANGE_FRONT,
     FrontAndSides = ffi::move_range::RANGE_FRONT_AND_SIDES,
@@ -323,9 +323,9 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]</span>
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]</span>
-<span class="doccomment">/// Conditions checked by the AI to determine when a move should be used.
+<span class="attribute">#[repr(u32)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+</span><span class="doccomment">/// Conditions checked by the AI to determine when a move should be used.
 /// It does not affect how the move works.
 </span><span class="kw">pub enum </span>MoveAiCondition {
     <span class="prelude-val">None </span>= ffi::move_ai_condition::AI_CONDITION_NONE,
@@ -489,4 +489,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (878aef79d 2022-08-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>
