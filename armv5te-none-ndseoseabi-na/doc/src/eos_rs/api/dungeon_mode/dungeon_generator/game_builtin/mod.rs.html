@@ -520,7 +520,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::dungeon_generator::{
     DungeonEntityGeneration, DungeonFloorGeneration,
 };
-<span class="kw">use </span><span class="kw">crate</span>::api::objects::fixed_room_catalog;
+<span class="kw">use </span><span class="kw">crate</span>::api::dungeons::FixedRoomId;
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
 <span class="kw">use </span><span class="kw">crate</span>::ctypes::c_int;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
@@ -546,7 +546,7 @@
     <span class="doccomment">/// Handles fixed room generation if the floor contains a fixed room.
     </span><span class="kw">pub fn </span>generate_fixed_room(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        fixed_room_id: fixed_room_catalog::Type,
+        fixed_room_id: FixedRoomId,
         properties: <span class="kw-2">&amp;</span>ffi::floor_properties,
     ) -&gt; bool {
         <span class="comment">// SAFETY: We have a mutable reference to the dungeon.
@@ -1001,4 +1001,4 @@
     </span>OneRoomMonsterHouse,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"type":[["AbilityId","An ability ID with associated methods to get metadata."]]};

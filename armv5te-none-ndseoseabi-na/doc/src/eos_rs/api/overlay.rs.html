@@ -281,7 +281,7 @@
     <span class="doccomment">/// Create a new instance by providing a lease.
     ///
     /// # Important
-    /// Overlay 29 must not be unloaded during the lifetime of the returned object.
+    /// Overlay N must not be unloaded during the lifetime of the returned object.
     </span><span class="kw">fn </span>new(lease: OverlayLoadLease&lt;N&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_create(lease)
     }
@@ -291,7 +291,7 @@
     /// This will panic if the overlay is not loaded.
     ///
     /// # Important
-    /// Overlay 29 must not be unloaded during the lifetime of the returned object.
+    /// Overlay N must not be unloaded during the lifetime of the returned object.
     </span><span class="kw">fn </span>new_checked() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_create(OverlayLoadLease::&lt;N&gt;::acquire())
     }
@@ -311,4 +311,4 @@
     </span><span class="kw">fn </span>lease(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OverlayLoadLease&lt;N&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

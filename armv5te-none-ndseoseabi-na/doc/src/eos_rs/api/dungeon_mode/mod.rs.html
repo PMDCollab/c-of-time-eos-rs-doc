@@ -82,7 +82,6 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-<span id="85">85</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits, enums, structs and functions related to dungeon mode.
 
 </span><span class="kw">mod </span>dungeon_struct;
@@ -97,7 +96,6 @@
 
 <span class="kw">pub mod </span>dungeon_generator;
 
-<span class="kw">use </span><span class="kw">crate</span>::api::objects::DungeonEntity;
 <span class="kw">use </span>core::ptr;
 <span class="kw">pub use </span>dungeon_struct::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>effects::<span class="kw-2">*</span>;
@@ -127,7 +125,7 @@
     ffi::ResetDamageDesc(damage_desc);
 }
 
-<span class="doccomment">/// [`crate::api::objects::DungeonMonsterRef::calc_damage`] seems to use scratch space of
+<span class="doccomment">/// [`DungeonMonsterRef::calc_damage`] seems to use scratch space of
 /// some kind, which this function zeroes.
 ///
 /// # Safety
@@ -169,4 +167,4 @@
     <span class="kw">unsafe </span>{ ffi::DisplayActions(ptr) &gt; <span class="number">0 </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"type":[["IqGroupId","An IQ Group ID with associated methods to get metadata."],["IqSkillId","An IQ Skill ID with associated methods to get metadata."]]};

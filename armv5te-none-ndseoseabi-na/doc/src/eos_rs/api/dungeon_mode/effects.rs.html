@@ -1184,17 +1184,19 @@
 <span id="1184">1184</span>
 <span id="1185">1185</span>
 <span id="1186">1186</span>
+<span id="1187">1187</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::items::ItemId;
+<span class="kw">use </span><span class="kw">crate</span>::api::moves::Move;
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::{CreatableWithLease, OverlayLoadLease};
+<span class="kw">use </span><span class="kw">crate</span>::api::types::MonsterTypeId;
 <span class="kw">use </span><span class="kw">crate</span>::ctypes::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span>fixed::types::I24F8;
 
 <span class="doccomment">/// Helper struct for emitting move and item effects.
 ///
-/// You may find more things to do with monsters in the [`DungeonMonsterExtWrite`] trait.
-///
+/// You may find more things to do with monsters in the [`DungeonMonsterMut`] struct.
 </span><span class="kw">pub struct </span>DungeonEffectsEmitter(OverlayLoadLease&lt;<span class="number">29</span>&gt;);
 
 <span class="kw">impl </span>CreatableWithLease&lt;<span class="number">29</span>&gt; <span class="kw">for </span>DungeonEffectsEmitter {
@@ -1250,7 +1252,7 @@
         defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
         used_move: <span class="kw-2">&amp;</span>Move,
         damage_multiplier: I24F8,
-        item_id: <span class="prelude-ty">Option</span>&lt;item_catalog::Type&gt;,
+        item_id: <span class="prelude-ty">Option</span>&lt;ItemId&gt;,
     ) -&gt; i32 {
         <span class="comment">// SAFETY: We have a lease on the overlay existing.
         </span><span class="kw">unsafe </span>{
@@ -1259,7 +1261,7 @@
                 defender,
                 <span class="macro">force_mut_ptr!</span>(used_move),
                 damage_multiplier.to_bits() <span class="kw">as </span>c_int,
-                item_id.unwrap_or(item_catalog::ITEM_NOTHING),
+                item_id.unwrap_or(ItemId::ITEM_NOTHING),
             )
         }
     }
@@ -1273,7 +1275,7 @@
         attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
         defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
         used_move: <span class="kw-2">&amp;</span>Move,
-        item_id: <span class="prelude-ty">Option</span>&lt;item_catalog::Type&gt;,
+        item_id: <span class="prelude-ty">Option</span>&lt;ItemId&gt;,
     ) -&gt; bool {
         <span class="comment">// SAFETY: We have a lease on the overlay existing.
         </span><span class="kw">unsafe </span>{
@@ -1281,7 +1283,7 @@
                 attacker,
                 defender,
                 <span class="macro">force_mut_ptr!</span>(used_move),
-                item_id.unwrap_or(item_catalog::ITEM_NOTHING),
+                item_id.unwrap_or(ItemId::ITEM_NOTHING),
             ) &gt; <span class="number">0
         </span>}
     }
@@ -2111,7 +2113,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         attacker: <span class="kw-2">&amp;mut </span>DungeonEntity,
         defender: <span class="kw-2">&amp;mut </span>DungeonEntity,
-        gummi_type: type_catalog::Type,
+        gummi_type: MonsterTypeId,
         stat_boost: i32,
     ) {
         <span class="comment">// SAFETY: We have a lease on the overlay existing.
@@ -2371,4 +2373,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

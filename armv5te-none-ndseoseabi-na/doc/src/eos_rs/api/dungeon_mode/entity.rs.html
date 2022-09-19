@@ -122,89 +122,43 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Extension trait for [`DungeonEntity`].
-///
-/// # Important safety note
-/// Implementations of this trait can assume that overlay 29 is loaded (since this is the
-/// only context dungeon entities are actually relevant). If you manually implement this trait,
-/// for some reason, you NEED to make sure overlay 29 is loaded when using some functions of this
-/// trait.
-/// If you use the DungeonEntity structs manually outside of dungeon mode, this trait will be
-/// unsafe to use.
-/// The trait and its functions are marked safe for convenience, since in its intended use case,
+<span class="doccomment">/// Entity in a dungeon. Has a [`DungeonEntityType`].
+</span><span class="kw">pub type </span>DungeonEntity = ffi::entity;
+
+<span class="doccomment">/// Extended info struct for [`DungeonEntity`] objects that are items.
+</span><span class="kw">pub type </span>DungeonItem = ffi::item;
+<span class="doccomment">/// Extended info struct for [`DungeonEntity`] objects that are traps.
+</span><span class="kw">pub type </span>DungeonTrap = ffi::trap;
+<span class="doccomment">/// A struct representing a single dungeon tile.
+</span><span class="kw">pub type </span>DungeonTile = ffi::tile;
+
+<span class="doccomment">/// # Important safety note
+/// These implementations can assume that overlay 29 is loaded (since this is the
+/// only context dungeon entities are actually relevant). If you somehow manually construct types
+/// of this struct for some reason, you NEED to make sure overlay 29 is loaded when using some f
+/// unctions of this trait.
+/// The methods in this impl are marked safe for convenience, since in its intended use case,
 /// overlay 29 will always be loaded.
-</span><span class="kw">pub trait </span>DungeonEntityExt {
+</span><span class="kw">impl </span>DungeonEntity {
     <span class="doccomment">/// Checks if a given entity is actually valid.
-    </span><span class="kw">fn </span>is_valid(slf: <span class="kw-2">*mut </span><span class="self">Self</span>) -&gt; bool;
-
-    <span class="doccomment">/// Entity type. Invalid values will return None.
-    </span><span class="kw">fn </span>entity_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonEntityType&gt;;
-
-    <span class="doccomment">/// This returns the monster info struct for the entity,
-    /// panics if the entity is not a monster.
-    </span><span class="kw">fn </span>info_for_monster(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonMonsterRef&gt;;
-
-    <span class="doccomment">/// This returns the item info struct for the entity,
-    /// panics if the entity is not an item.
-    </span><span class="kw">fn </span>info_for_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonItem&gt;;
-
-    <span class="doccomment">/// This returns the trap info struct for the entity,
-    /// panics if the entity is not a trap.
-    </span><span class="kw">fn </span>info_for_trap(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTrap&gt;;
-
-    <span class="doccomment">/// This returns the monster info struct for the entity,
-    /// panics if the entity is not a monster.
-    </span><span class="kw">fn </span>info_for_monster_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonMonsterMut&gt;;
-
-    <span class="doccomment">/// This returns the item info struct for the entity,
-    /// panics if the entity is not an item.
-    </span><span class="kw">fn </span>info_for_item_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonItem&gt;;
-
-    <span class="doccomment">/// This returns the trap info struct for the entity,
-    /// panics if the entity is not a trap.
-    </span><span class="kw">fn </span>info_for_trap_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTrap&gt;;
-
-    <span class="doccomment">/// Returns the tile, that the entity is located at.
-    </span><span class="kw">fn </span>get_tile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTile&gt;;
-
-    <span class="doccomment">/// Returns the tile, that the entity is located at.
-    </span><span class="kw">fn </span>get_tile_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTile&gt;;
-}
-
-<span class="kw">impl </span>DungeonEntityExt <span class="kw">for </span>DungeonEntity {
-    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
-    </span><span class="kw">fn </span>is_valid(slf: <span class="kw-2">*mut </span><span class="self">Self</span>) -&gt; bool {
+    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="kw">pub fn </span>is_valid(slf: <span class="kw-2">*mut </span><span class="self">Self</span>) -&gt; bool {
         <span class="comment">// SAFETY: The lease passed into the function promises us that the overlay is loaded.
         //         Since this function is intended to actually check if the entity is valid,
         //         it&#39;s safe to call, even if the `slf` pointer is invalid.
         </span><span class="kw">unsafe </span>{ ffi::EntityIsValid(slf) &gt; <span class="number">0 </span>}
     }
 
-    <span class="kw">fn </span>entity_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonEntityType&gt; {
+    <span class="doccomment">/// Entity type. Invalid values will return None.
+    </span><span class="kw">pub fn </span>entity_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonEntityType&gt; {
         <span class="self">self</span>.type_.try_into().ok()
     }
 
-    <span class="kw">fn </span>info_for_monster(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonMonsterRef&gt; {
+    <span class="doccomment">/// This returns the monster info struct for the entity,
+    /// returns None if the entity is not a monster.
+    </span><span class="kw">pub fn </span>info_for_monster(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonMonsterRef&gt; {
         <span class="kw">if </span><span class="self">self</span>.entity_type() == <span class="prelude-val">Some</span>(DungeonEntityType::Monster) {
             <span class="kw">unsafe </span>{
                 <span class="prelude-val">Some</span>(DungeonMonsterRef(
@@ -217,7 +171,9 @@
         </span>}
     }
 
-    <span class="kw">fn </span>info_for_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonItem&gt; {
+    <span class="doccomment">/// This returns the item info struct for the entity,
+    /// returns None if the entity is not an item.
+    </span><span class="kw">pub fn </span>info_for_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonItem&gt; {
         <span class="kw">if </span><span class="self">self</span>.entity_type() == <span class="prelude-val">Some</span>(DungeonEntityType::Item) {
             <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(<span class="kw-2">&amp;*</span>(<span class="self">self</span>.info <span class="kw">as </span><span class="kw-2">*const </span>DungeonItem)) }
         } <span class="kw">else </span>{
@@ -225,7 +181,9 @@
         </span>}
     }
 
-    <span class="kw">fn </span>info_for_trap(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTrap&gt; {
+    <span class="doccomment">/// This returns the trap info struct for the entity,
+    /// returns None if the entity is not a trap.
+    </span><span class="kw">pub fn </span>info_for_trap(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTrap&gt; {
         <span class="kw">if </span><span class="self">self</span>.entity_type() == <span class="prelude-val">Some</span>(DungeonEntityType::Trap) {
             <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(<span class="kw-2">&amp;*</span>(<span class="self">self</span>.info <span class="kw">as </span><span class="kw-2">*const </span>DungeonTrap)) }
         } <span class="kw">else </span>{
@@ -233,7 +191,9 @@
         </span>}
     }
 
-    <span class="kw">fn </span>info_for_monster_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonMonsterMut&gt; {
+    <span class="doccomment">/// This returns the monster info struct for the entity,
+    /// returns None if the entity is not a monster.
+    </span><span class="kw">pub fn </span>info_for_monster_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DungeonMonsterMut&gt; {
         <span class="kw">if </span><span class="self">self</span>.entity_type() == <span class="prelude-val">Some</span>(DungeonEntityType::Monster) {
             <span class="kw">unsafe </span>{
                 <span class="prelude-val">Some</span>(DungeonMonsterMut(
@@ -246,7 +206,9 @@
         </span>}
     }
 
-    <span class="kw">fn </span>info_for_item_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonItem&gt; {
+    <span class="doccomment">/// This returns the item info struct for the entity,
+    /// returns None if the entity is not an item.
+    </span><span class="kw">pub fn </span>info_for_item_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonItem&gt; {
         <span class="kw">if </span><span class="self">self</span>.entity_type() == <span class="prelude-val">Some</span>(DungeonEntityType::Item) {
             <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>(<span class="self">self</span>.info <span class="kw">as </span><span class="kw-2">*mut </span>DungeonItem)) }
         } <span class="kw">else </span>{
@@ -254,7 +216,9 @@
         </span>}
     }
 
-    <span class="kw">fn </span>info_for_trap_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTrap&gt; {
+    <span class="doccomment">/// This returns the trap info struct for the entity,
+    /// returns None if the entity is not a trap.
+    </span><span class="kw">pub fn </span>info_for_trap_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTrap&gt; {
         <span class="kw">if </span><span class="self">self</span>.entity_type() == <span class="prelude-val">Some</span>(DungeonEntityType::Trap) {
             <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>(<span class="self">self</span>.info <span class="kw">as </span><span class="kw-2">*mut </span>DungeonTrap)) }
         } <span class="kw">else </span>{
@@ -262,7 +226,8 @@
         </span>}
     }
 
-    <span class="kw">fn </span>get_tile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTile&gt; {
+    <span class="doccomment">/// Returns the tile, that the entity is located at.
+    </span><span class="kw">pub fn </span>get_tile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonTile&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetTileAtEntity(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) };
         <span class="kw">if </span>ptr.is_null() {
             <span class="prelude-val">None
@@ -271,7 +236,8 @@
         }
     }
 
-    <span class="kw">fn </span>get_tile_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTile&gt; {
+    <span class="doccomment">/// Returns the tile, that the entity is located at.
+    </span><span class="kw">pub fn </span>get_tile_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonTile&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetTileAtEntity(<span class="self">self</span>) };
         <span class="kw">if </span>ptr.is_null() {
             <span class="prelude-val">None
@@ -281,4 +247,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

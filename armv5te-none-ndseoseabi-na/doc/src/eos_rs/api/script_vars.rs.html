@@ -775,12 +775,96 @@
 <span id="775">775</span>
 <span id="776">776</span>
 <span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Code for handling script variables.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::api::objects::script_var_catalog;
-<span class="kw">use </span><span class="kw">crate</span>::ctypes::c_void;
+</span><span class="kw">use </span><span class="kw">crate</span>::ctypes::c_void;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
-<span class="kw">use </span><span class="kw">crate</span>::ffi::script_var_id::Type;
 <span class="kw">use </span><span class="kw">crate</span>::ffi::script_var_type;
 <span class="kw">use </span>alloc::ffi::CString;
 <span class="kw">use </span>alloc::vec;
@@ -788,6 +872,79 @@
 <span class="kw">use </span>core::ffi::CStr;
 <span class="kw">use </span>core::marker::PhantomData;
 <span class="kw">use </span>core::ptr;
+
+<span class="doccomment">/// A script opcode ID with associated methods to get metadata.
+///
+/// Use the associated constants or the [`Self::get`] method to get instances of this.
+</span><span class="kw">pub type </span>ScriptOpcodeId = ffi::script_opcode_id;
+<span class="kw">impl </span>Copy <span class="kw">for </span>ScriptOpcodeId {}
+
+<span class="doccomment">/// This impl provides general metadata about script opcodes in the game.
+</span><span class="kw">impl </span>ScriptOpcodeId {
+    <span class="doccomment">/// Returns the ID struct for the script opcode with the given ID.
+    ///
+    /// # Safety
+    /// The caller must make sure the ID is valid (refers to an existing script opcode),
+    /// otherwise this is UB.
+    </span><span class="kw">pub const unsafe fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Returns the ID of this script opcode.
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;ScriptOpcodeId&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(v: ScriptOpcodeId) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// A script variable ID with associated methods to get metadata.
+///
+/// Use the associated constants or the [`Self::get`] method to get instances of this.
+</span><span class="kw">pub type </span>ScriptVariableId = ffi::script_var_id;
+<span class="kw">impl </span>Copy <span class="kw">for </span>ScriptVariableId {}
+
+<span class="doccomment">/// This impl provides general metadata about script variables in the game.
+</span><span class="kw">impl </span>ScriptVariableId {
+    <span class="doccomment">/// Returns the ID struct for the script variable with the given ID.
+    ///
+    /// # Safety
+    /// The caller must make sure the ID is valid (refers to an existing script variable),
+    /// otherwise this is UB.
+    </span><span class="kw">pub const unsafe fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Returns the ID of this script variable.
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Whether or not this variable is a local variable (as opposed to a global one).
+    </span><span class="kw">fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0 </span>&gt;= ScriptVariableId::VAR_LOCAL0.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;ScriptVariableId&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(v: ScriptVariableId) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0
+    </span>}
+}
+
+<span class="kw">pub trait </span>AsScriptVariableId {
+    <span class="kw">fn </span>as_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId;
+}
+
+<span class="kw">impl </span>AsScriptVariableId <span class="kw">for </span>ScriptVariableId {
+    <span class="kw">fn </span>as_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId {
+        <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
 
 <span class="doccomment">/// Value types of script variables.
 ///
@@ -896,8 +1053,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;()&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::None,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::None,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -909,8 +1067,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;bool&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; bool {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::Bit,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::Bit,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -922,8 +1081,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;CString&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; CString {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::String,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::String,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -935,8 +1095,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;u8&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; u8 {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::U8,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::U8,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -948,8 +1109,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;u16&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; u16 {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::U16,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::U16,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -961,8 +1123,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;u32&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; u32 {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::U32,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::U32,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -974,8 +1137,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;i8&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; i8 {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::I8,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::I8,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -987,8 +1151,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;i16&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; i16 {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::I16,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::I16,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -1000,8 +1165,9 @@
 
 <span class="kw">impl </span>UnwrapScriptVariableValueAs&lt;i32&gt; <span class="kw">for </span>ScriptVariableValue {
     <span class="kw">fn </span>unwrap_as(<span class="self">self</span>, as_type: ScriptVariableValueType) -&gt; i32 {
-        <span class="macro">assert!</span>(
-            as_type == ScriptVariableValueType::I32,
+        <span class="macro">assert_eq!</span>(
+            as_type,
+            ScriptVariableValueType::I32,
             <span class="string">&quot;Invalid use of `unwrap_as`&quot;
         </span>);
         <span class="kw">match </span><span class="self">self </span>{
@@ -1013,9 +1179,18 @@
 }
 
 <span class="doccomment">/// Helper struct for manipulating the global and local script variables.
-</span><span class="kw">pub struct </span>ScriptVariables;
+</span><span class="kw">pub struct </span>ScriptVariables(PhantomData&lt;()&gt;);
 
 <span class="kw">impl </span>ScriptVariables {
+    <span class="doccomment">/// Returns a struct for manipulating global and local script variables.
+    ///
+    /// # Safety
+    /// This is unsafe, since it essentially borrows a global mutable variable (`static mut`), see
+    /// safety rules for `static mut`s.
+    </span><span class="kw">pub unsafe fn </span>get() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(PhantomData)
+    }
+
     <span class="doccomment">/// Initialize the script variable values table (SCRIPT_VARS_VALUES).
     ///
     /// The whole table is first zero-initialized. Then, all script variable values are first
@@ -1028,18 +1203,15 @@
 
     <span class="doccomment">/// Get a reference to the global variable. This must not be used
     /// for local variables.
-    </span><span class="kw">pub fn </span>global_variable(<span class="kw-2">&amp;</span><span class="self">self</span>, var_id: script_var_catalog::Type) -&gt; GlobalScriptVariableRef {
-        <span class="macro">assert!</span>(!is_local(var_id));
+    </span><span class="kw">pub fn </span>global_variable(<span class="kw-2">&amp;</span><span class="self">self</span>, var_id: ScriptVariableId) -&gt; GlobalScriptVariableRef {
+        <span class="macro">assert!</span>(!var_id.is_local());
         GlobalScriptVariableRef(var_id, PhantomData)
     }
 
     <span class="doccomment">/// Get a mutable reference to the global variable. This must not be used
     /// for local variables.
-    </span><span class="kw">pub fn </span>global_variable_mut(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        var_id: script_var_catalog::Type,
-    ) -&gt; GlobalScriptVariableMut {
-        <span class="macro">assert!</span>(!(is_local(var_id)));
+    </span><span class="kw">pub fn </span>global_variable_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, var_id: ScriptVariableId) -&gt; GlobalScriptVariableMut {
+        <span class="macro">assert!</span>(!(var_id.is_local()));
         GlobalScriptVariableMut(var_id, PhantomData)
     }
 
@@ -1051,9 +1223,9 @@
     </span><span class="kw">pub unsafe fn </span>local_variable(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         local_var_vals: <span class="kw-2">*mut </span>c_void,
-        var_id: script_var_catalog::Type,
+        var_id: ScriptVariableId,
     ) -&gt; LocalScriptVariableRef {
-        <span class="macro">assert!</span>(is_local(var_id));
+        <span class="macro">assert!</span>(var_id.is_local());
         LocalScriptVariableRef(local_var_vals, var_id, PhantomData)
     }
 
@@ -1065,9 +1237,9 @@
     </span><span class="kw">pub unsafe fn </span>local_variable_mut(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         local_var_vals: <span class="kw-2">*mut </span>c_void,
-        var_id: script_var_catalog::Type,
+        var_id: ScriptVariableId,
     ) -&gt; LocalScriptVariableMut {
-        <span class="macro">assert!</span>(is_local(var_id));
+        <span class="macro">assert!</span>(var_id.is_local());
         LocalScriptVariableMut(local_var_vals, var_id, PhantomData)
     }
 
@@ -1160,27 +1332,26 @@
 }
 
 <span class="doccomment">/// Reference to a global script variable, see [`ScriptVariableRead`].
-</span><span class="kw">pub struct </span>GlobalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt;(script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
+</span><span class="kw">pub struct </span>GlobalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt;(ScriptVariableId, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
 <span class="doccomment">/// Mutable reference to a global script variable, see
 /// [`ScriptVariableRead`] and [`ScriptVariableWrite`].
-</span><span class="kw">pub struct </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
+</span><span class="kw">pub struct </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(ScriptVariableId, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
 <span class="doccomment">/// Reference to a local script variable, see [`ScriptVariableRead`].
-</span><span class="kw">pub struct </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
+</span><span class="kw">pub struct </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, ScriptVariableId, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
 <span class="doccomment">/// Mutable reference to a local script variable, see
 /// [`ScriptVariableRead`] and [`ScriptVariableWrite`].
-</span><span class="kw">pub struct </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, script_var_catalog::Type, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
+</span><span class="kw">pub struct </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">*mut </span>c_void, ScriptVariableId, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
 <span class="doccomment">/// Read actions for script variables.
-</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
 </span><span class="kw">pub trait </span>ScriptVariableRead: PartialEq + Eq {
     <span class="attribute">#[doc(hidden)]
     </span><span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void;
 
     <span class="doccomment">/// Returns the variable ID
-    </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; script_var_catalog::Type;
+    </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId;
 
     <span class="doccomment">/// Loads a script variable descriptor for a given ID.
     </span><span class="kw">fn </span>descriptor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ffi::script_var {
@@ -1195,9 +1366,9 @@
         }
     }
 
-    <span class="doccomment">/// Returns whether or not this is a local variable
+    <span class="doccomment">/// Returns whether or not this is a local variable (as opposed to a global one).
     </span><span class="kw">fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        is_local(<span class="self">self</span>.id())
+        <span class="self">self</span>.id().is_local()
     }
 
     <span class="doccomment">/// Returns the type of the variable
@@ -1354,22 +1525,30 @@
     ///
     /// Hint: Implementors of this trait also implement `PartialEq` and `Eq`, so you can use those
     /// instead if the underlying type is the same.
-    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other_id: script_var_catalog::Type) -&gt; bool {
-        <span class="kw">if </span>is_local(<span class="self">self</span>.id()) != (is_local(other_id)) {
+    </span><span class="kw">fn </span>var_eq&lt;S: AsScriptVariableId&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: S) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.id().is_local() != other.as_id().is_local() {
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
         <span class="kw">unsafe </span>{
-            ffi::ScriptVariablesEqual(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id(), other_id) &gt; <span class="number">0
+            ffi::ScriptVariablesEqual(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id(), other.as_id()) &gt; <span class="number">0
         </span>}
     }
 }
 
+<span class="kw">impl</span>&lt;T&gt; AsScriptVariableId <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: ScriptVariableRead,
+{
+    <span class="kw">fn </span>as_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId {
+        <span class="self">self</span>.id()
+    }
+}
+
 <span class="doccomment">/// Write actions for script variables.
-</span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
 </span><span class="kw">pub trait </span>ScriptVariableWrite: ScriptVariableRead {
     <span class="doccomment">/// Zero-initialize the values of the given script variable.
-    </span><span class="kw">fn </span>zero_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, var_id: script_var_catalog::Type) {
-        <span class="macro">assert!</span>(var_id &lt; script_var_catalog::VAR_LOCAL0);
+    </span><span class="kw">fn </span>zero_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, var_id: ScriptVariableId) {
+        <span class="macro">assert!</span>(var_id.is_local());
         <span class="kw">unsafe </span>{ ffi::ZinitScriptVariable(<span class="self">self</span>.internal_local_var_table(), <span class="self">self</span>.id()) }
     }
 
@@ -1477,7 +1656,7 @@
         ptr::null_mut()
     }
 
-    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId {
         <span class="self">self</span>.<span class="number">0
     </span>}
 }
@@ -1495,7 +1674,7 @@
         ptr::null_mut()
     }
 
-    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId {
         <span class="self">self</span>.<span class="number">0
     </span>}
 }
@@ -1503,8 +1682,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>GlobalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>LocalScriptVariableRef&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
-    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= other.<span class="number">0 </span>{
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
@@ -1519,14 +1697,13 @@
         <span class="self">self</span>.<span class="number">0
     </span>}
 
-    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId {
         <span class="self">self</span>.<span class="number">1
     </span>}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
-    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= other.<span class="number">0 </span>{
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
@@ -1541,16 +1718,11 @@
         <span class="self">self</span>.<span class="number">0
     </span>}
 
-    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScriptVariableId {
         <span class="self">self</span>.<span class="number">1
     </span>}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
-
-<span class="attribute">#[inline(always)]
-</span><span class="kw">fn </span>is_local(var_id: script_var_catalog::Type) -&gt; bool {
-    var_id &gt;= script_var_catalog::VAR_LOCAL0
-}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

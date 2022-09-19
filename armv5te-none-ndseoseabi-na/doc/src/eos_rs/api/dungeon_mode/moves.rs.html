@@ -20,13 +20,7 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::moves::{Move, MoveId};
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 
@@ -36,10 +30,7 @@
     </span><span class="kw">fn </span>move_is_not_physical(<span class="kw-2">&amp;</span><span class="self">self</span>, _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; bool;
 
     <span class="doccomment">/// Checks if the move isn&#39;t a physical move.
-    </span><span class="kw">fn </span>move_is_not_physical_static(
-        move_id: move_catalog::Type,
-        _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;,
-    ) -&gt; bool;
+    </span><span class="kw">fn </span>move_is_not_physical_static(move_id: MoveId, _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; bool;
 }
 
 <span class="kw">impl </span>DungeonMoveExt <span class="kw">for </span>Move {
@@ -47,12 +38,9 @@
         <span class="self">Self</span>::move_is_not_physical_static(<span class="self">self</span>.id.val(), _ov29)
     }
 
-    <span class="kw">fn </span>move_is_not_physical_static(
-        move_id: move_catalog::Type,
-        _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;,
-    ) -&gt; bool {
+    <span class="kw">fn </span>move_is_not_physical_static(move_id: MoveId, _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; bool {
         <span class="kw">unsafe </span>{ ffi::MoveIsNotPhysical(move_id) &gt; <span class="number">0 </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

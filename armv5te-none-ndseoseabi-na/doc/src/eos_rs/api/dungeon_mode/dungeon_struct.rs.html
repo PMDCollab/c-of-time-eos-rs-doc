@@ -1577,17 +1577,13 @@
 <span id="1577">1577</span>
 <span id="1578">1578</span>
 <span id="1579">1579</span>
-<span id="1580">1580</span>
-<span id="1581">1581</span>
-<span id="1582">1582</span>
-<span id="1583">1583</span>
-<span id="1584">1584</span>
-<span id="1585">1585</span>
-<span id="1586">1586</span>
-<span id="1587">1587</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::api::objects::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::api::dungeons::{DungeonGroupId, DungeonId};
+<span class="kw">use </span><span class="kw">crate</span>::api::iq::IqSkillId;
+<span class="kw">use </span><span class="kw">crate</span>::api::items::ItemId;
+<span class="kw">use </span><span class="kw">crate</span>::api::monsters::MonsterSpeciesId;
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
+<span class="kw">use </span><span class="kw">crate</span>::api::types::MonsterTypeId;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span>alloc::vec::Vec;
 
@@ -1621,22 +1617,22 @@
 <span class="doccomment">/// Manipulate the dungeon.
 </span><span class="kw">impl</span>&lt;T: AsRef&lt;ffi::dungeon&gt; + AsMut&lt;ffi::dungeon&gt;&gt; Dungeon&lt;T&gt; {
     <span class="doccomment">/// Dungeon ID.
-    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; dungeon_catalog::Type {
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DungeonId {
         <span class="self">self</span>.<span class="number">0</span>.as_ref().id.val()
     }
 
     <span class="doccomment">/// Set Dungeon ID.
-    </span><span class="kw">pub fn </span>set_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: dungeon_catalog::Type) {
+    </span><span class="kw">pub fn </span>set_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DungeonId) {
         <span class="self">self</span>.<span class="number">0</span>.as_mut().id.set_val(id);
     }
 
     <span class="doccomment">/// Dungeon group ID.
-    </span><span class="kw">pub fn </span>group_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; dungeon_group_catalog::Type {
+    </span><span class="kw">pub fn </span>group_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DungeonGroupId {
         <span class="self">self</span>.<span class="number">0</span>.as_ref().group_id.val()
     }
 
     <span class="doccomment">/// Set Dungeon group ID.
-    </span><span class="kw">pub fn </span>set_group_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: dungeon_group_catalog::Type) {
+    </span><span class="kw">pub fn </span>set_group_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DungeonGroupId) {
         <span class="self">self</span>.<span class="number">0</span>.as_mut().group_id.set_val(id);
     }
 
@@ -2375,11 +2371,6 @@
         </span><span class="kw">unsafe </span>{ ffi::IsNormalFloor() &gt; <span class="number">0 </span>}
     }
 
-    <span class="doccomment">/// Checks if a fixed room ID corresponds to a fixed, full-floor layout.
-    </span><span class="kw">pub fn </span>is_full_floor_fixed_rooms(<span class="kw-2">&amp;</span><span class="self">self</span>, fixed_room_id: fixed_room_catalog::Type) -&gt; bool {
-        <span class="comment">// SAFETY:We hold a valid mutable reference to the global dungeon struct.
-        </span><span class="kw">unsafe </span>{ ffi::IsNotFullFloorFixedRoom(fixed_room_id) == <span class="number">0 </span>}
-    }
     <span class="doccomment">/// Checks if a position (x, y) is out of bounds on the map:
     /// !((0 &lt;= x &lt;= 55) &amp;&amp; (0 &lt;= y &lt;= 31)).
     </span><span class="kw">pub fn </span>is_pos_out_of_bounds(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; bool {
@@ -2497,21 +2488,21 @@
 
     <span class="doccomment">/// Get the ID of the item that needs to be retrieve on the current floor for a mission,
     /// if one exists.
-    </span><span class="kw">pub fn </span>get_item_to_retrieve(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; item_catalog::Type {
+    </span><span class="kw">pub fn </span>get_item_to_retrieve(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ItemId {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetItemToRetrieve() }
     }
 
     <span class="doccomment">/// Get the ID of the item that needs to be delivered to a mission client on the current floor,
     /// if one exists.
-    </span><span class="kw">pub fn </span>get_item_to_deliver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; item_catalog::Type {
+    </span><span class="kw">pub fn </span>get_item_to_deliver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ItemId {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetItemToDeliver() }
     }
 
     <span class="doccomment">/// Get the ID of the special target item for a Sealed Chamber or Treasure Memo mission on
     /// the current floor.
-    </span><span class="kw">pub fn </span>get_special_target_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; item_catalog::Type {
+    </span><span class="kw">pub fn </span>get_special_target_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ItemId {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetSpecialTargetItem() }
     }
@@ -2540,7 +2531,7 @@
 
     <span class="doccomment">/// Get the monster ID of the target enemy to be defeated on the current floor for a mission,
     /// if one exists.
-    </span><span class="kw">pub fn </span>get_mission_target_enemy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; monster_catalog::Type {
+    </span><span class="kw">pub fn </span>get_mission_target_enemy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterSpeciesId {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetMissionTargetEnemy() }
     }
@@ -2550,7 +2541,7 @@
     ///
     /// Note that a single minion group can correspond to multiple actual minions of the same
     /// species. There can be up to 2 minion groups.
-    </span><span class="kw">pub fn </span>get_mission_enemy_minion_group(<span class="kw-2">&amp;</span><span class="self">self</span>, minion_group_index: i32) -&gt; monster_catalog::Type {
+    </span><span class="kw">pub fn </span>get_mission_enemy_minion_group(<span class="kw-2">&amp;</span><span class="self">self</span>, minion_group_index: i32) -&gt; MonsterSpeciesId {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetMissionEnemyMinionGroup(minion_group_index) }
     }
@@ -2587,7 +2578,7 @@
 
     <span class="doccomment">/// Returns true if the specified monster is included in the floor&#39;s monster spawn list
     /// (the modified list after a maximum of 14 different species were chosen).
-    </span><span class="kw">pub fn </span>is_on_monster_spawn_list(<span class="kw-2">&amp;</span><span class="self">self</span>, monster_id: monster_catalog::Type) -&gt; bool {
+    </span><span class="kw">pub fn </span>is_on_monster_spawn_list(<span class="kw-2">&amp;</span><span class="self">self</span>, monster_id: MonsterSpeciesId) -&gt; bool {
         <span class="kw">unsafe </span>{ ffi::IsOnMonsterSpawnList(monster_id) &gt; <span class="number">0 </span>}
     }
 
@@ -2614,7 +2605,7 @@
     }
 
     <span class="doccomment">/// Gets the sprite index of the specified monster on this floor
-    </span><span class="kw">pub fn </span>get_monster_sprite_index(<span class="kw-2">&amp;</span><span class="self">self</span>, monster_idx: monster_catalog::Type) -&gt; u16 {
+    </span><span class="kw">pub fn </span>get_monster_sprite_index(<span class="kw-2">&amp;</span><span class="self">self</span>, monster_idx: MonsterSpeciesId) -&gt; u16 {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetSpriteIndex(monster_idx) }
     }
@@ -2741,7 +2732,7 @@
     }
 
     <span class="doccomment">/// Get the id of the monster to be randomly spawned.
-    </span><span class="kw">pub fn </span>get_monster_id_to_spawn(<span class="kw-2">&amp;mut </span><span class="self">self</span>, is_for_monster_house: bool) -&gt; monster_catalog::Type {
+    </span><span class="kw">pub fn </span>get_monster_id_to_spawn(<span class="kw-2">&amp;mut </span><span class="self">self</span>, is_for_monster_house: bool) -&gt; MonsterSpeciesId {
         <span class="kw">let </span>weight_id = <span class="kw">if </span>is_for_monster_house { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetMonsterIdToSpawn(weight_id) }
@@ -2751,7 +2742,7 @@
     ///
     /// Returns the level of the monster to be spawned, or 1 if the specified ID can&#39;t be found on
     /// the floor&#39;s spawn table.
-    </span><span class="kw">pub fn </span>get_monster_level_to_spawn(<span class="kw-2">&amp;mut </span><span class="self">self</span>, monster_id: monster_catalog::Type) -&gt; u8 {
+    </span><span class="kw">pub fn </span>get_monster_level_to_spawn(<span class="kw-2">&amp;mut </span><span class="self">self</span>, monster_id: MonsterSpeciesId) -&gt; u8 {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetMonsterLevelToSpawn(monster_id) }
     }
@@ -2819,7 +2810,7 @@
 
     <span class="doccomment">/// If the current floor number is even, returns female Kecleon&#39;s id (default: 0x3D7),
     /// otherwise returns male Kecleon&#39;s id (default: 0x17F).
-    </span><span class="kw">pub fn </span>get_kecleon_id_to_spawn_by_floor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; monster_catalog::Type {
+    </span><span class="kw">pub fn </span>get_kecleon_id_to_spawn_by_floor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterSpeciesId {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetKecleonIdToSpawnByFloor() }
     }
@@ -2830,7 +2821,7 @@
     /// The caller must make sure the undefined params are valid for this function.
     </span><span class="kw">pub unsafe fn </span>load_monster_sprite(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        monster_id: monster_catalog::Type,
+        monster_id: MonsterSpeciesId,
         param_2: ffi::undefined,
     ) {
         ffi::LoadMonsterSprite(monster_id, param_2)
@@ -2840,20 +2831,13 @@
     /// [`ffi::dungeon::mew_cannot_spawn`] or the second parameter are true.
     ///
     /// Called before spawning an enemy, appears to be checking if Mew can spawn on the current floor.
-    </span><span class="kw">pub fn </span>mew_spawn_check(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        monster_id: monster_catalog::Type,
-        force_fail_if_mew: bool,
-    ) -&gt; bool {
+    </span><span class="kw">pub fn </span>mew_spawn_check(<span class="kw-2">&amp;</span><span class="self">self</span>, monster_id: MonsterSpeciesId, force_fail_if_mew: bool) -&gt; bool {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::MewSpawnCheck(monster_id, force_fail_if_mew <span class="kw">as </span>ffi::bool_) &gt; <span class="number">0 </span>}
     }
 
     <span class="doccomment">/// Returns an entity reference to the first team member which has the specified iq skill.
-    </span><span class="kw">pub fn </span>get_team_member_with_iq_skill(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        iq_skill: iq_skill_catalog::Type,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonEntity&gt; {
+    </span><span class="kw">pub fn </span>get_team_member_with_iq_skill(<span class="kw-2">&amp;</span><span class="self">self</span>, iq_skill: IqSkillId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DungeonEntity&gt; {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetTeamMemberWithIqSkill(iq_skill) };
         <span class="kw">if </span>ptr.is_null() {
@@ -2866,7 +2850,7 @@
     <span class="doccomment">/// Returns an entity reference to the first team member which has the specified iq skill.
     </span><span class="kw">pub fn </span>get_team_member_with_iq_skill_mut(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        iq_skill: iq_skill_catalog::Type,
+        iq_skill: IqSkillId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DungeonEntity&gt; {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ ffi::GetTeamMemberWithIqSkill(iq_skill) };
@@ -2878,13 +2862,13 @@
     }
 
     <span class="doccomment">/// Returns true if any team member has the specified iq skill.
-    </span><span class="kw">pub fn </span>team_member_has_enabled_iq_skill(<span class="kw-2">&amp;</span><span class="self">self</span>, iq_skill: iq_skill_catalog::Type) -&gt; bool {
+    </span><span class="kw">pub fn </span>team_member_has_enabled_iq_skill(<span class="kw-2">&amp;</span><span class="self">self</span>, iq_skill: IqSkillId) -&gt; bool {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::TeamMemberHasEnabledIqSkill(iq_skill) &gt; <span class="number">0 </span>}
     }
 
     <span class="doccomment">/// Returns true the leader has the specified iq skill.
-    </span><span class="kw">pub fn </span>team_leader_has_enabled_iq_skill(<span class="kw-2">&amp;</span><span class="self">self</span>, iq_skill: iq_skill_catalog::Type) -&gt; bool {
+    </span><span class="kw">pub fn </span>team_leader_has_enabled_iq_skill(<span class="kw-2">&amp;</span><span class="self">self</span>, iq_skill: IqSkillId) -&gt; bool {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::TeamLeaderIqSkillIsEnabled(iq_skill) &gt; <span class="number">0 </span>}
     }
@@ -2903,9 +2887,9 @@
     /// The caller must make sure the undefined params are valid for this function.
     </span><span class="kw">pub unsafe fn </span>init_team_member(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        arg1: monster_catalog::Type,
-        type_1: type_catalog::Type,
-        type_2: type_catalog::Type,
+        arg1: MonsterSpeciesId,
+        type_1: MonsterTypeId,
+        type_2: MonsterTypeId,
         team_member_data: <span class="kw-2">&amp;mut </span>ffi::team_member,
         param_5: ffi::undefined,
         param_6: ffi::undefined,
@@ -3173,4 +3157,4 @@
     res
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

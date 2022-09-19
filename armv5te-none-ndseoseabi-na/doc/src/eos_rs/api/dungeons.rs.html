@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `eos-rs/src/api/dungeons.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dungeons.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../eos_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../eos_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../eos_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of dungeons, dungeon groups and fixed rooms
+//! in a general context.
+</span><span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+
+<span class="doccomment">/// A dungeon ID with associated methods to get metadata.
+///
+/// Use the associated constants or the [`Self::get`] method to get instances of this.
+</span><span class="kw">pub type </span>DungeonGroupId = ffi::dungeon_group_id;
+<span class="kw">impl </span>Copy <span class="kw">for </span>DungeonGroupId {}
+
+<span class="doccomment">/// This impl provides general metadata about dungeons in the game.
+</span><span class="kw">impl </span>DungeonGroupId {
+    <span class="doccomment">/// Returns the ID struct for the dungeon group with the given ID.
+    ///
+    /// # Safety
+    /// The caller must make sure the ID is valid (refers to an existing dungeon group),
+    /// otherwise this is UB.
+    </span><span class="kw">pub const unsafe fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Returns the ID of this dungeon group.
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;DungeonGroupId&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(v: DungeonGroupId) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// A dungeon group ID with associated methods to get metadata.
+///
+/// Use the associated constants or the [`Self::get`] method to get instances of this.
+</span><span class="kw">pub type </span>DungeonId = ffi::dungeon_id;
+<span class="kw">impl </span>Copy <span class="kw">for </span>DungeonId {}
+
+<span class="doccomment">/// This impl provides general metadata about dungeons in the game.
+</span><span class="kw">impl </span>DungeonId {
+    <span class="doccomment">/// Returns the ID struct for the dungeon with the given ID.
+    ///
+    /// # Safety
+    /// The caller must make sure the ID is valid (refers to an existing dungeon),
+    /// otherwise this is UB.
+    </span><span class="kw">pub const unsafe fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Returns the ID of this dungeon.
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns whether this dungeon is considered as going upward or not
+    </span><span class="kw">pub fn </span>goes_up(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::DungeonGoesUp(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Returns the maximum rescue attempts allowed in this dungeon,
+    /// or -1 if rescues are disabled.
+    </span><span class="kw">pub fn </span>get_max_rescue_attempts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i8 {
+        <span class="kw">unsafe </span>{ ffi::GetMaxRescueAttempts(<span class="kw-2">*</span><span class="self">self</span>) }
+    }
+
+    <span class="doccomment">/// Returns whether this dungeon as a joined at location is between
+    /// [`DungeonId::DUNGEON_JOINED_AT_BIDOOF`] and [`DungeonId::DUNGEON_DUMMY_0xE3`].
+    </span><span class="kw">pub fn </span>is_special_joined_at_location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{
+            ffi::JoinedAtRangeCheck(ffi::dungeon_id_8 {
+                _bitfield_align_1: [],
+                _bitfield_1: ffi::dungeon_id_8::new_bitfield_1(<span class="kw-2">*</span><span class="self">self</span>),
+            }) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Returns whether a game over should happen when a monster with this dungeon ID as
+    /// &quot;joined at&quot; value faints (as long as the other conditions are met).
+    /// It might have a more generic meaning.
+    </span><span class="kw">pub fn </span>should_cause_game_over_on_faint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{
+            ffi::ShouldCauseGameOverOnFaint(ffi::dungeon_id_8 {
+                _bitfield_align_1: [],
+                _bitfield_1: ffi::dungeon_id_8::new_bitfield_1(<span class="kw-2">*</span><span class="self">self</span>),
+            }) &gt; <span class="number">0
+        </span>}
+    }
+}
+
+<span class="kw">impl </span>From&lt;DungeonId&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(v: DungeonId) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// A fixed room ID with associated methods to get metadata.
+///
+/// Use the associated constants or the [`Self::get`] method to get instances of this.
+</span><span class="kw">pub type </span>FixedRoomId = ffi::fixed_room_id;
+<span class="kw">impl </span>Copy <span class="kw">for </span>FixedRoomId {}
+
+<span class="doccomment">/// This impl provides general metadata about fixed rooms in the game.
+</span><span class="kw">impl </span>FixedRoomId {
+    <span class="doccomment">/// Returns the ID struct for the fixed room with the given ID.
+    ///
+    /// # Safety
+    /// The caller must make sure the ID is valid (refers to an existing fixed room),
+    /// otherwise this is UB.
+    </span><span class="kw">pub const unsafe fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Returns the ID of this fixed room.
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Checks if this ID corresponds to a fixed, full-floor layout.
+    </span><span class="kw">pub fn </span>is_full_floor_fixed_room(<span class="kw-2">&amp;</span><span class="self">self</span>, _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;) -&gt; bool {
+        <span class="comment">// SAFETY:We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::IsNotFullFloorFixedRoom(<span class="kw-2">*</span><span class="self">self</span>) == <span class="number">0 </span>}
+    }
+}
+
+<span class="kw">impl </span>From&lt;FixedRoomId&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(v: FixedRoomId) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0
+    </span>}
+}
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>

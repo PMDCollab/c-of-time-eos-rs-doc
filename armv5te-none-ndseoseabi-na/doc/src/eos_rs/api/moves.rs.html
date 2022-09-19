@@ -243,11 +243,33 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions related to getting information about monster moves.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::MoveCategory;
-<span class="kw">use </span><span class="kw">crate</span>::api::objects::{type_catalog, Move};
+<span class="kw">use </span><span class="kw">crate</span>::api::types::MonsterTypeId;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
+
+<span class="doccomment">/// A monster move.
+</span><span class="kw">pub type </span>Move = ffi::move_;
+
+<span class="doccomment">/// A move ID with associated methods to get metadata.
+///
+/// Use the associated constants or the [`Self::get`] method to get instances of this.
+</span><span class="kw">pub type </span>MoveId = ffi::move_id;
+<span class="kw">impl </span>Copy <span class="kw">for </span>MoveId {}
 
 <span class="attribute">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -403,90 +425,94 @@
     }
 }
 
-<span class="doccomment">/// Game functions related to [`Move`]s.
-</span><span class="kw">pub trait </span>MoveExt {
+<span class="doccomment">/// See [`MoveId`] for additional metadata methods.
+</span><span class="kw">impl </span>Move {
+    <span class="doccomment">/// Returns the move ID
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MoveId {
+        <span class="self">self</span>.id.val()
+    }
+
     <span class="doccomment">/// Gets the move target-and-range field. See struct move_target_and_range in the C headers.
-    </span><span class="kw">fn </span>get_target_and_range(<span class="kw-2">&amp;</span><span class="self">self</span>, is_ai: bool) -&gt; MoveTargetAndRange;
+    </span><span class="kw">pub fn </span>get_target_and_range(<span class="kw-2">&amp;</span><span class="self">self</span>, is_ai: bool) -&gt; MoveTargetAndRange {
+        <span class="kw">unsafe </span>{ ffi::GetMoveTargetAndRange(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), is_ai <span class="kw">as </span>ffi::bool_) }.into()
+    }
 
     <span class="doccomment">/// Gets the base power of the move.
-    </span><span class="kw">fn </span>get_base_power(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32;
+    </span><span class="kw">pub fn </span>get_base_power(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::GetMoveBasePower(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
+    }
 
     <span class="doccomment">/// Gets the maximum PP for the move.
     ///
     /// Returns max PP for the given move, capped at 99.
-    </span><span class="kw">fn </span>get_max_pp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32;
-
-    <span class="doccomment">/// Gets the critical hit chance of the move.
-    </span><span class="kw">fn </span>get_crit_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32;
-
-    <span class="doccomment">/// Checks if the move is a recoil move (affected by Reckless).
-    </span><span class="kw">fn </span>is_recoil_move(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
-
-    <span class="doccomment">/// Checks if the move is a punch move (affected by Iron Fist).
-    </span><span class="kw">fn </span>is_punch_move(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
-
-    <span class="doccomment">/// Gets a move&#39;s category (physical, special, status). Returns None if the catgeory is invalid.
-    </span><span class="kw">fn </span>get_category(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;MoveCategory&gt;;
-
-    <span class="doccomment">/// Gets the type of the move.
-    </span><span class="kw">fn </span>get_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; type_catalog::Type;
-
-    <span class="doccomment">/// Gets the accuracy1 value for the move.
-    </span><span class="kw">fn </span>get_accuracy1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
-
-    <span class="doccomment">/// Gets the accuracy2 value for the move.
-    </span><span class="kw">fn </span>get_accuracy2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
-
-    <span class="doccomment">/// Gets the `ai_condition_random_chance` value for the move.
-    </span><span class="kw">fn </span>get_ai_condition_random_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
-}
-
-<span class="kw">impl </span>MoveExt <span class="kw">for </span>Move {
-    <span class="kw">fn </span>get_target_and_range(<span class="kw-2">&amp;</span><span class="self">self</span>, is_ai: bool) -&gt; MoveTargetAndRange {
-        <span class="kw">unsafe </span>{ ffi::GetMoveTargetAndRange(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), is_ai <span class="kw">as </span>ffi::bool_) }.into()
-    }
-
-    <span class="kw">fn </span>get_base_power(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
-        <span class="kw">unsafe </span>{ ffi::GetMoveBasePower(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
-    }
-
-    <span class="kw">fn </span>get_max_pp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+    </span><span class="kw">pub fn </span>get_max_pp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
         <span class="kw">unsafe </span>{ ffi::GetMaxPp(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
     }
 
-    <span class="kw">fn </span>get_crit_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+    <span class="doccomment">/// Gets the critical hit chance of the move.
+    </span><span class="kw">pub fn </span>get_crit_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
         <span class="kw">unsafe </span>{ ffi::GetMoveCritChance(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
     }
 
-    <span class="kw">fn </span>is_recoil_move(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ ffi::IsRecoilMove(<span class="self">self</span>.id.val()) &gt; <span class="number">0 </span>}
-    }
-
-    <span class="kw">fn </span>is_punch_move(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ ffi::IsPunchMove(<span class="self">self</span>.id.val()) &gt; <span class="number">0 </span>}
-    }
-
-    <span class="kw">fn </span>get_category(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;MoveCategory&gt; {
-        <span class="kw">unsafe </span>{ ffi::GetMoveCategory(<span class="self">self</span>.id.val()) }
-            .try_into()
-            .ok()
-    }
-
-    <span class="kw">fn </span>get_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; type_catalog::Type {
+    <span class="doccomment">/// Gets the type of the move.
+    </span><span class="kw">pub fn </span>get_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterTypeId {
         <span class="kw">unsafe </span>{ ffi::GetMoveType(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
     }
 
-    <span class="kw">fn </span>get_accuracy1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    <span class="doccomment">/// Gets the accuracy1 value for the move.
+    </span><span class="kw">pub fn </span>get_accuracy1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="kw">unsafe </span>{ ffi::GetMoveAccuracyOrAiChance(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), <span class="number">0</span>) }
     }
 
-    <span class="kw">fn </span>get_accuracy2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    <span class="doccomment">/// Gets the accuracy2 value for the move.
+    </span><span class="kw">pub fn </span>get_accuracy2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="kw">unsafe </span>{ ffi::GetMoveAccuracyOrAiChance(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), <span class="number">1</span>) }
     }
 
-    <span class="kw">fn </span>get_ai_condition_random_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    <span class="doccomment">/// Gets the `ai_condition_random_chance` value for the move.
+    </span><span class="kw">pub fn </span>get_ai_condition_random_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="kw">unsafe </span>{ ffi::GetMoveAccuracyOrAiChance(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), <span class="number">2</span>) }
     }
 }
+
+<span class="doccomment">/// This impl provides general metadata about moves in the game.
+///
+/// See [`Move`] for additional metadata methods.
+</span><span class="kw">impl </span>MoveId {
+    <span class="doccomment">/// Returns the ID struct for the move with the given ID.
+    ///
+    /// # Safety
+    /// The caller must make sure the ID is valid (refers to an existing move),
+    /// otherwise this is UB.
+    </span><span class="kw">pub const unsafe fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Returns the ID of this move.
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Checks if the move is a recoil move (affected by Reckless).
+    </span><span class="kw">pub fn </span>is_recoil_move(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsRecoilMove(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Checks if the move is a punch move (affected by Iron Fist).
+    </span><span class="kw">pub fn </span>is_punch_move(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsPunchMove(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Gets a move&#39;s category (physical, special, status). Returns None if the category is invalid.
+    </span><span class="kw">pub fn </span>get_category(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;MoveCategory&gt; {
+        <span class="kw">unsafe </span>{ ffi::GetMoveCategory(<span class="kw-2">*</span><span class="self">self</span>) }.try_into().ok()
+    }
+}
+
+<span class="kw">impl </span>From&lt;MoveId&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(v: MoveId) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0
+    </span>}
+}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a37499ae6 2022-09-18)" ></div></body></html>
