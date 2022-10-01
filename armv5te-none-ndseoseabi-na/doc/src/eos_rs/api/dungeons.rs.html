@@ -128,7 +128,6 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-<span id="131">131</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of dungeons, dungeon groups and fixed rooms
 //! in a general context.
 </span><span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
@@ -136,7 +135,7 @@
 
 <span class="doccomment">/// A dungeon ID with associated methods to get metadata.
 ///
-/// Use the associated constants or the [`Self::get`] method to get instances of this.
+/// Use the associated constants or the [`Self::new`] method to get instances of this.
 </span><span class="kw">pub type </span>DungeonGroupId = ffi::dungeon_group_id;
 <span class="kw">impl </span>Copy <span class="kw">for </span>DungeonGroupId {}
 
@@ -165,7 +164,7 @@
 
 <span class="doccomment">/// A dungeon group ID with associated methods to get metadata.
 ///
-/// Use the associated constants or the [`Self::get`] method to get instances of this.
+/// Use the associated constants or the [`Self::new`] method to get instances of this.
 </span><span class="kw">pub type </span>DungeonId = ffi::dungeon_id;
 <span class="kw">impl </span>Copy <span class="kw">for </span>DungeonId {}
 
@@ -196,7 +195,7 @@
         <span class="kw">unsafe </span>{ ffi::GetMaxRescueAttempts(<span class="kw-2">*</span><span class="self">self</span>) }
     }
 
-    <span class="doccomment">/// Returns whether this dungeon as a joined at location is between
+    <span class="doccomment">/// Returns whether this dungeon has a joined at location between
     /// [`DungeonId::DUNGEON_JOINED_AT_BIDOOF`] and [`DungeonId::DUNGEON_DUMMY_0xE3`].
     </span><span class="kw">pub fn </span>is_special_joined_at_location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">unsafe </span>{
@@ -207,12 +206,11 @@
         </span>}
     }
 
-    <span class="doccomment">/// Returns whether a game over should happen when a monster with this dungeon ID as
-    /// &quot;joined at&quot; value faints (as long as the other conditions are met).
-    /// It might have a more generic meaning.
-    </span><span class="kw">pub fn </span>should_cause_game_over_on_faint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="doccomment">/// Returns whether a certain joined_at field value is equal to [`DungeonId::DUNGEON_BEACH`] or
+    /// is between [`DungeonId::DUNGEON_DUMMY_0xEC`] and [`DungeonId::DUNGEON_DUMMY_0xF0`].
+    </span><span class="kw">pub fn </span>is_special_joined_at_location2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">unsafe </span>{
-            ffi::ShouldCauseGameOverOnFaint(ffi::dungeon_id_8 {
+            ffi::JoinedAtRangeCheck2(ffi::dungeon_id_8 {
                 _bitfield_align_1: [],
                 _bitfield_1: ffi::dungeon_id_8::new_bitfield_1(<span class="kw-2">*</span><span class="self">self</span>),
             }) &gt; <span class="number">0
@@ -228,7 +226,7 @@
 
 <span class="doccomment">/// A fixed room ID with associated methods to get metadata.
 ///
-/// Use the associated constants or the [`Self::get`] method to get instances of this.
+/// Use the associated constants or the [`Self::new`] method to get instances of this.
 </span><span class="kw">pub type </span>FixedRoomId = ffi::fixed_room_id;
 <span class="kw">impl </span>Copy <span class="kw">for </span>FixedRoomId {}
 
@@ -261,4 +259,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (9c56d9d6f 2022-09-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>

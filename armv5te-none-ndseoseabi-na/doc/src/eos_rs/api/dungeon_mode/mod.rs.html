@@ -82,6 +82,47 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits, enums, structs and functions related to dungeon mode.
 
 </span><span class="kw">mod </span>dungeon_struct;
@@ -155,6 +196,47 @@
     <span class="kw">unsafe </span>{ ffi::AdvanceFrame(<span class="number">0 </span><span class="kw">as </span>ffi::undefined) }
 }
 
+<span class="doccomment">/// Gets the direction in which a monster should move to go from the origin position to the target position.
+///
+/// Returns None if the direction returned is somehow invalid.
+</span><span class="kw">pub fn </span>get_direction_towards_position(
+    _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    pos1: <span class="kw-2">&amp;</span>ffi::position,
+    pos2: <span class="kw-2">&amp;</span>ffi::position,
+) -&gt; <span class="prelude-ty">Option</span>&lt;Direction&gt; {
+    <span class="kw">unsafe </span>{ ffi::GetDirectionTowardsPosition(<span class="macro">force_mut_ptr!</span>(pos1), <span class="macro">force_mut_ptr!</span>(pos2)) }
+        .try_into()
+        .ok()
+}
+
+<span class="doccomment">/// Returns the Chebyshev distance between two positions. Calculated as max(abs(x0-x1), abs(y0-y1)).
+</span><span class="kw">pub fn </span>get_chebyshev_distance(
+    _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    pos1: <span class="kw-2">&amp;</span>ffi::position,
+    pos2: <span class="kw-2">&amp;</span>ffi::position,
+) -&gt; i32 {
+    <span class="kw">unsafe </span>{ ffi::GetChebyshevDistance(<span class="macro">force_mut_ptr!</span>(pos1), <span class="macro">force_mut_ptr!</span>(pos2)) }
+}
+
+<span class="doccomment">/// Checks if a given target position is in sight from a given origin position.
+///
+/// There&#39;s multiple factors that affect this check, but generally, it&#39;s true if both
+/// positions are in the same room or within 2 tiles of each other.
+</span><span class="kw">pub fn </span>is_position_in_sight(
+    _ov29: <span class="kw-2">&amp;</span>OverlayLoadLease&lt;<span class="number">29</span>&gt;,
+    origin: <span class="kw-2">&amp;</span>ffi::position,
+    target: <span class="kw-2">&amp;</span>ffi::position,
+    user_has_dropeye: bool,
+) -&gt; bool {
+    <span class="kw">unsafe </span>{
+        ffi::IsPositionInSight(
+            <span class="macro">force_mut_ptr!</span>(origin),
+            <span class="macro">force_mut_ptr!</span>(target),
+            user_has_dropeye <span class="kw">as </span>ffi::bool_,
+        ) &gt; <span class="number">0
+    </span>}
+}
+
 <span class="doccomment">/// Graphically displays any pending actions that have happened but haven&#39;t been shown on screen
 /// yet.
 ///
@@ -167,4 +249,4 @@
     <span class="kw">unsafe </span>{ ffi::DisplayActions(ptr) &gt; <span class="number">0 </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (9c56d9d6f 2022-09-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>

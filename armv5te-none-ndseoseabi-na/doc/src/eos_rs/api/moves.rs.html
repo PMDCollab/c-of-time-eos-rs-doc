@@ -256,9 +256,50 @@
 <span id="256">256</span>
 <span id="257">257</span>
 <span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions related to getting information about monster moves.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::MoveCategory;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::{DungeonEntity, MoveCategory, Weather};
 <span class="kw">use </span><span class="kw">crate</span>::api::types::MonsterTypeId;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 
@@ -267,7 +308,7 @@
 
 <span class="doccomment">/// A move ID with associated methods to get metadata.
 ///
-/// Use the associated constants or the [`Self::get`] method to get instances of this.
+/// Use the associated constants or the [`Self::new`] method to get instances of this.
 </span><span class="kw">pub type </span>MoveId = ffi::move_id;
 <span class="kw">impl </span>Copy <span class="kw">for </span>MoveId {}
 
@@ -454,9 +495,19 @@
         <span class="kw">unsafe </span>{ ffi::GetMoveCritChance(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
     }
 
+    <span class="doccomment">/// Returns whether a move&#39;s range string is 19 (&quot;User&quot;).
+    </span><span class="kw">pub fn </span>is_move_range_string_19(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsMoveRangeString19(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) &gt; <span class="number">0 </span>}
+    }
+
     <span class="doccomment">/// Gets the type of the move.
     </span><span class="kw">pub fn </span>get_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterTypeId {
         <span class="kw">unsafe </span>{ ffi::GetMoveType(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
+    }
+
+    <span class="doccomment">/// Gets the AI weight of a move.
+    </span><span class="kw">pub fn </span>get_ai_weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="kw">unsafe </span>{ ffi::GetMoveAiWeight(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>)) }
     }
 
     <span class="doccomment">/// Gets the accuracy1 value for the move.
@@ -472,6 +523,37 @@
     <span class="doccomment">/// Gets the `ai_condition_random_chance` value for the move.
     </span><span class="kw">pub fn </span>get_ai_condition_random_chance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="kw">unsafe </span>{ ffi::GetMoveAccuracyOrAiChance(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), <span class="number">2</span>) }
+    }
+
+    <span class="doccomment">/// Checks whether a moved used by a monster should play its alternative animation.
+    /// Includes checks for Curse, Snore, Sleep Talk, Solar Beam and 2-turn moves.
+    </span><span class="kw">pub fn </span>should_play_alternative_animation(<span class="kw-2">&amp;</span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>DungeonEntity) -&gt; bool {
+        <span class="kw">unsafe </span>{
+            ffi::ShouldMovePlayAlternativeAnimation(<span class="macro">force_mut_ptr!</span>(<span class="self">self</span>), <span class="macro">force_mut_ptr!</span>(user)) &gt; <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Returns the move animation ID that should be played for a move.
+    /// It contains a check for weather ball. After that, if the parameter
+    /// `should_play_alternative_animation` is false, the move ID is returned.
+    ///
+    /// `should_play_alternative_animation` can be retrieved with
+    /// [`Self::should_play_alternative_animation`].
+    ///
+    /// If it&#39;s true, there&#39;s a bunch of manual ID checks that result on a certain hardcoded return
+    /// value.
+    </span><span class="kw">pub fn </span>get_animation_id(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        apparent_weather: Weather,
+        should_play_alternative_animation: bool,
+    ) -&gt; u16 {
+        <span class="kw">unsafe </span>{
+            ffi::GetMoveAnimationId(
+                <span class="macro">force_mut_ptr!</span>(<span class="self">self</span>),
+                apparent_weather <span class="kw">as </span>ffi::weather_id::Type,
+                should_play_alternative_animation <span class="kw">as </span>ffi::bool_,
+            )
+        }
     }
 }
 
@@ -515,4 +597,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (9c56d9d6f 2022-09-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>

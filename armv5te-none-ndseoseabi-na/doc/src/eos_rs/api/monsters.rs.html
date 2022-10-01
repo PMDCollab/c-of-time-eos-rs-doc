@@ -107,6 +107,11 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of monsters in a general context.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::ffi;
@@ -114,7 +119,7 @@
 
 <span class="doccomment">/// A monster species ID with associated methods to get metadata.
 ///
-/// Use the associated constants or the [`Self::get`] method to get instances of this.
+/// Use the associated constants or the [`Self::new`] method to get instances of this.
 </span><span class="kw">pub type </span>MonsterSpeciesId = ffi::monster_id;
 <span class="kw">impl </span>Copy <span class="kw">for </span>MonsterSpeciesId {}
 
@@ -209,6 +214,11 @@
     </span><span class="kw">pub fn </span>is_deoxys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">unsafe </span>{ ffi::IsDeoxys(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
     }
+
+    <span class="doccomment">/// Returns the flag that determines if a monster can move in dungeons.
+    </span><span class="kw">pub fn </span>get_can_move_flag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::GetCanMoveFlag(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
 }
 
 <span class="kw">impl </span>From&lt;MonsterSpeciesId&gt; <span class="kw">for </span>u32 {
@@ -217,4 +227,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (9c56d9d6f 2022-09-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>

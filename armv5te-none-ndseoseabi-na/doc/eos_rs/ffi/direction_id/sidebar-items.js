@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["DIR_CURRENT",""],["DIR_DOWN",""],["DIR_DOWN_LEFT",""],["DIR_DOWN_RIGHT",""],["DIR_LEFT",""],["DIR_RIGHT",""],["DIR_UP",""],["DIR_UP_LEFT",""],["DIR_UP_RIGHT",""]],"type":[["Type",""]]};
+window.SIDEBAR_ITEMS = {"constant":[["DIR_CURRENT",""],["DIR_DOWN",""],["DIR_DOWN_LEFT",""],["DIR_DOWN_RIGHT",""],["DIR_LEFT",""],["DIR_NONE",""],["DIR_RIGHT",""],["DIR_UP",""],["DIR_UP_LEFT",""],["DIR_UP_RIGHT",""]],"type":[["Type",""]]};

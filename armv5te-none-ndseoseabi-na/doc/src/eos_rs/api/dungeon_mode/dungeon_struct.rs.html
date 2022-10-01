@@ -1577,6 +1577,49 @@
 <span id="1577">1577</span>
 <span id="1578">1578</span>
 <span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::api::dungeons::{DungeonGroupId, DungeonId};
 <span class="kw">use </span><span class="kw">crate</span>::api::iq::IqSkillId;
@@ -2442,6 +2485,21 @@
         </span><span class="kw">unsafe </span>{ ffi::IsDestinationFloorWithMonster() &gt; <span class="number">0 </span>}
     }
 
+    <span class="doccomment">/// Loads the sprites of monsters that appear on the current floor because of a mission,
+    /// if applicable.
+    ///
+    /// This includes monsters to be rescued, outlaws and its minions.
+    </span><span class="kw">pub fn </span>load_mission_monster_sprites(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::LoadMissionMonsterSprites() }
+    }
+
+    <span class="doccomment">/// Returns the index of the room that contains the stairs.
+    </span><span class="kw">pub fn </span>get_stairs_room(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::GetStairsRoom() }
+    }
+
     <span class="doccomment">/// Checks if a given floor is a mission destination with a special monster, either a target to rescue or an enemy to defeat.
     ///
     /// Mission types with a monster on the destination floor:
@@ -2546,6 +2604,18 @@
         </span><span class="kw">unsafe </span>{ ffi::GetMissionEnemyMinionGroup(minion_group_index) }
     }
 
+    <span class="doccomment">/// Gets the value of [`ffi::dungeon::target_monster_not_found_flag`].
+    </span><span class="kw">pub fn </span>get_target_monster_not_found_flag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::GetTargetMonsterNotFoundFlag() &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Sets [`ffi::dungeon::target_monster_not_found_flag`] to the specified value.
+    </span><span class="kw">pub fn </span>set_target_monster_not_found_flag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::SetTargetMonsterNotFoundFlag(value <span class="kw">as </span>ffi::bool_) }
+    }
+
     <span class="doccomment">/// Gets a reference to the entity that is currently leading the team, or None if none of
     /// the first 4 entities is a valid monster with its is_team_leader flag set.
     </span><span class="comment">// Needs a mut reference, since:
@@ -2570,10 +2640,15 @@
         }
     }
 
-    <span class="doccomment">/// Returns true if the player should get kicked out of the dungeon if an important team member
-    /// (like the partner or certain story allies) faints.
-    </span><span class="kw">pub fn </span>should_game_over_on_important_team_member_faint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ ffi::ShouldGameOverOnImportantTeamMemberFaint() &gt; <span class="number">0 </span>}
+    <span class="doccomment">/// Returns true if certain special restrictions are enabled.
+    ///
+    /// If true, you will get kicked out of the dungeon if a team member that passes the
+    /// [`DungeonId::is_special_joined_at_location2`] check faints.
+    ///
+    /// Returns `!ffi::dungeon::nonstory_flag || ffi::dungeon::hidden_land_flag`
+    ///
+    </span><span class="kw">pub fn </span>story_restrictions_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::StoryRestrictionsEnabled() &gt; <span class="number">0 </span>}
     }
 
     <span class="doccomment">/// Returns true if the specified monster is included in the floor&#39;s monster spawn list
@@ -2733,7 +2808,7 @@
 
     <span class="doccomment">/// Get the id of the monster to be randomly spawned.
     </span><span class="kw">pub fn </span>get_monster_id_to_spawn(<span class="kw-2">&amp;mut </span><span class="self">self</span>, is_for_monster_house: bool) -&gt; MonsterSpeciesId {
-        <span class="kw">let </span>weight_id = <span class="kw">if </span>is_for_monster_house { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
+        <span class="kw">let </span>weight_id = is_for_monster_house <span class="kw">as </span>i32;
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
         </span><span class="kw">unsafe </span>{ ffi::GetMonsterIdToSpawn(weight_id) }
     }
@@ -2956,6 +3031,17 @@
         </span><span class="kw">unsafe </span>{ ffi::GetDungeonGenInfoUnk0C() }
     }
 
+    <span class="doccomment">/// Checks if a value obtained from [`ffi::team_member::field_0x8`] is equal to certain values.
+    ///
+    /// This is known to return true for some or all of the guest monsters (if the value is equal
+    /// to 0x55AA or 0x5AA5).
+    ///
+    /// # Note
+    /// The underlying function [`ffi::CheckTeamMemberField8`] does not need overlay29 to be loaded.
+    </span><span class="kw">pub fn </span>check_team_member_field_8(<span class="kw-2">&amp;</span><span class="self">self</span>, team_member: <span class="kw-2">&amp;</span>ffi::team_member) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::CheckTeamMemberField8(team_member.field_0x8) &gt; <span class="number">0 </span>}
+    }
+
     <span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;eu&quot;</span>)))]
     #[cfg(feature = <span class="string">&quot;eu&quot;</span>)]
     </span><span class="doccomment">/// This function is exclusive to the EU ROM. Seems to perform a check to see if the monster
@@ -3157,4 +3243,4 @@
     res
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (9c56d9d6f 2022-09-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>
