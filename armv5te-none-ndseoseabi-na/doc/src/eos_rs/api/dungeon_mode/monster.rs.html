@@ -965,8 +965,6 @@
 <span id="965">965</span>
 <span id="966">966</span>
 <span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::abilities::AbilityId;
 <span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::api::iq::IqSkillId;
@@ -1506,35 +1504,33 @@
         </span>}
     }
 
-    <span class="comment">// TODO: Stubbed out until the definition of CanAiMonsterMoveInDirection is fixed (
-    //       third parameter seems to be a bool instead).
-    // /// Checks whether this monster if AI-controlled can move in the specified direction.
-    // ///
-    // /// Accounts for walls, other monsters on the target position and IQ skills that might prevent
-    // /// a monster from moving into a specific location, such as House Avoider, Trap Avoider or
-    // /// Lava Evader.
-    // ///
-    // /// Returns an empty `Ok` on success, and on error returns whether ot not the path was blocked
-    // /// by an entity.
-    // fn can_ai_move_self_in_direction(&amp;self, direction: Direction) -&gt; Result&lt;(), bool&gt; {
-    //     unsafe {
-    //         let mut was_entity = 0;
-    //         let success = ffi::CanAiMonsterMoveInDirection(
-    //             force_mut_ptr!(self.entity()),
-    //             direction as ffi::direction_id::Type,
-    //             &amp;mut was_entity,
-    //         ) &gt; 0;
-    //         if success {
-    //             Ok(())
-    //         } else if was_entity &gt; 0 {
-    //             Err(true)
-    //         } else {
-    //             Err(false)
-    //         }
-    //     }
-    // }
+    <span class="doccomment">/// Returns whether the AI could not move the monster in the specified direction.
+    ///
+    /// Accounts for walls, other monsters on the target position and IQ skills that might prevent
+    /// a monster from moving into a specific location, such as House Avoider, Trap Avoider or
+    /// Lava Evader.
+    ///
+    /// Returns a `None` if there are no obstructions. If there are, the `Some` contains a boolean,
+    /// that is true if the way is blocked by another entity.
+    </span><span class="kw">fn </span>ai_obstruction_in_direction(<span class="kw-2">&amp;</span><span class="self">self</span>, direction: Direction) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>was_entity = <span class="number">0</span>;
+            <span class="kw">let </span>success = ffi::CanAiMonsterMoveInDirection(
+                <span class="macro">force_mut_ptr!</span>(<span class="self">self</span>.entity()),
+                direction <span class="kw">as </span>ffi::direction_id::Type,
+                <span class="kw-2">&amp;mut </span>was_entity,
+            ) &gt; <span class="number">0</span>;
+            <span class="kw">if </span>success {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else if </span>was_entity &gt; <span class="number">0 </span>{
+                <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)
+            }
+        }
+    }
 
-    </span><span class="doccomment">/// Returns whether this monster can see other invisible monsters.
+    <span class="doccomment">/// Returns whether this monster can see other invisible monsters.
     ///
     /// To be precise, this function returns true if the monster is holding Goggle Specs or if it
     /// has the status [`ffi::status_id::STATUS_EYEDROPS`].
@@ -1937,4 +1933,4 @@
     <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sealed <span class="kw">for </span>DungeonMonsterMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>

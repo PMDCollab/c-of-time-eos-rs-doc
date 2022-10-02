@@ -128,6 +128,12 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of dungeons, dungeon groups and fixed rooms
 //! in a general context.
 </span><span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
@@ -195,6 +201,12 @@
         <span class="kw">unsafe </span>{ ffi::GetMaxRescueAttempts(<span class="kw-2">*</span><span class="self">self</span>) }
     }
 
+    <span class="doccomment">/// Returns true if the flag that allows changing leaders is set in the restrictions of this
+    /// dungeon.
+    </span><span class="kw">pub fn </span>get_leader_change_flag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::GetLeaderChangeFlag(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
+
     <span class="doccomment">/// Returns whether this dungeon has a joined at location between
     /// [`DungeonId::DUNGEON_JOINED_AT_BIDOOF`] and [`DungeonId::DUNGEON_DUMMY_0xE3`].
     </span><span class="kw">pub fn </span>is_special_joined_at_location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -259,4 +271,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8ce3204af 2022-09-30)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
