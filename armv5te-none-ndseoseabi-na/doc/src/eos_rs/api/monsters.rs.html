@@ -112,9 +112,67 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Structs and functions to interact with the data of monsters in a general context.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
+</span><span class="kw">use </span><span class="kw">crate</span>::api::enums::MonsterGender;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span>alloc::vec::Vec;
 
 <span class="doccomment">/// A monster species ID with associated methods to get metadata.
@@ -139,10 +197,26 @@
         <span class="self">self</span>.<span class="number">0
     </span>}
 
+    <span class="doccomment">/// Checks if the specified monster ID corresponds to any of the pokémon that have multiple
+    /// forms and returns the ID of the base form if so. If it doesn&#39;t, the same ID is returned.
+    ///
+    /// Some of the monsters included in the check are Unown, Cherrim and Deoxys.
+    </span><span class="kw">pub fn </span>base_form(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterSpeciesId {
+        <span class="kw">unsafe </span>{ ffi::GetBaseForm(<span class="kw-2">*</span><span class="self">self</span>) }
+    }
+
+    <span class="doccomment">/// Returns the ID of the first form of the specified monster if the specified ID corresponds
+    /// to a secondary form with female gender and the first form has male gender.
+    ///
+    /// If those conditions don&#39;t meet, returns the same ID unchanged.
+    </span><span class="kw">pub fn </span>base_gender_form(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterSpeciesId {
+        <span class="kw">unsafe </span>{ ffi::FemaleToMaleForm(<span class="kw-2">*</span><span class="self">self</span>) }
+    }
+
     <span class="doccomment">/// Returns the gender field of the monster.
-    </span><span class="kw">pub fn </span>gender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    </span><span class="kw">pub fn </span>gender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MonsterGender {
         <span class="comment">// TODO: Enum.
-        </span><span class="kw">unsafe </span>{ ffi::GetMonsterGender(<span class="kw-2">*</span><span class="self">self</span>) }
+        </span><span class="kw">unsafe </span>{ ffi::GetMonsterGender(<span class="kw-2">*</span><span class="self">self</span>).into() }
     }
 
     <span class="doccomment">/// Returns the sprite size of the monster. If the size is between 1 and 6,
@@ -219,6 +293,46 @@
     </span><span class="kw">pub fn </span>get_can_move_flag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">unsafe </span>{ ffi::GetCanMoveFlag(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
     }
+
+    <span class="doccomment">/// Checks if this monster is contained in the [`ffi::MISSION_BANNED_MONSTERS`] array.
+    /// The function converts the ID by calling [`Self::base_form`] and
+    /// [`Self::base_gender_form`] first.
+    </span><span class="kw">pub fn </span>is_mission_allowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsMonsterMissionAllowed(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Checks if the specified monster should be allowed to be part of a mission (probably as the
+    /// client or the target), accounting for the progress on the story.
+    ///
+    /// If `PERFORMANCE_PROGRESS_FLAG[9]` is true, the function returns true.
+    /// If it isn&#39;t, the function checks if the specified monster is contained in the
+    /// [`ffi::MISSION_BANNED_STORY_MONSTERS`] array, or if it corresponds to the ID of the player
+    /// or the  partner.
+    ///
+    /// The function converts the ID by calling [`Self::base_form`] and [`Self::base_gender_form`]
+    /// first.
+    </span><span class="kw">pub fn </span>is_mission_allowed_story(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::IsMonsterMissionAllowedStory(<span class="kw-2">*</span><span class="self">self</span>) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Returns whether this monster can be used (probably as the client or as the target) when
+    /// generating a mission.
+    ///
+    /// Excluded monsters include those that haven&#39;t been fought in dungeons yet, the second form
+    /// of certain monsters and, if `PERFORMANCE_PROGRESS_FLAG[9]` is 0, monsters in
+    /// [`ffi::MISSION_BANNED_MONSTERS`, the species of the player and the species of the partner.
+    ///
+    </span><span class="kw">pub fn </span>can_be_used_for_mission(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        exclude_monsters_in_mission_banned_monsters: bool,
+    ) -&gt; bool {
+        <span class="kw">unsafe </span>{
+            ffi::CanMonsterBeUsedForMission(
+                <span class="kw-2">*</span><span class="self">self</span>,
+                exclude_monsters_in_mission_banned_monsters <span class="kw">as </span>ffi::bool_,
+            ) &gt; <span class="number">0
+        </span>}
+    }
 }
 
 <span class="kw">impl </span>From&lt;MonsterSpeciesId&gt; <span class="kw">for </span>u32 {
@@ -227,4 +341,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (c0983a9aa 2022-10-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (6b3ede3f7 2022-10-13)" ></div></body></html>

@@ -123,13 +123,11 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-<span id="126">126</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits, enums, structs and functions related to dungeon mode.
 
 </span><span class="kw">mod </span>dungeon_struct;
 <span class="kw">mod </span>effects;
 <span class="kw">mod </span>entity;
-<span class="kw">mod </span>enums;
 <span class="kw">mod </span>message_log;
 <span class="kw">mod </span>monster;
 <span class="kw">mod </span>moves;
@@ -139,11 +137,11 @@
 <span class="kw">pub mod </span>dungeon_generator;
 <span class="kw">pub mod </span>menus;
 
+<span class="kw">use </span><span class="kw">crate</span>::api::enums::Direction;
 <span class="kw">use </span>core::ptr;
 <span class="kw">pub use </span>dungeon_struct::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>effects::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>entity::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>enums::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>message_log::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>monster::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>moves::<span class="kw-2">*</span>;
@@ -251,4 +249,4 @@
     <span class="kw">unsafe </span>{ ffi::DisplayActions(ptr) &gt; <span class="number">0 </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (c0983a9aa 2022-10-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (6b3ede3f7 2022-10-13)" ></div></body></html>

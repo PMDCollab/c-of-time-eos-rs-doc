@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["get_personality","Returns the personality obtained after answering all the questions."]]};

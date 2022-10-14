@@ -1620,13 +1620,45 @@
 <span id="1620">1620</span>
 <span id="1621">1621</span>
 <span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::api::dungeon_mode::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::api::dungeons::{DungeonGroupId, DungeonId};
+<span class="kw">use </span><span class="kw">crate</span>::api::enums::{
+    DungeonObjective, FloorLoopStatus, FloorType, ForcedLossReason, MissionType, MissionTypeGroup,
+    Weather,
+};
 <span class="kw">use </span><span class="kw">crate</span>::api::iq::IqSkillId;
 <span class="kw">use </span><span class="kw">crate</span>::api::items::ItemId;
 <span class="kw">use </span><span class="kw">crate</span>::api::monsters::MonsterSpeciesId;
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::OverlayLoadLease;
-<span class="kw">use </span><span class="kw">crate</span>::api::types::MonsterTypeId;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span>alloc::vec::Vec;
 
@@ -2679,6 +2711,15 @@
         </span><span class="kw">unsafe </span>{ ffi::GetForcedLossReason() }.try_into().ok()
     }
 
+    <span class="doccomment">/// Tries to change the current leader to the monster specified by [`ffi::dungeon::new_leader`].
+    /// Accounts for situations that can prevent changing leaders, such as having stolen from a
+    /// Kecleon shop. If one of those situations prevents changing leaders, prints the
+    /// corresponding message to the message log.
+    </span><span class="kw">pub fn </span>change_leader(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::ChangeLeader() }
+    }
+
     <span class="doccomment">/// Gets the sprite index of the specified monster on this floor
     </span><span class="kw">pub fn </span>get_monster_sprite_index(<span class="kw-2">&amp;</span><span class="self">self</span>, monster_idx: MonsterSpeciesId) -&gt; u16 {
         <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
@@ -2963,8 +3004,8 @@
     </span><span class="kw">pub unsafe fn </span>init_team_member(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         arg1: MonsterSpeciesId,
-        type_1: MonsterTypeId,
-        type_2: MonsterTypeId,
+        x_pos: i16,
+        y_pos: i16,
         team_member_data: <span class="kw-2">&amp;mut </span>ffi::team_member,
         param_5: ffi::undefined,
         param_6: ffi::undefined,
@@ -2974,8 +3015,8 @@
     ) {
         ffi::InitTeamMember(
             arg1,
-            type_1,
-            type_2,
+            x_pos,
+            y_pos,
             team_member_data,
             param_5,
             param_6,
@@ -3040,6 +3081,23 @@
     /// The underlying function [`ffi::CheckTeamMemberField8`] does not need overlay29 to be loaded.
     </span><span class="kw">pub fn </span>check_team_member_field_8(<span class="kw-2">&amp;</span><span class="self">self</span>, team_member: <span class="kw-2">&amp;</span>ffi::team_member) -&gt; bool {
         <span class="kw">unsafe </span>{ ffi::CheckTeamMemberField8(team_member.field_0x8) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Checks whether any of the items in the bag or any of the items carried by team members has
+    /// any of the specified flags set in its flags field:
+    ///
+    /// `(0 = f_exists, 1 = f_in_shop, 2 = f_unpaid, etc.)`
+    ///
+    /// Returns true if any of the items of the team has the specified flags set, false otherwise.
+    </span><span class="kw">pub fn </span>check_team_items_flag(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: i32) -&gt; bool {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::CheckTeamItemsFlags(flags) &gt; <span class="number">0 </span>}
+    }
+
+    <span class="doccomment">/// Checks if there&#39;s an active challenge request on the current dungeon.
+    </span><span class="kw">pub fn </span>check_active_challenge_request(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="comment">// SAFETY: We hold a valid mutable reference to the global dungeon struct.
+        </span><span class="kw">unsafe </span>{ ffi::CheckActiveChallengeRequest() &gt; <span class="number">0 </span>}
     }
 
     <span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;eu&quot;</span>)))]
@@ -3243,4 +3301,4 @@
     res
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (c0983a9aa 2022-10-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (6b3ede3f7 2022-10-13)" ></div></body></html>

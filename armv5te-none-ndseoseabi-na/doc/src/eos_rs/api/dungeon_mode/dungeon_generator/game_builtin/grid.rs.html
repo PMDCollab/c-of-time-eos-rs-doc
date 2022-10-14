@@ -692,7 +692,7 @@
         ov29: OverlayLoadLease&lt;<span class="number">29</span>&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(width &lt;= GRID_CAPACITY_DIM &amp;&amp; height &lt;= GRID_CAPACITY_DIM);
-        <span class="macro">assert!</span>(in_cells.len() &gt;= width <span class="kw">as </span>usize * height <span class="kw">as </span>usize);
+        <span class="macro">assert!</span>(in_cells.len() &gt;= width * height);
 
         <span class="kw">let </span><span class="kw-2">mut </span>cells_iter = in_cells.into_iter().peekable();
 
@@ -745,7 +745,7 @@
         <span class="kw">let </span>height = GRID_CAPACITY_DIM;
         <span class="macro">assert!</span>(width &lt;= GRID_CAPACITY_DIM);
         <span class="comment">// The game stops after the last column that had cells, so this is the actual capacity:
-        </span><span class="kw">let </span>min_grid_size = (GRID_CAPACITY_DIM * (width - <span class="number">1</span>) + height) <span class="kw">as </span>usize;
+        </span><span class="kw">let </span>min_grid_size = GRID_CAPACITY_DIM * (width - <span class="number">1</span>) + height;
         <span class="kw">let </span><span class="kw-2">mut </span>cells;
         <span class="comment">// SAFETY: We know the grid vector will be big enough.
         //         We also know the height is at least 15, so all cells will be initialized.
@@ -1187,4 +1187,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (c0983a9aa 2022-10-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (6b3ede3f7 2022-10-13)" ></div></body></html>
