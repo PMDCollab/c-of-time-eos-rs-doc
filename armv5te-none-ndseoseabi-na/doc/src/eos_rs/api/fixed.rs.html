@@ -163,12 +163,12 @@
 <span class="kw">pub use </span>fixed::{FixedI16, FixedI32, FixedI8, FixedU16, FixedU32, FixedU8};
 
 <span class="comment">// Since doctests don&#39;t work, we turn the doctest into a normal unit test here.
-</span><span class="attribute">#[cfg(test)]
+</span><span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span><span class="kw">super</span>::I24F8;
     <span class="kw">use </span>alloc::format;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_documentation() {
         <span class="kw">let </span>n1 = I24F8::from_num(<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(n1, <span class="number">10.0</span>);
@@ -187,4 +187,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

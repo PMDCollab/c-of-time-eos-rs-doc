@@ -145,7 +145,7 @@
 /// overlay 29 will always be loaded.
 </span><span class="kw">impl </span>DungeonEntity {
     <span class="doccomment">/// Checks if a given entity is actually valid.
-    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="attr">#[allow(clippy::not_unsafe_ptr_arg_deref)]
     </span><span class="kw">pub fn </span>is_valid(slf: <span class="kw-2">*mut </span><span class="self">Self</span>) -&gt; bool {
         <span class="comment">// SAFETY: The lease passed into the function promises us that the overlay is loaded.
         //         Since this function is intended to actually check if the entity is valid,
@@ -249,4 +249,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

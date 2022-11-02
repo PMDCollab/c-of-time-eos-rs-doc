@@ -1012,9 +1012,9 @@
 /// # Important safety note
 /// Please see the safety note of [`DungeonEntity`]. It also applies to this trait.
 </span><span class="kw">pub trait </span>DungeonMonsterRead: private::Sealed {
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">fn </span>entity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DungeonEntity;
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">fn </span>monster(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ffi::monster;
 
     <span class="doccomment">/// Checks if the monster is a special story ally.
@@ -1639,9 +1639,9 @@
 /// # Important safety note
 /// Please see the safety note of [`DungeonEntity`]. It also applies to this trait.
 </span><span class="kw">pub trait </span>DungeonMonsterWrite: private::Sealed {
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">fn </span>entity_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>DungeonEntity;
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">fn </span>monster_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>ffi::monster;
 
     <span class="doccomment">/// Updates the PP of any moves that were used the a monster, if PP should be consumed.
@@ -1935,4 +1935,4 @@
     <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sealed <span class="kw">for </span>DungeonMonsterMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

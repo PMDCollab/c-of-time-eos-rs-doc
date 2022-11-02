@@ -739,7 +739,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span><span class="kw">crate</span>::ffi::type_matchup::Type;
 
-<span class="attribute">#[repr(i32)]
+<span class="attr">#[repr(i32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Move index of a monster, used by some functions.
 </span><span class="kw">pub enum </span>TargetTypeIndex {
@@ -747,7 +747,7 @@
     SecondType = <span class="number">1</span>,
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Describes the effectiveness of a move&#39;s type against type(s).
 </span><span class="kw">pub enum </span>DungeonTypeMatchup {
@@ -773,7 +773,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The type of an entity in a dungeon.
 </span><span class="kw">pub enum </span>DungeonEntityType {
@@ -799,7 +799,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The gender of a monster.
 </span><span class="kw">pub enum </span>MonsterGender {
@@ -822,7 +822,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The category of a move.
 </span><span class="kw">pub enum </span>MoveCategory {
@@ -846,7 +846,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The type of a floor.
 </span><span class="kw">pub enum </span>FloorType {
@@ -871,7 +871,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The type of terrain of a tile.
 </span><span class="kw">pub enum </span>TerrainType {
@@ -895,7 +895,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The type of secondary terrain of a tile.
 </span><span class="kw">pub enum </span>SecondaryTerrainType {
@@ -917,7 +917,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Types of weather.
 </span><span class="kw">pub enum </span>Weather {
@@ -951,7 +951,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Types of weather.
 </span><span class="kw">pub enum </span>DungeonObjective {
@@ -973,7 +973,7 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]
+<span class="attr">#[repr(i32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Direction on the dungeon grid
 </span><span class="kw">pub enum </span>Direction {
@@ -1007,7 +1007,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Different types of warp effects
 </span><span class="kw">pub enum </span>WarpType {
@@ -1041,7 +1041,7 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]
+<span class="attr">#[repr(i32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// The status of a monster&#39;s Conversion 2 state.
 </span><span class="kw">pub enum </span>Conversion2Status {
@@ -1066,7 +1066,7 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]
+<span class="attr">#[repr(i32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Controls whether the loop that runs until the current floor ends should continue
 /// iterating or not and why
@@ -1092,7 +1092,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Indicates whether or not the attempt of generating a mission was successful or not.
 </span><span class="kw">pub enum </span>MissionGenerationResult {
@@ -1123,7 +1123,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Group of mission type on a dungeon floor.
 </span><span class="kw">pub enum </span>MissionTypeGroup {
@@ -1171,7 +1171,7 @@
     }
 }
 
-<span class="attribute">#[derive(PartialEq, Eq, Clone, Copy)]
+<span class="attr">#[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Specific mission type on a dungeon floor.
 </span><span class="kw">pub enum </span>MissionType {
     RescueClient,
@@ -1256,7 +1256,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Mission subtype for [`MissionType::ExploreWithClient`].
 </span><span class="kw">pub enum </span>MissionSubtypeExplore {
@@ -1293,7 +1293,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Mission subtype for [`MissionType::TakeItemFromOutlaw`].
 </span><span class="kw">pub enum </span>MissionSubtypeTakeItem {
@@ -1330,7 +1330,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Mission subtype for [`MissionType::ArrestOutlaw`].
 </span><span class="kw">pub enum </span>MissionSubtypeOutlaw {
@@ -1385,7 +1385,7 @@
     }
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Mission subtype for [`MissionType::ChallengeRequest`].
 </span><span class="kw">pub enum </span>MissionSubtypeChallenge {
@@ -1434,7 +1434,7 @@
     }
 }
 
-<span class="attribute">#[repr(i32)]
+<span class="attr">#[repr(i32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// List of reasons why you can get forcefully kicked out of a dungeon.
 </span><span class="kw">pub enum </span>ForcedLossReason {
@@ -1473,4 +1473,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

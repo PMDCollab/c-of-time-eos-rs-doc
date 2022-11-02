@@ -669,13 +669,13 @@
 <span class="kw">use </span>core::ptr;
 
 <span class="doccomment">/// Describes an active team setup
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 </span><span class="kw">pub enum </span>TeamSetup {
     HeroOnly,
     HeroAndPartnerOnly,
 }
 
-<span class="attribute">#[repr(i32)]
+<span class="attr">#[repr(i32)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 </span><span class="doccomment">/// Move index of a monster, used by some functions.
 </span><span class="kw">pub enum </span>TargetTypeIndex {
@@ -683,7 +683,7 @@
     SecondType = <span class="number">1</span>,
 }
 
-<span class="attribute">#[repr(u32)]
+<span class="attr">#[repr(u32)]
 #[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq)]
 </span><span class="doccomment">/// The rank a player scored in the sentry duty (footprint) minigame.
 </span><span class="kw">pub enum </span>SentryGameRank {
@@ -1062,7 +1062,7 @@
 
     <span class="comment">// As far as we know by checking the ASM the functions only check the first byte of the struct
     // passed in, so this should be safe enough.
-    </span><span class="attribute">#[repr(C)]
+    </span><span class="attr">#[repr(C)]
     </span><span class="kw">struct </span>MissionSubtypeStruct {
         subtype: ffi::mission_subtype,
     }
@@ -1313,4 +1313,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

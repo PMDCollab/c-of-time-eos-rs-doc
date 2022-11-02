@@ -23,7 +23,7 @@ for log macros to work.</p>
 <h4 id="syntax-of-argument"><a href="#syntax-of-argument">Syntax of argument</a></h4>
 <p><code>&lt;Function Name; Rust Identifier&gt;</code></p>
 <h4 id="signature-of-raw-patch-functions-registered-this-way"><a href="#signature-of-raw-patch-functions-registered-this-way">Signature of raw patch functions registered this way:</a></h4>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[no_mangle] </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>function(<span class="comment">/* ? */</span>) <span class="comment">/* -&gt; ? */ </span>{ <span class="comment">/* ... */ </span>}</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[no_mangle] </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>function(<span class="comment">/* ? */</span>) <span class="comment">/* -&gt; ? */ </span>{ <span class="comment">/* ... */ </span>}</code></pre></div>
 <p>Can be optionally marked unsafe.</p>
 <h4 id="note"><a href="#note">Note</a></h4>
 <p>At the present time, defining raw patches in this macro doesn’t actually do anything.
@@ -79,7 +79,7 @@ file that is placed in the <code>patches/</code> directory of <code>c-of-time</c
 ///
 /// NOTE: By default `src/item_effects.c` is written in a way that will only call
 /// the Rust codebase, if there is no item effect already defined in C code.
-</span><span class="attribute">#[no_mangle]
+</span><span class="attr">#[no_mangle]
 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>eos_rs_apply_item_effect(
     user: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
     target: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
@@ -88,7 +88,7 @@ file that is placed in the <code>patches/</code> directory of <code>c-of-time</c
 ) -&gt; eos_rs::ffi::bool_ { <span class="comment">/* ... */ </span>}
 
 <span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for move effects.
-</span><span class="attribute">#[no_mangle]
+</span><span class="attr">#[no_mangle]
 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>eos_rs_apply_move_effect(
     data: <span class="kw-2">*mut </span>eos_rs::ffi::move_effect_input,
     user: <span class="kw-2">*mut </span>eos_rs::ffi::entity,
@@ -97,7 +97,7 @@ file that is placed in the <code>patches/</code> directory of <code>c-of-time</c
 ) -&gt; eos_rs::ffi::bool_ { <span class="comment">/* ... */ </span>}
 
 <span class="doccomment">/// See `eos_rs_apply_item_effect`, this is exactly the same, but for special processes.
-</span><span class="attribute">#[no_mangle]
+</span><span class="attr">#[no_mangle]
 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>eos_rs_call_special_process(
     unknown: <span class="kw-2">*mut </span>eos_rs::ffi::undefined4,
     special_process_id: eos_rs::ctypes::c_uint,
@@ -126,4 +126,4 @@ HasLowHealth+0:
 during build.
 It will extract the ASM glue code to the <code>patches/</code> directory in the <code>c-of-time</code>
 base directory (in the default configuration of the <code>c-of-time</code> repository.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

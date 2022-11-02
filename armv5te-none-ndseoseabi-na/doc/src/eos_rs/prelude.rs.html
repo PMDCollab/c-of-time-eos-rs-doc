@@ -18,17 +18,17 @@
 //! and set up the allocator and panic handler.
 //! Logging macros of the [`log`] crate are also included.
 
-</span><span class="attribute">#[cfg(not(test))]
+</span><span class="attr">#[cfg(not(test))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::allocation::ALLOCATOR;
-<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;io&quot;</span>)))]
+<span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;io&quot;</span>)))]
 #[cfg(feature = <span class="string">&quot;io&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::api::io::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(not(test))]
+<span class="attr">#[cfg(not(test))]
 #[allow(unused_imports)]
 </span><span class="comment">// I&#39;m not sure if without this import the panic_handler will be registered.
 </span><span class="kw">pub use </span><span class="kw">crate</span>::panic::<span class="kw-2">*</span>;
-<span class="attribute">#[doc(hidden)] </span><span class="comment">// So it&#39;s not documented twice.
+<span class="attr">#[doc(hidden)] </span><span class="comment">// So it&#39;s not documented twice.
 </span><span class="kw">pub use </span><span class="kw">crate</span>::patches;
 <span class="kw">pub use </span>log::{debug, error, info, trace, warn};
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

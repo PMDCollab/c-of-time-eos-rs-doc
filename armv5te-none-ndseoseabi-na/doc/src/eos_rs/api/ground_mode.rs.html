@@ -234,13 +234,13 @@
 <span id="234">234</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits, structs and functions related to ground mode.
 
-</span><span class="attribute">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
+</span><span class="attr">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
 </span><span class="kw">use </span><span class="kw">crate</span>::api::gameplay;
-<span class="attribute">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
+<span class="attr">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
 </span><span class="kw">use </span><span class="kw">crate</span>::api::items;
 <span class="kw">use </span><span class="kw">crate</span>::api::monsters::MonsterSpeciesId;
 <span class="kw">use </span><span class="kw">crate</span>::api::overlay::{CreatableWithLease, OverlayLoadLease};
-<span class="attribute">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
+<span class="attr">#[allow(unused_imports)] </span><span class="comment">// for easier reference in the docs of script_special_process_call
 </span><span class="kw">use </span><span class="kw">crate</span>::api::script_vars::ScriptOpcodeId;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 
@@ -441,7 +441,7 @@
     /// # Parameters
     /// * `size` - initial memory arena pointer, or null.
     /// * `flags` - `MemAlloc` flags.
-    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="attr">#[allow(clippy::not_unsafe_ptr_arg_deref)]
     </span><span class="kw">pub fn </span>get_alloc_arena_ground(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         arena: <span class="kw-2">*mut </span>ffi::mem_arena,
@@ -457,7 +457,7 @@
     /// # Parameters
     /// * `size` - initial memory arena pointer, or null.
     /// * `flags` - `MemAlloc` flags.
-    </span><span class="attribute">#[allow(clippy::not_unsafe_ptr_arg_deref)]
+    </span><span class="attr">#[allow(clippy::not_unsafe_ptr_arg_deref)]
     </span><span class="kw">pub fn </span>get_free_arena_ground(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         arena: <span class="kw-2">*mut </span>ffi::mem_arena,
@@ -467,4 +467,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

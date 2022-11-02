@@ -950,7 +950,7 @@
 ///
 /// You can convert into this from [`script_var_type::Type`] with
 /// [`TryInto::try_into`] / [`TryFrom::try_from`].
-</span><span class="attribute">#[repr(u32)]
+</span><span class="attr">#[repr(u32)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 </span><span class="kw">pub enum </span>ScriptVariableValueType {
     <span class="prelude-val">None </span>= script_var_type::VARTYPE_NONE,
@@ -986,7 +986,7 @@
 }
 
 <span class="doccomment">/// Value of a script variable.
-</span><span class="attribute">#[derive(Clone, Eq, PartialEq)]
+</span><span class="attr">#[derive(Clone, Eq, PartialEq)]
 </span><span class="kw">pub enum </span>ScriptVariableValue {
     <span class="prelude-val">None</span>,
     Bit(bool),
@@ -1347,7 +1347,7 @@
 
 <span class="doccomment">/// Read actions for script variables.
 </span><span class="kw">pub trait </span>ScriptVariableRead: PartialEq + Eq {
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">fn </span>internal_local_var_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_void;
 
     <span class="doccomment">/// Returns the variable ID
@@ -1725,4 +1725,4 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScriptVariableWrite <span class="kw">for </span>LocalScriptVariableMut&lt;<span class="lifetime">&#39;a</span>&gt; {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>

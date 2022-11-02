@@ -16,11 +16,11 @@
 
 <span class="kw">use </span>core::fmt::Debug;
 
-<span class="attribute">#[inline(always)]
+<span class="attr">#[inline(always)]
 </span><span class="doccomment">/// Converts a Rust String to a CString.
 </span><span class="kw">pub fn </span>str_to_cstring&lt;S: AsRef&lt;str&gt; + Debug&gt;(s: S) -&gt; CString {
     CString::new(s.as_ref())
         .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Was unable to convert {:?} to CString.&quot;</span>, s.as_ref()))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="eos_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>
