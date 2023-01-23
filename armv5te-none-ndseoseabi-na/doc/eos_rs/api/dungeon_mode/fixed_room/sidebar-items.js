@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["DungeonFixedRoomIdExt","Extension trait for [`FixedRoomId`] specific to dungeon mode."]]};

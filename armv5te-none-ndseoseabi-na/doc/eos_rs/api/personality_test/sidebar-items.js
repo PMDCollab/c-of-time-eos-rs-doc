@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["get_personality","Returns the personality obtained after answering all the questions."]]};
+window.SIDEBAR_ITEMS = {"fn":[["get_option_string_from_id","No description available."],["get_personality","Returns the personality obtained after answering all the questions."],["wait_for_next_step","No description available."]]};

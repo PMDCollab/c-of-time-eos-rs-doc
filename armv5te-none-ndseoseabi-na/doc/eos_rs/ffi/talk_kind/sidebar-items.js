@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["TALK_HERO_FEMALE",""],["TALK_HERO_MALE",""],["TALK_NONE",""],["TALK_PARTNER_DEFAULT",""],["TALK_PARTNER_FEMALE_SPECIAL",""],["TALK_PARTNER_MALE_SPECIAL",""]],"type":[["Type",""]]};
