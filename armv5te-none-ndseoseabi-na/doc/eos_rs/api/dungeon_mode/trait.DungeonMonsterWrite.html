@@ -5,7 +5,11 @@
 <span class="item-spacer"></span>    fn <a href="#method.try_weather_form_change" class="fn">try_weather_form_change</a>(&amp;mut self) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.restore_pp_for_all_moves_set_flags" class="fn">restore_pp_for_all_moves_set_flags</a>(&amp;mut self) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.evolve_this_enemy_if_should" class="fn">evolve_this_enemy_if_should</a>(&amp;mut self) { ... }
-<span class="item-spacer"></span>    unsafe fn <a href="#method.evolve" class="fn">evolve</a>(<br>        &amp;mut self,<br>        param_2: &amp;mut <a class="type" href="../../ffi/type.undefined4.html" title="type eos_rs::ffi::undefined4">undefined4</a>,<br>        new_monster_idx: <a class="type" href="../monsters/type.MonsterSpeciesId.html" title="type eos_rs::api::monsters::MonsterSpeciesId">MonsterSpeciesId</a><br>    ) { ... }
+<span class="item-spacer"></span>    unsafe fn <a href="#method.evolve" class="fn">evolve</a>(
+        &amp;mut self,
+        param_2: &amp;mut <a class="type" href="../../ffi/type.undefined4.html" title="type eos_rs::ffi::undefined4">undefined4</a>,
+        new_monster_idx: <a class="type" href="../monsters/type.MonsterSpeciesId.html" title="type eos_rs::api::monsters::MonsterSpeciesId">MonsterSpeciesId</a>
+    ) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.calc_speed_stage" class="fn">calc_speed_stage</a>(&amp;mut self, counter_weight: i32) -&gt; i32 { ... }
 <span class="item-spacer"></span>    fn <a href="#method.set_reflect_damage_countdown_to_four" class="fn">set_reflect_damage_countdown_to_four</a>(&amp;mut self) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.execute_action" class="fn">execute_action</a>(&amp;mut self) { ... }
@@ -16,12 +20,27 @@
 <span class="item-spacer"></span>    fn <a href="#method.set_monster_action_fields" class="fn">set_monster_action_fields</a>(&amp;mut self, action_id: <a class="type" href="../../ffi/action/type.Type.html" title="type eos_rs::ffi::action::Type">Type</a>) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.set_action_pass_turn_or_walk" class="fn">set_action_pass_turn_or_walk</a>(&amp;mut self, monster_id: <a class="type" href="../monsters/type.MonsterSpeciesId.html" title="type eos_rs::api::monsters::MonsterSpeciesId">MonsterSpeciesId</a>) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.set_action_regular_attack" class="fn">set_action_regular_attack</a>(&amp;mut self, direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a>) { ... }
-<span class="item-spacer"></span>    unsafe fn <a href="#method.set_action_use_move_ai_unchecked" class="fn">set_action_use_move_ai_unchecked</a>(<br>        &amp;mut self,<br>        move_index: u8,<br>        direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a><br>    ) { ... }
+<span class="item-spacer"></span>    unsafe fn <a href="#method.set_action_use_move_ai_unchecked" class="fn">set_action_use_move_ai_unchecked</a>(
+        &amp;mut self,
+        move_index: u8,
+        direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a>
+    ) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.set_action_use_move_ai" class="fn">set_action_use_move_ai</a>(&amp;mut self, move_index: u8, direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a>) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.update_ai_target_pos" class="fn">update_ai_target_pos</a>(&amp;mut self) { ... }
 <span class="item-spacer"></span>    unsafe fn <a href="#method.run_ai" class="fn">run_ai</a>(&amp;mut self, param: <a class="type" href="../../ffi/type.undefined.html" title="type eos_rs::ffi::undefined">undefined</a>) { ... }
-<span class="item-spacer"></span>    fn <a href="#method.ai_consider_move" class="fn">ai_consider_move</a>(<br>        &amp;mut self,<br>        ai_possible_move: &amp;mut <a class="struct" href="../../ffi/struct.ai_possible_move.html" title="struct eos_rs::ffi::ai_possible_move">ai_possible_move</a>,<br>        the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a><br>    ) -&gt; i32 { ... }
-<span class="item-spacer"></span>    unsafe fn <a href="#method.try_add_target_to_ai_target_list" class="fn">try_add_target_to_ai_target_list</a>(<br>        &amp;mut self,<br>        current_num_targets: i32,<br>        move_ai_range: <a class="struct" href="../moves/struct.MoveTargetAndRange.html" title="struct eos_rs::api::moves::MoveTargetAndRange">MoveTargetAndRange</a>,<br>        target: &amp;<a class="type" href="type.DungeonEntity.html" title="type eos_rs::api::dungeon_mode::DungeonEntity">DungeonEntity</a>,<br>        the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a>,<br>        check_all_conditions: bool<br>    ) -&gt; i32 { ... }
+<span class="item-spacer"></span>    fn <a href="#method.ai_consider_move" class="fn">ai_consider_move</a>(
+        &amp;mut self,
+        ai_possible_move: &amp;mut <a class="struct" href="../../ffi/struct.ai_possible_move.html" title="struct eos_rs::ffi::ai_possible_move">ai_possible_move</a>,
+        the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a>
+    ) -&gt; i32 { ... }
+<span class="item-spacer"></span>    unsafe fn <a href="#method.try_add_target_to_ai_target_list" class="fn">try_add_target_to_ai_target_list</a>(
+        &amp;mut self,
+        current_num_targets: i32,
+        move_ai_range: <a class="struct" href="../moves/struct.MoveTargetAndRange.html" title="struct eos_rs::api::moves::MoveTargetAndRange">MoveTargetAndRange</a>,
+        target: &amp;<a class="type" href="type.DungeonEntity.html" title="type eos_rs::api::dungeon_mode::DungeonEntity">DungeonEntity</a>,
+        the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a>,
+        check_all_conditions: bool
+    ) -&gt; i32 { ... }
 <span class="item-spacer"></span>    fn <a href="#method.update_status_icon_flags" class="fn">update_status_icon_flags</a>(&amp;mut self) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.set_monster_type_and_ability" class="fn">set_monster_type_and_ability</a>(&amp;mut self) { ... }
 <span class="item-spacer"></span>    fn <a href="#method.change_shaymin_forme" class="fn">change_shaymin_forme</a>(&amp;mut self, mode: i32) -&gt; i32 { ... }
@@ -40,7 +59,11 @@ to it.</p>
 <p>Called when a monster is revived.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.evolve_this_enemy_if_should" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#796-798">source</a><h4 class="code-header">fn <a href="#method.evolve_this_enemy_if_should" class="fn">evolve_this_enemy_if_should</a>(&amp;mut self)</h4></section></summary><div class="docblock"><p>Checks if the specified enemy should evolve because it just defeated an ally, and if so,
 attempts to evolve it.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.evolve" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#804-806">source</a><h4 class="code-header">unsafe fn <a href="#method.evolve" class="fn">evolve</a>(<br>    &amp;mut self,<br>    param_2: &amp;mut <a class="type" href="../../ffi/type.undefined4.html" title="type eos_rs::ffi::undefined4">undefined4</a>,<br>    new_monster_idx: <a class="type" href="../monsters/type.MonsterSpeciesId.html" title="type eos_rs::api::monsters::MonsterSpeciesId">MonsterSpeciesId</a><br>)</h4></section></summary><div class="docblock"><p>Makes the specified monster evolve into the specified species.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.evolve" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#804-806">source</a><h4 class="code-header">unsafe fn <a href="#method.evolve" class="fn">evolve</a>(
+    &amp;mut self,
+    param_2: &amp;mut <a class="type" href="../../ffi/type.undefined4.html" title="type eos_rs::ffi::undefined4">undefined4</a>,
+    new_monster_idx: <a class="type" href="../monsters/type.MonsterSpeciesId.html" title="type eos_rs::api::monsters::MonsterSpeciesId">MonsterSpeciesId</a>
+)</h4></section></summary><div class="docblock"><p>Makes the specified monster evolve into the specified species.</p>
 <h5 id="safety"><a href="#safety">Safety</a></h5>
 <p>The caller must make sure the undefined params are valid for this function.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.calc_speed_stage" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#816-818">source</a><h4 class="code-header">fn <a href="#method.calc_speed_stage" class="fn">calc_speed_stage</a>(&amp;mut self, counter_weight: i32) -&gt; i32</h4></section></summary><div class="docblock"><p>Calculates the speed stage of a monster from its speed up/down counters. The second
@@ -72,7 +95,11 @@ The last 2 are always set to 0.</p>
 <a href="../../ffi/struct.monster_id.html#method.get_can_move_flag" title="MonsterSpeciesId::get_can_move_flag"><code>MonsterSpeciesId::get_can_move_flag</code></a> for the monster’s ID.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.set_action_regular_attack" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#894-901">source</a><h4 class="code-header">fn <a href="#method.set_action_regular_attack" class="fn">set_action_regular_attack</a>(&amp;mut self, direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a>)</h4></section></summary><div class="docblock"><p>Sets a monster’s action to <a href="../../ffi/action/constant.ACTION_REGULAR_ATTACK.html" title="ffi::action::ACTION_REGULAR_ATTACK"><code>ffi::action::ACTION_REGULAR_ATTACK</code></a>,
 with a specified direction.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.set_action_use_move_ai_unchecked" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#908-914">source</a><h4 class="code-header">unsafe fn <a href="#method.set_action_use_move_ai_unchecked" class="fn">set_action_use_move_ai_unchecked</a>(<br>    &amp;mut self,<br>    move_index: u8,<br>    direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a><br>)</h4></section></summary><div class="docblock"><p>Sets a monster’s action to <a href="../../ffi/action/constant.ACTION_USE_MOVE_AI.html" title="ffi::action::ACTION_USE_MOVE_AI"><code>ffi::action::ACTION_USE_MOVE_AI</code></a>, with a specified direction and
+</div></details><details class="toggle method-toggle" open><summary><section id="method.set_action_use_move_ai_unchecked" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#908-914">source</a><h4 class="code-header">unsafe fn <a href="#method.set_action_use_move_ai_unchecked" class="fn">set_action_use_move_ai_unchecked</a>(
+    &amp;mut self,
+    move_index: u8,
+    direction: <a class="enum" href="../enums/enum.Direction.html" title="enum eos_rs::api::enums::Direction">Direction</a>
+)</h4></section></summary><div class="docblock"><p>Sets a monster’s action to <a href="../../ffi/action/constant.ACTION_USE_MOVE_AI.html" title="ffi::action::ACTION_USE_MOVE_AI"><code>ffi::action::ACTION_USE_MOVE_AI</code></a>, with a specified direction and
 move index.</p>
 <h5 id="safety-2"><a href="#safety-2">Safety</a></h5>
 <p>The caller must make sure the move index is not out of bounds (normally 0-3).</p>
@@ -85,7 +112,11 @@ the direction in which it plans to attack.</p>
 it should perform if so.</p>
 <h5 id="safety-3"><a href="#safety-3">Safety</a></h5>
 <p>The caller must make sure the undefined params are valid for this function.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.ai_consider_move" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#954-966">source</a><h4 class="code-header">fn <a href="#method.ai_consider_move" class="fn">ai_consider_move</a>(<br>    &amp;mut self,<br>    ai_possible_move: &amp;mut <a class="struct" href="../../ffi/struct.ai_possible_move.html" title="struct eos_rs::ffi::ai_possible_move">ai_possible_move</a>,<br>    the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a><br>) -&gt; i32</h4></section></summary><div class="docblock"><p>The AI uses this function to check if a move has any potential targets, to calculate the
+</div></details><details class="toggle method-toggle" open><summary><section id="method.ai_consider_move" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#954-966">source</a><h4 class="code-header">fn <a href="#method.ai_consider_move" class="fn">ai_consider_move</a>(
+    &amp;mut self,
+    ai_possible_move: &amp;mut <a class="struct" href="../../ffi/struct.ai_possible_move.html" title="struct eos_rs::ffi::ai_possible_move">ai_possible_move</a>,
+    the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a>
+) -&gt; i32</h4></section></summary><div class="docblock"><p>The AI uses this function to check if a move has any potential targets, to calculate the
 list of potential targets and to calculate the move’s special weight.
 This weight will be higher if the monster has weak-type picker and the target is weak to the
 move (allies only, enemies always get a result of 1 even if the move is super effective).
@@ -95,7 +126,14 @@ sense to use it.
 More research is needed. There’s more documentation about this special weight. Does all the
 documented behavior happen in this function?</p>
 <p>Returns the move’s calculated weight</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.try_add_target_to_ai_target_list" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#984-1001">source</a><h4 class="code-header">unsafe fn <a href="#method.try_add_target_to_ai_target_list" class="fn">try_add_target_to_ai_target_list</a>(<br>    &amp;mut self,<br>    current_num_targets: i32,<br>    move_ai_range: <a class="struct" href="../moves/struct.MoveTargetAndRange.html" title="struct eos_rs::api::moves::MoveTargetAndRange">MoveTargetAndRange</a>,<br>    target: &amp;<a class="type" href="type.DungeonEntity.html" title="type eos_rs::api::dungeon_mode::DungeonEntity">DungeonEntity</a>,<br>    the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a>,<br>    check_all_conditions: bool<br>) -&gt; i32</h4></section></summary><div class="docblock"><p>Checks if the specified target is eligible to be targeted by the AI and if so adds it to
+</div></details><details class="toggle method-toggle" open><summary><section id="method.try_add_target_to_ai_target_list" class="method"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#984-1001">source</a><h4 class="code-header">unsafe fn <a href="#method.try_add_target_to_ai_target_list" class="fn">try_add_target_to_ai_target_list</a>(
+    &amp;mut self,
+    current_num_targets: i32,
+    move_ai_range: <a class="struct" href="../moves/struct.MoveTargetAndRange.html" title="struct eos_rs::api::moves::MoveTargetAndRange">MoveTargetAndRange</a>,
+    target: &amp;<a class="type" href="type.DungeonEntity.html" title="type eos_rs::api::dungeon_mode::DungeonEntity">DungeonEntity</a>,
+    the_move: &amp;<a class="type" href="../moves/type.Move.html" title="type eos_rs::api::moves::Move">Move</a>,
+    check_all_conditions: bool
+) -&gt; i32</h4></section></summary><div class="docblock"><p>Checks if the specified target is eligible to be targeted by the AI and if so adds it to
 the list of targets. This function also fills an array that seems to contain the directions
 in which the user should turn to look at each of the targets in the list, as well as a
 third unknown array.</p>
@@ -127,4 +165,4 @@ Identifier Orb (see <a href="../../ffi/struct.dungeon.html#structfield.identify_
 2: frozen
 3: ok</p>
 <p>Note: unverified, ported from Irdkwia’s notes</p>
-</div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-DungeonMonsterWrite-for-DungeonMonsterMut%3C%27a%3E" class="impl"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#1071-1079">source</a><a href="#impl-DungeonMonsterWrite-for-DungeonMonsterMut%3C%27a%3E" class="anchor">§</a><h3 class="code-header">impl&lt;'a&gt; <a class="trait" href="trait.DungeonMonsterWrite.html" title="trait eos_rs::api::dungeon_mode::DungeonMonsterWrite">DungeonMonsterWrite</a> for <a class="struct" href="struct.DungeonMonsterMut.html" title="struct eos_rs::api::dungeon_mode::DungeonMonsterMut">DungeonMonsterMut</a>&lt;'a&gt;</h3></section></div><script src="../../../implementors/eos_rs/api/dungeon_mode/monster/trait.DungeonMonsterWrite.js" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="eos_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (bd39bbb4b 2023-02-07)" data-search-js="search-28136cea55c34037.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-DungeonMonsterWrite-for-DungeonMonsterMut%3C%27a%3E" class="impl"><a class="srclink rightside" href="../../../src/eos_rs/api/dungeon_mode/monster.rs.html#1071-1079">source</a><a href="#impl-DungeonMonsterWrite-for-DungeonMonsterMut%3C%27a%3E" class="anchor">§</a><h3 class="code-header">impl&lt;'a&gt; <a class="trait" href="trait.DungeonMonsterWrite.html" title="trait eos_rs::api::dungeon_mode::DungeonMonsterWrite">DungeonMonsterWrite</a> for <a class="struct" href="struct.DungeonMonsterMut.html" title="struct eos_rs::api::dungeon_mode::DungeonMonsterMut">DungeonMonsterMut</a>&lt;'a&gt;</h3></section></div><script src="../../../implementors/eos_rs/api/dungeon_mode/monster/trait.DungeonMonsterWrite.js" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="eos_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (ef934d9b6 2023-02-08)" data-search-js="search-28136cea55c34037.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
