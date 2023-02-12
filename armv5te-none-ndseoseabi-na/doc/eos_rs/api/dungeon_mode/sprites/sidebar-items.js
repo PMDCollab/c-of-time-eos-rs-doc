@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["DungeonSpriteHandler","Helper struct for dealing with sprite data in dungeon mode."]]};
+window.SIDEBAR_ITEMS = {"struct":["DungeonSpriteHandler"]};

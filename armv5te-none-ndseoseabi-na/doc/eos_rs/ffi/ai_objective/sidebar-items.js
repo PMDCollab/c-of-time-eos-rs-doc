@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["AI_CHASE_REMEMBERED_TARGET",""],["AI_CHASE_TARGET",""],["AI_LEAVE_ROOM",""],["AI_ROAM",""],["AI_RUN_AWAY",""],["AI_STAND_STILL",""],["AI_TAKE_ITEM",""],["AI_UNKNOWN",""]],"type":[["Type",""]]};
+window.SIDEBAR_ITEMS = {"constant":["AI_CHASE_REMEMBERED_TARGET","AI_CHASE_TARGET","AI_LEAVE_ROOM","AI_ROAM","AI_RUN_AWAY","AI_STAND_STILL","AI_TAKE_ITEM","AI_UNKNOWN"],"type":["Type"]};

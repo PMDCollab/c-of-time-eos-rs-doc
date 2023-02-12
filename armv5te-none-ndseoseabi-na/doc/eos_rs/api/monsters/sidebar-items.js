@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"type":[["MonsterSpeciesId","A monster species ID with associated methods to get metadata."]]};
+window.SIDEBAR_ITEMS = {"type":["MonsterSpeciesId"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["FAINT_REASON_ITEM_NON_ORB",""],["FAINT_REASON_ITEM_ORB",""]],"type":[["Type",""]]};
+window.SIDEBAR_ITEMS = {"constant":["FAINT_REASON_ITEM_NON_ORB","FAINT_REASON_ITEM_ORB"],"type":["Type"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"type":[["DungeonGroupId","A dungeon ID with associated methods to get metadata."],["DungeonId","A dungeon group ID with associated methods to get metadata."],["FixedRoomId","A fixed room ID with associated methods to get metadata."]]};
+window.SIDEBAR_ITEMS = {"type":["DungeonGroupId","DungeonId","FixedRoomId"]};

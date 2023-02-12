@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["translate_sir0","Translates the offsets in a SIR0 file into NDS memory addresses, changes the magic number to SirO (opened), and returns a pointer to the first pointer specified in the SIR0 header (beginning of the data)."]]};
+window.SIDEBAR_ITEMS = {"fn":["translate_sir0"]};

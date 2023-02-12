@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["GroundModeContext","Misc. and general ground mode functions, guarded by this struct."]],"type":[["SpecialProcessId","A special process ID with associated methods to get metadata."]]};
+window.SIDEBAR_ITEMS = {"struct":["GroundModeContext"],"type":["SpecialProcessId"]};

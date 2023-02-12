@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["FLOOR_TYPE_FIXED",""],["FLOOR_TYPE_NORMAL",""],["FLOOR_TYPE_RESCUE",""]],"type":[["Type",""]]};
+window.SIDEBAR_ITEMS = {"constant":["FLOOR_TYPE_FIXED","FLOOR_TYPE_NORMAL","FLOOR_TYPE_RESCUE"],"type":["Type"]};
