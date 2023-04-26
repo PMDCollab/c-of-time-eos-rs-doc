@@ -1,3 +1,3 @@
 (function() {var implementors = {
-"eos_rs":[["impl GlobalAlloc for <a class=\"struct\" href=\"eos_rs/allocation/struct.EoSCustomAllocator.html\" title=\"struct eos_rs::allocation::EoSCustomAllocator\">EoSCustomAllocator</a>"],["impl GlobalAlloc for <a class=\"struct\" href=\"eos_rs/allocation/struct.EoSDefaultAllocator.html\" title=\"struct eos_rs::allocation::EoSDefaultAllocator\">EoSDefaultAllocator</a>"]]
+"eos_rs":[["impl GlobalAlloc for <a class=\"struct\" href=\"eos_rs/allocation/struct.EoSDefaultAllocator.html\" title=\"struct eos_rs::allocation::EoSDefaultAllocator\">EoSDefaultAllocator</a>"],["impl GlobalAlloc for <a class=\"struct\" href=\"eos_rs/allocation/struct.EoSCustomAllocator.html\" title=\"struct eos_rs::allocation::EoSCustomAllocator\">EoSCustomAllocator</a>"]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
