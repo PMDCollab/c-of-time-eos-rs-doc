@@ -1,3 +1,3 @@
 (function() {var implementors = {
-"eos_rs":[["impl Ord for <a class=\"enum\" href=\"eos_rs/api/gameplay/enum.SentryGameRank.html\" title=\"enum eos_rs::api::gameplay::SentryGameRank\">SentryGameRank</a>"],["impl&lt;Storage: Ord&gt; Ord for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenBitfieldUnit.html\" title=\"struct eos_rs::ffi::__BindgenBitfieldUnit\">__BindgenBitfieldUnit</a>&lt;Storage&gt;"]]
+"eos_rs":[["impl&lt;Storage: Ord&gt; Ord for <a class=\"struct\" href=\"eos_rs/ffi/struct.__BindgenBitfieldUnit.html\" title=\"struct eos_rs::ffi::__BindgenBitfieldUnit\">__BindgenBitfieldUnit</a>&lt;Storage&gt;"],["impl Ord for <a class=\"enum\" href=\"eos_rs/api/gameplay/enum.SentryGameRank.html\" title=\"enum eos_rs::api::gameplay::SentryGameRank\">SentryGameRank</a>"]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
